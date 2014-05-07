@@ -1,0 +1,251 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+
+    Business.Platform.Organize borganize = new Business.Platform.Organize();
+    Business.Platform.Users busers = new Business.Platform.Users();
+    Business.Platform.UsersRelation buserRelation = new Business.Platform.UsersRelation();
+    Data.Model.Users user = null;
+    Data.Model.Organize organize = null;
+    string id = Request.QueryString["id"];
+    string parentID = Request.QueryString["parentid"];
+
+    string name = string.Empty;
+    string account = string.Empty;
+    string status = string.Empty;
+    string note = string.Empty;
+
+    string parentString = string.Empty;
+
+    Guid userID, organizeID;
+    if(id.IsGuid(out userID))
+    {
+        user = busers.Get(userID);
+        if(user!=null)
+        {
+            name = user.Name;
+            account = user.Account;
+            status = user.Status.ToString();
+            note = user.Note;
+
+            //所在组织字符串
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var userRelations = buserRelation.GetAllByUserID(user.ID).OrderByDescending(p => p.IsMain);
+            foreach(var userRelation in userRelations)
+            {
+                sb.Append("<div style='margin:3px 0;'>");
+                sb.Append(borganize.GetAllParentNames(userRelation.OrganizeID, true));
+                if (userRelation.IsMain == 0)
+                {
+                    sb.Append("<span style='color:#999'> [兼职]</span>");
+                }
+                sb.Append("</div>");
+                
+            }
+            parentString = sb.ToString();
+        }
+    }
+    if(parentID.IsGuid(out organizeID))
+    {
+        organize = borganize.Get(organizeID);
+    }
+
+    Validation.RequireFields("Name", "Account", "Status");
+    
+    if(IsPost)
+    {
+        //保存
+        if(!Request.Form["Save"].IsNullOrEmpty() && user!=null && Validation.IsValid())
+        {
+            name = Request.Form["Name"];
+            account = Request.Form["Account"];
+            status = Request.Form["Status"];
+            note = Request.Form["Status"];
+
+            string oldXML = user.Serialize();
+
+            user.Name = name.Trim();
+            user.Account = account.Trim();
+            user.Status = status.AsInt(1);
+            user.Note = note.IsNullOrEmpty() ? null : note.Trim();
+
+            busers.Update(user);
+            Business.Platform.Log.Add("修改了用户", "修改前：" + oldXML + "修改后：" + user.Serialize(), Business.Platform.Log.Types.组织机构);
+            <script type="text/javascript">
+                parent.frames[0].reLoad('@parentID');
+                alert("保存成功!");
+            </script>
+            
+        }
+        
+        //删除用户
+        if (!Request.Form["DeleteBut"].IsNullOrEmpty() && user!=null && organize!=null)
+        {
+            using (System.Transactions.TransactionScope scope = new System.Transactions.TransactionScope())
+            {
+
+                var urs = buserRelation.GetAllByUserID(user.ID);
+                busers.Delete(user.ID);
+
+                buserRelation.DeleteByUserID(user.ID);
+
+                new Business.Platform.UsersInfo().Delete(user.ID);
+
+                //更新父级[ChildsLength]字段
+                foreach (var ur in urs)
+                {
+                    borganize.UpdateChildsLength(ur.OrganizeID);
+                }
+                scope.Complete();
+            }
+           
+            string refreshID = parentID;
+            string url = string.Empty;
+            var users = borganize.GetAllUsers(refreshID.ToGuid());
+            if(users.Count>0)
+            {
+                url = "User?id=" + users.Last().ID + "&appid=" + Request.QueryString["appid"] + "&tabid=" + Request.QueryString["tabid"] + "&parentid=" + parentID;
+            }
+            else
+            {
+                refreshID = organize.ParentID == Guid.Empty ? organize.ID.ToString() : organize.ParentID.ToString();
+                url = "Body?id=" + parentID + "&appid=" + Request.QueryString["appid"] + "&tabid=" + Request.QueryString["tabid"] + "&parentid=" + organize.ParentID;
+            }
+            Business.Platform.Log.Add("删除了用户", user.Serialize(), Business.Platform.Log.Types.组织机构);
+            
+            <script type="text/javascript">
+                parent.frames[0].reLoad('@refreshID');
+                alert('删除成功!');
+                window.location='@url';
+            </script>
+        }
+        
+        //初始化密码
+        if(!Request.Form["InitPass"].IsNullOrEmpty() && user!=null)
+        {
+            string initpass = busers.GetInitPassword();
+            busers.InitPassword(user.ID);
+            Business.Platform.Log.Add("初始化了用户密码", user.Serialize(), Business.Platform.Log.Types.组织机构);
+            <script type="text/javascript">
+                alert("密码已初始化为:@initpass");
+            </script>
+        }
+        
+        //调动
+        if(!Request.Form["Move1"].IsNullOrEmpty() && user !=null)
+        {
+            string moveto = Request.Form["movetostation"];
+            string movetostationjz = Request.Form["movetostationjz"];
+            Guid moveToID;
+            if (moveto.IsGuid(out moveToID))
+            {
+                using (System.Transactions.TransactionScope scope = new System.Transactions.TransactionScope())
+                {
+                    var us = buserRelation.GetAllByUserID(user.ID);
+                    if("1" != movetostationjz)
+                    {
+                        buserRelation.DeleteByUserID(user.ID);
+                    }
+                    
+                    Data.Model.UsersRelation ur = new Data.Model.UsersRelation();
+                    ur.UserID = user.ID;
+                    ur.OrganizeID = moveToID;
+                    ur.IsMain = "1" == movetostationjz ? 0 : 1;
+                    ur.Sort = buserRelation.GetMaxSort(moveToID);
+                    buserRelation.Add(ur);
+
+                    foreach (var u in us)
+                    {
+                        borganize.UpdateChildsLength(u.OrganizeID);
+                    }
+                    
+                    borganize.UpdateChildsLength(organizeID);
+                    borganize.UpdateChildsLength(moveToID);
+                    
+                    scope.Complete();
+                    <script type="text/javascript">
+                        parent.frames[0].reLoad('@parentID');
+                        if ('@parentID' != '@moveto')
+                        {
+                            parent.frames[0].reLoad('@moveto');
+                        }
+                        alert('调动成功!');
+                    </script>
+                }
+
+                Business.Platform.Log.Add(("1" == movetostationjz ? "兼职" : "全职") + "调动了人员的岗位", "将人员调往岗位(" + moveto + ")", Business.Platform.Log.Types.组织机构);
+            }
+        }
+    }
+
+    string statusRadios = borganize.GetStatusRadio("Status", status, "validate=\"radio\"");
+}
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        var validate = new RoadUI.Validate();
+    </script>
+    <form action="" method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+        <tr>
+            <th style="width:80px;">姓名：</th>
+            <td><input type="text" id="Name" name="Name" class="mytext" value="@name" validate="empty,min,max" max="50" style="width:160px;" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">帐号：</th>
+            <td><input type="text" id="Account" name="Account" class="mytext" value="@account" validate="empty,max,ajax" validate_url="CheckAccount?id=@id" max="20" style="width:160px;" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">状态：</th>
+            <td>@Html.Raw(statusRadios)</td>
+        </tr>
+        <tr>
+            <th style="width:80px;">备注：</th>
+            <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;" >@note</textarea></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">所在组织：</th>
+            <td>@Html.Raw(parentString)</td>
+        </tr>
+        <tr id="StationMove_tr" style="display:none;">
+            <th style="width:80px;">调往组织：</th>
+            <td>
+            <table cellpadding="0" cellspacing="0" border="0"><tr>
+                <td><input type="text" style="width:180px;" title="选择要调往的组织：" class="mymember" id="movetostation" name="movetostation" more="false" user="false" station="true" dept="true" unit="true" />
+                    <input type="checkbox" name="movetostationjz" id="movetostationjz" style="vertical-align:middle;" value="1" /><label for="movetostationjz" style="vertical-align:middle;">兼职</label>
+                </td>
+                <td><input type="submit" class="mybutton" name="Move1" onclick="return stationMove1();" value="确定调动" /></td>
+            </tr></table>
+            </td>
+        </tr>
+        
+    </table>
+    <div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+        <input type="button" value="调动" class="mybutton" onclick="stationMove();" />
+        <input type="button" class="mybutton" value="排序" id="sort" onclick="sort1();" runat="server" />
+        <input type="submit" class="mybutton" onclick="return confirm('您真的要初始化密码吗?');" name="InitPass" value="初始密码" />
+        <input type="submit" class="mybutton" name="Save" onclick="return validate.validateForm(document.forms[0]);" value="保存" />
+        <input type="submit" class="mybutton" onclick="return confirm('您真的要删除该用户吗?');" name="DeleteBut" value="删除" />
+    </div>
+    </form>
+    <script type="text/javascript">
+        function stationMove()
+        {
+            $('#StationMove_tr').toggle();
+        }
+
+        function stationMove1()
+        {
+            if ($.trim($("#movetostation").val()).length == 0)
+            {
+                alert("请选择要调往的组织!");
+                return false;
+            }
+            return true;
+        }
+        
+        function sort1()
+        {
+            window.location = 'SortUsers' + '@Html.Raw(Request.Url.Query)';
+        }
+    </script>

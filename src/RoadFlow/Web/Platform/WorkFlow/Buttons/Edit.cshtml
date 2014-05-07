@@ -1,0 +1,105 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    
+    Business.Platform.WorkFlowButtons bworkFlowButtons=new Business.Platform.WorkFlowButtons();
+    Data.Model.WorkFlowButtons workFlowButton = null;
+    string id=Request.QueryString["id"];
+
+    string title = string.Empty;
+    string ico = string.Empty;
+    string script = string.Empty;
+    string note = string.Empty;
+    
+    Guid buttionID;
+    if(id.IsGuid(out buttionID))
+    {
+        workFlowButton = bworkFlowButtons.Get(buttionID);
+        title = workFlowButton.Title;
+        ico = workFlowButton.Ico;
+        script = workFlowButton.Script;
+        note = workFlowButton.Note;
+    }
+    string oldXML = workFlowButton.Serialize();
+    Validation.RequireField("Title");
+    if(IsPost && Validation.IsValid())
+    {
+        title = Request.Form["Title"];
+        ico = Request.Form["Ico"];
+        script = Request.Form["Script"];
+        note = Request.Form["Note"];
+
+        bool isAdd = false;
+        if(workFlowButton==null)
+        {
+            isAdd = true;
+            workFlowButton = new Data.Model.WorkFlowButtons();
+            workFlowButton.ID = Guid.NewGuid();
+            workFlowButton.Sort = bworkFlowButtons.GetMaxSort();
+        }
+
+        workFlowButton.Ico = ico.IsNullOrEmpty() ? null : ico.Trim();
+        workFlowButton.Note = note.IsNullOrEmpty() ? null : note.Trim();
+        workFlowButton.Script = script.IsNullOrEmpty() ? null : script;
+        workFlowButton.Title = title.Trim();
+        
+        if(isAdd)
+        {
+            bworkFlowButtons.Add(workFlowButton);
+            Business.Platform.Log.Add("添加了流程按钮", workFlowButton.Serialize(), Business.Platform.Log.Types.流程相关);
+        }
+        else
+        {
+            bworkFlowButtons.Update(workFlowButton);
+            Business.Platform.Log.Add("修改了流程按钮", "修改前：" + oldXML + "修改后：" + workFlowButton.Serialize(), Business.Platform.Log.Types.流程相关);
+        }
+        bworkFlowButtons.ClearCache();
+        <script type="text/javascript">
+            new RoadUI.Window().reloadOpener();
+            alert("保存成功!");
+            new RoadUI.Window().close();
+        </script>
+    }
+    
+}
+
+    <form method="post" action="">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width: 80px;">
+            按钮名称：
+        </th>
+        <td>
+            <input type="text" name="Title" id="Title" class="mytext" value="@title" validate="empty" style="width: 75%" />
+        </td>
+    </tr>
+    <tr>
+        <th>
+            按钮图标：
+        </th>
+        <td>
+            <input type="text" name="Ico" id="Ico" class="myico" source="/Images/ico" value="@ico" style="width: 75%"/>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            执行脚本：
+        </th>
+        <td>
+            <textarea class="mytext" name="Script" rows="1" cols="1" style="width:90%; height:180px; line-height:16px; color:Blue; font-family:Courier New; padding:5px;">@Html.Raw(@script)</textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            按钮说明：
+        </th>
+        <td>
+            <textarea class="mytext" name="Note" rows="1" cols="1" style="width:90%; height:50px;">@Html.Raw(@note)</textarea>
+        </td>
+    </tr>
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="new RoadUI.Window().close();" />
+    </div>
+    </form>

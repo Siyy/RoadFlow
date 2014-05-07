@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string parentid = Request.QueryString["parentid"];
+    if(IsPost)
+    {
+        string sort = Request.Form["sort"] ?? "";
+        string[] sortArray = sort.Split(',');
+        Business.Platform.Organize borganize = new Business.Platform.Organize();
+        for (int i = 0; i < sortArray.Length; i++)
+        {
+            Guid gid;
+            if (!sortArray[i].IsGuid(out gid))
+            {
+                continue;
+            }
+            borganize.UpdateSort(gid, i + 1);
+        }
+        
+        <script type="text/javascript">
+            parent.frames[0].reLoad('@parentid');
+        </script>
+    }
+    
+    var orgs = new Business.Platform.Organize().GetChilds(parentid.ToGuid());
+}
+<form method="post"><br />
+    <div style="width:82%; margin:0 auto; height:auto;" id="sortdiv">
+        @{
+        foreach(var org in orgs)
+        {
+        <ul class="sortul">
+            <input type="hidden" value="@org.ID" name="sort" />
+            @org.Name
+        </ul>
+        }  
+        }
+    </div>
+    <div style="width:400px; text-align:center; margin:0 auto; margin-top:10px;">
+        <input type="submit" class="mybutton" name="save" value="保存排序" />
+        <input type="button" class="mybutton" value="返回" onclick="re();" />
+    </div>
+    </form>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            new RoadUI.DragSort($("#sortdiv"));
+        });
+        function re()
+        {
+            window.location = "Body" + '@Request.Url.Query';
+        }
+    </script>

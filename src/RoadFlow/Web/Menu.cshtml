@@ -1,0 +1,13 @@
+﻿@{
+    string roleID=Request.QueryString["roleid"];
+    Guid gid;
+    if(!roleID.IsGuid(out gid))
+    {
+        @:[]
+    }
+    else
+    {
+        string json=new Business.Platform.RoleApp().GetRoleAppJsonString(gid);
+        Response.Write(json);
+    }
+}

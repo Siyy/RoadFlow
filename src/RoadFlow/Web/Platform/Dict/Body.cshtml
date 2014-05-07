@@ -1,0 +1,102 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string id = Request.QueryString["id"];
+
+    Business.Platform.Dictionary bdict = new Business.Platform.Dictionary();
+    Data.Model.Dictionary dict = null;
+    if(id.IsGuid())
+    {
+        dict = bdict.Get(id.ToGuid());
+    }
+    else
+    {
+        dict = bdict.GetRoot();
+    }
+    
+    Validation.RequireFields("Title");
+    
+    if(IsPost && Validation.IsValid() && dict!=null)
+    {
+        string refreshID = dict.ParentID == Guid.Empty ? dict.ID.ToString() : dict.ParentID.ToString();
+        
+        //保存
+        if(!Request.Form["Save"].IsNullOrEmpty())
+        {
+            string title = Request.Form["Title"];
+            string code = Request.Form["Code"];
+            string values = Request.Form["Values"];
+            string note = Request.Form["Note"];
+            string other = Request.Form["Other"];
+            string oldXML = dict.Serialize();
+
+            dict.Code = code.IsNullOrEmpty() ? null : code.Trim();
+            dict.Note = note.IsNullOrEmpty() ? null : note.Trim();
+            dict.Other = other.IsNullOrEmpty() ? null : other.Trim();
+            dict.Title = title.Trim();
+            dict.Value = values.IsNullOrEmpty() ? null : values.Trim();
+
+            bdict.Update(dict);
+
+            bdict.RefreshCache();
+
+            Business.Platform.Log.Add("修改了数据字典项", "修改前："+oldXML+"修改后："+ dict.Serialize(), Business.Platform.Log.Types.数据字典);
+            
+            <script type="text/javascript">
+                parent.frames[0].reLoad('@refreshID');
+                alert("保存成功");
+            </script>
+        }
+        
+        //删除
+        if(!Request.Form["Delete"].IsNullOrEmpty())
+        {
+            int i = bdict.DeleteAndAllChilds(dict.ID);
+            bdict.RefreshCache();
+            Business.Platform.Log.Add("删除了数据字典及其下级共" + i.ToString() + "项", dict.Serialize(), Business.Platform.Log.Types.数据字典);  
+             <script type="text/javascript">
+                 parent.frames[0].reLoad('@refreshID');
+                 window.location="Body?id=@dict.ParentID&appid=@Request.QueryString["appid"]&tabid=@Request.QueryString["tabid"]";
+            </script>    
+        }
+
+    }
+}
+
+    <form action="" method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+        <tr>
+            <th style="width:80px;">标题：</th>
+            <td><input type="text" id="Title" name="Title" class="mytext" value="@dict.Title" validate="empty" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">唯一代码：</th>
+            <td><input type="text" id="Code" name="Code" class="mytext" value="@dict.Code" validate="canempty,ajax" validate_url="CheckCode?id=@id" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">值：</th>
+            <td><input type="text" id="Values" name="Values" class="mytext" value="@dict.Value" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">备注：</th>
+            <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;">@Html.Raw(dict.Note)</textarea></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">其它：</th>
+            <td><textarea id="Other" name="Other" class="mytext" style="width:90%; height:50px;">@Html.Raw(dict.Other)</textarea></td>
+        </tr>
+    </table>
+    <div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+        <input type="button" class="mybutton" value="添加子项" onclick="window.location='Add'+'@Request.Url.Query';" />
+        <input type="button" class="mybutton" value="排序" onclick="sort1();" />
+        <input type="submit" class="mybutton" name="Save" value="保存" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+        <input type="submit" class="mybutton" name="Delete" value="删除" onclick="return confirm('您真的要删除该字典项吗?');" />
+    </div>
+    </form>
+    <script type="text/javascript">
+        function sort1()
+        {
+            window.location = "/Platform/Dict/Sort" + "@Request.Url.Query";
+        }
+    </script>

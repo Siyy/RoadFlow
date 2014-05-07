@@ -1,0 +1,62 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    Business.Platform.RoleApp broleApp = new Business.Platform.RoleApp();
+    List<Data.Model.RoleApp> roleAppList = new List<Data.Model.RoleApp>();
+    string id = Request.QueryString["id"];
+    var roleApp = broleApp.Get(id.ToGuid());
+    roleAppList = broleApp.GetChild(roleApp.ParentID);
+    
+    
+    if(IsPost)
+    {
+        string srots = Request.Form["sortapp"];
+        if (srots.IsNullOrEmpty())
+        {
+            return;
+        }
+        string[] sortArray = srots.Split(new char[] { ',' });
+        for (int i = 0; i < sortArray.Length; i++)
+        {
+            Guid guid;
+            if (!sortArray[i].IsGuid(out guid))
+            {
+                continue;
+            }
+            broleApp.UpdateSort(guid, i + 1);
+        }
+        string rid=roleApp.ParentID.ToString();
+        <script type="text/javascript">
+            parent.frames[0].reLoad('@rid');
+        </script>
+    }
+}
+
+    <form action="" method="post" >
+        <br />
+        <div style="padding-left:7px; width:83%; margin:0 auto; height:auto;" id="sortdiv">
+            @foreach (var app in roleAppList)
+            { 
+            
+            <ul class="sortul">
+                <input type="hidden" value="@app.ID" name="sortapp" />
+                @app.Title
+            </ul>
+            }
+        </div>
+        <div class="buttondiv">
+            <input type="submit" class="mybutton" value="保存排序" onclick="re();" />
+            <input type="button" class="mybutton" value="返回" onclick="re();" />
+        </div>
+    </form>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            new RoadUI.DragSort($("#sortdiv"));
+        });
+        function re()
+        {
+            window.location = "Body" + "@Request.Url.Query";
+        }
+    </script>

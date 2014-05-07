@@ -1,0 +1,75 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    
+    Business.Platform.Dictionary BDict = new Business.Platform.Dictionary();
+    string id = Request.QueryString["id"];
+    string refreshID="";
+    Guid dictid;
+    List<Data.Model.Dictionary> dicts = new List<Data.Model.Dictionary>();
+    if (id.IsGuid(out dictid))
+    {
+        var dict = BDict.Get(dictid);
+        if (dict != null)
+        {
+            dicts = BDict.GetChilds(dict.ParentID);
+            refreshID = dict.ParentID.ToString();
+        }
+    }
+    
+    if(IsPost)
+    {
+        string sortdict = Request.Form["sortdict"];
+        
+        if (sortdict.IsNullOrEmpty())
+        {
+            return;
+        }
+        string[] sortArray = sortdict.Split(',');
+        
+        int i = 1;
+        foreach (string id1 in sortArray)
+        {
+            Guid gid;
+            if (id1.IsGuid(out gid))
+            {
+                BDict.UpdateSort(gid, i++);
+            }
+        }
+        BDict.RefreshCache();
+        <script type="text/javascript">
+            parent.frames[0].reLoad('@refreshID');
+        </script>
+    }
+}
+
+    <form action="" method="post">
+        <br />
+        <div style="padding-left:7px; width:95%;">
+        <ul class="sortul">
+             @{ 
+                
+                
+                
+                 foreach (var dict in dicts)
+                 { 
+            
+            <li>
+                <input type="hidden" value="@dict.ID" name="sortdict" />
+                @dict.Title
+            </li>
+                 }
+            }
+        </ul>
+        </div>
+        <div class="buttondiv">
+            <input type="submit" class="mybutton" value="保存排序" />
+            <input type="button" class="mybutton" value="返回" onclick="window.location='Body'+'@Request.Url.Query';" />
+        </div>
+    </form>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            $(".sortul").dragsort({ dragSelector: "li" });
+        });
+    </script>

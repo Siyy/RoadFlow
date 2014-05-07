@@ -1,0 +1,135 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Validation.RequireField("Name");
+    Business.Platform.Role brole = new Business.Platform.Role();
+    Data.Model.Role role = null;
+    string roleID = Request.QueryString["id"];
+    Guid roleGID;
+    string name = string.Empty;
+    string useMember = string.Empty;
+    string note = string.Empty;
+    
+    if(roleID.IsGuid(out roleGID))
+    {
+        role = brole.Get(roleGID);
+        if(role!=null)
+        {
+            name = role.Name;
+            useMember = role.UseMember;
+            note = role.Note;
+        }
+    }
+    
+    Validation.RequireField("Name");
+    
+    if(IsPost)
+    {
+        
+        if(!Request.Form["Copy"].IsNullOrEmpty())
+        {
+            string tpl = Request.Form["ToTpl"];
+            if(tpl.IsGuid())
+            {
+                new Business.Platform.RoleApp().CopyRoleApp(roleGID, tpl.ToGuid());
+
+                Business.Platform.Log.Add("复制了模板应用", "源：" + roleID + "复制给：" + tpl, Business.Platform.Log.Types.角色应用);
+                <script type="text/javascript">
+                    alert("复制成功!");
+                </script>
+            }
+        }
+        
+        if(!Request.Form["Save"].IsNullOrEmpty() && role!=null && Validation.IsValid())
+        {
+            name = Request.Form["Name"];
+            useMember = Request.Form["UseMember"];
+            note = Request.Form["Note"];
+
+            role.Name = name.Trim();
+            role.Note = note.IsNullOrEmpty() ? null : note.Trim();
+            role.UseMember = useMember.IsNullOrEmpty() ? null : useMember;
+            brole.Update(role);
+            if(!useMember.IsNullOrEmpty())
+            {
+                Business.Platform.UsersRole busersRole = new Business.Platform.UsersRole();
+                using(System.Transactions.TransactionScope scope=new System.Transactions.TransactionScope())
+                {
+                    busersRole.DeleteByRoleID(role.ID);
+                    foreach(var member in useMember.Split(','))
+                    {
+                        string member1=member.Replace(Business.Platform.Users.PREFIX, "").Replace(Business.Platform.WorkGroup.PREFIX, "");
+                        Guid gid;
+                        if(!member1.IsGuid(out gid))
+                        {
+                            continue;
+                        }
+                        Data.Model.UsersRole ur = new Data.Model.UsersRole();
+                        ur.IsDefault = true;
+                        ur.MemberID = gid;
+                        ur.RoleID = role.ID;
+                        busersRole.Add(ur);
+                    }
+                    scope.Complete();
+                }
+            }
+            <script type="text/javascript">
+                parent.frames[0].location = "Tree?appid=@Request.QueryString["appid"]&roleid=@roleID";
+            </script>
+            
+        }
+        
+        if(!Request.Form["Delete"].IsNullOrEmpty())
+        {
+            using(System.Transactions.TransactionScope scope=new System.Transactions.TransactionScope())
+            {
+                brole.Delete(roleGID);
+                new Business.Platform.RoleApp().DeleteByRoleID(roleGID);
+                new Business.Platform.UsersRole().DeleteByRoleID(roleGID);
+                scope.Complete();
+            }
+            Business.Platform.Log.Add("删除的角色其及相关数据", roleID, Business.Platform.Log.Types.角色应用);
+            <script type="text/javascript">
+                parent.frames[0].location = parent.frames[0].location;
+            </script>
+        }
+    }
+
+    var roleOptions = brole.GetRoleOptions("", roleID);
+}
+<form action="" method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+        <tr>
+            <th style="width:80px;">模板名称：</th>
+            <td><input type="text" id="Name" name="Name" class="mytext" validate="empty" value="@name" style="width:65%"/></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">使用成员：</th>
+            <td><input type="text" id="UseMember" name="UseMember"  class="mymember" validate="empty" value="@useMember" style="width:65%"/></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">备注说明：</th>
+            <td><textarea class="mytext" id="Note" name="Note" cols="1" rows="1" style="width:95%; height:50px;">@note</textarea></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">模板复制：</th>
+            <td>将此模板复制给：<select id="ToTpl" name="ToTpl" class="myselect"><option value=""></option>@Html.Raw(roleOptions)</select>
+            <input type="submit" name="Copy" value="确认复制" onclick="return copy();" class="mybutton" /></td>
+        </tr>
+    </table>
+    <div class="buttondiv">
+       <input type="submit" name="Save" value="确认保存" onclick="return new RoadUI.Validate().validateForm(this);" class="mybutton" />
+       <input type="submit" name="Delete" value="删除模板" onclick="return confirm('您真的要删除该模板吗?');" class="mybutton" />
+    </div>
+    <script type="text/javascript">
+        function copy()
+        {
+            if ($("#ToTpl").val().length == 0)
+            {
+                alert("请选择要复制到的模板!");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</form>

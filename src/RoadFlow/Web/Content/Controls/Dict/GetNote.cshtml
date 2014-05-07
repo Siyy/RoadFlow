@@ -1,0 +1,15 @@
+﻿@{
+    string id = Request.QueryString["id"];
+    Guid gid;
+    string note = "";
+    if(id.IsGuid(out gid))
+    {
+        var dict = new Business.Platform.Dictionary().Get(gid, true);
+        if (dict != null)
+        {
+            note = dict.Note;
+        }
+    }
+    Response.Write(note);
+    Response.End();
+}

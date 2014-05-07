@@ -1,0 +1,40 @@
+﻿@using System.Xml.Linq;
+@using System.IO;
+@using System.Linq;
+@{
+    
+    Response.Expires = 0;
+    Response.Buffer = true;
+    Response.Clear();
+    Response.ContentType = "text/xml";
+
+    XElement rootElement = new XElement("Root");
+    string Path = Request["Path"];
+
+    string showType = ",.jpg,.gif,.png,";
+
+    if (!Directory.Exists(Server.MapPath(Path)))
+    {
+        rootElement.Save(Response.Output);
+        Response.End();
+    }
+
+    DirectoryInfo folder = new DirectoryInfo(Server.MapPath(Path));
+
+    XElement element;
+    foreach (var item in folder.GetFiles().Where(p => (p.Attributes & FileAttributes.Hidden) == 0))
+    {
+        if (showType.IndexOf("," + item.Extension.ToLower() + ",") != -1)
+        {
+            element = new XElement("Icon");
+            rootElement.Add(element);
+            element.SetAttributeValue("title", item.Name);
+
+            element.SetAttributeValue("path", Path.Replace(@"\", "/") + "/" + item.Name);
+
+        }
+    }
+
+    rootElement.Save(Response.Output);
+    Response.End();        
+}

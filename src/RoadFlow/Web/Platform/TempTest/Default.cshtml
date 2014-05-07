@@ -1,0 +1,24 @@
+﻿<div style="font-size:20px; font-weight:bold; width:98%; margin:20px auto 0 auto; text-align:center;">
+    请假申请
+</div>
+<br /><br />
+<table cellpadding="0" cellspacing="1" border="0" width="98%" class="formtable">
+    <tr>
+        <th style="width:80px;">请假人：</th>
+        <td><input type="text" name="Test_WF_Leave.UserName" id="Test_WF_Leave.UserName" class="mytext" value="" validate="empty" style="width:75%" /></td>
+        <th style="width:80px;">所在组织：</th>
+        <td><input type="text" name="Test_WF_Leave.OrganizeString" id="Test_WF_Leave.OrganizeString" class="mytext" value="" validate="empty" style="width:75%"/></td>
+    </tr>
+    <tr>
+        <th>请假类型：</th>
+        <td><select class="myselect" name="Test_WF_Leave.Type" id="Test_WF_Leave.Type"></select></td>
+        <th>请假时间：</th>
+        <td><input type="text" name="Test_WF_Leave.StartTime" id="Test_WF_Leave.StartTime" class="mycalendar" value="" istime="1" validate="empty" style="width:100px"/>
+            到 <input type="text" name="Test_WF_Leave.EndTime" id="Test_WF_Leave.EndTime" class="mycalendar" value="" istime="1" validate="empty" style="width:100px"/>
+        </td>
+    </tr>
+    <tr>
+        <th>请假事由：</th>
+        <td colspan="3"><textarea name="Test_WF_Leave.Cause" id="Test_WF_Leave.Cause" class="mytext" style="width:90%; height:80px;"></textarea></td>
+    </tr>
+</table>

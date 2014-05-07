@@ -1,0 +1,96 @@
+﻿@{  
+    Layout = "~/_SiteLayout.cshtml";
+
+    Business.Platform.Users busers=new Business.Platform.Users();
+    Business.Platform.WorkFlow bwf = new Business.Platform.WorkFlow();
+
+    string name = string.Empty;
+    string type = string.Empty;
+    if(IsPost)
+    {
+        name = Request.Form["flow_name"];
+        type = Request.Form["flow_type"];
+    }
+
+    var typesOptions = bwf.GetAllTypesOptions(type);
+    IEnumerable<Data.Model.WorkFlow> flows = bwf.GetAll().Where(p => p.Status != 4);
+    if(!name.IsNullOrEmpty())
+    {
+        flows = flows.Where(p => p.Name.IndexOf(name) >= 0);
+    }
+    if(!type.IsNullOrEmpty())
+    {
+        flows = flows.Where(p => p.Type == type);
+    }
+}
+<form action="" method="post">
+<table cellpadding="0" cellspacing="0" border="0" width="99%" align="center">
+    <tr>
+        <td align="left" height="35">
+            名称：<input type="text" class="mytext" id="flow_name" value="@name" name="flow_name" />
+            分类：<select class="myselect" id="flow_type" name="flow_type" onchange="document.forms[0].submit();">
+            <option value=""></option>
+            @Html.Raw(typesOptions)
+            </select>&nbsp;&nbsp;
+            <input type="submit" class="mybutton" value="查询"/>
+            <input type="button" class="mybutton" value="关闭" onclick="new RoadUI.Window().close();" />
+        </td>
+    </tr>
+</table>
+<div style="height:350px; overflow:auto; width:99%; margin:0 auto;">
+<table cellpadding="0" cellspacing="1" border="0" width="100%" style="width:100%; margin:0 auto;" class="listtable" id="data_table">
+    <thead>
+    <tr>
+        <th>流程名称</th>
+        <th>创建时间</th>
+        <th>创建人</th>
+        <th>状态</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var flow in flows.OrderBy(p=>p.Name))
+    {
+        <tr>
+            <td>@flow.Name</td>
+            <td>@flow.CreateDate</td>
+            <td>@busers.GetName(flow.CreateUserID)</td>
+            <td>@bwf.GetStatusTitle(flow.Status)</td>
+            <td>
+                <a href="javascript:void(0);" onclick="openflow('@flow.ID');return false;">
+                <img src="/Images/ico/folder_classic_opened.png" alt="" style="vertical-align:middle; border:0;" />
+                <span style="vertical-align:middle;">打开</span>
+                </a>
+            </td>
+        </tr>
+    }       
+    </tbody>
+</table> 
+</div> 
+</form>   
+<script type="text/javascript">
+    var frame = null;
+    var openerid = '@Request.QueryString["openerid"]';
+    $(function ()
+    {
+        var iframes = top.frames;
+        for (var i = 0; i < iframes.length; i++)
+        {
+            if (iframes[i].name == openerid + "_iframe")
+            {
+                frame = iframes[i]; break;
+            }
+        }
+        if (frame == null) return;
+
+    });
+    function typechange(type)
+    {
+
+    }
+    function openflow(id)
+    {
+        frame.openFlow1(id);
+        new RoadUI.Window().close();
+    }
+</script>

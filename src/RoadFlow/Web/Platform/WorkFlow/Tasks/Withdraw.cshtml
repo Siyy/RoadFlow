@@ -1,0 +1,35 @@
+﻿@{
+    if (!Check.CheckLogin(false) || !Check.CheckUrl())
+    {
+        Response.Write("验证错误!");
+        Response.End();
+    }
+
+    string taskid = Request.QueryString["taskid"];
+    Guid tid;
+    if (!taskid.IsGuid(out tid))
+    {
+        Response.Write("参数错误!");
+        Response.End();
+    }
+    else if(new Business.Platform.WorkFlowTask().HasWithdraw(tid))
+    {
+        bool success = new Business.Platform.WorkFlowTask().WithdrawTask(tid);
+        if(success)
+        {
+            Business.Platform.Log.Add("收回了任务", "任务ID：" + taskid, Business.Platform.Log.Types.流程相关);
+            Response.Write("收回成功!");
+            Response.End();
+        }
+        else
+        {
+            Response.Write("收回失败!");
+            Response.End();
+        }
+    }
+    else
+    {
+        Response.Write("该任务不能收回!");
+        Response.End();
+    }
+}

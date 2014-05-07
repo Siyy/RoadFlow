@@ -1,0 +1,98 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string id = Request.QueryString["id"];
+    Guid wid;
+    Business.Platform.WorkGroup bwg = new Business.Platform.WorkGroup();
+    Data.Model.WorkGroup wg=null;
+    string name=string.Empty;
+    string members=string.Empty;
+    string note=string.Empty;
+    string users = string.Empty;
+    
+    if(!id.IsGuid(out wid) || wid==Guid.Empty)
+    {
+        Response.End();
+    }
+
+    wg = bwg.Get(wid);
+    if(wg!=null)
+    {
+        name = wg.Name;
+        members = wg.Members;
+        note = wg.Note;
+        users = bwg.GetUsersNames(wg.Members,'、');
+    }
+    
+
+    Validation.RequireFields("name", "members");
+    if (!Request.Form["Save"].IsNullOrEmpty() && IsPost && Validation.IsValid() && wg != null)
+    {
+        string oldxml = wg.Serialize();
+        name = Request.Form["Name"];
+        members = Request.Form["Members"];
+        note = Request.Form["Note"];
+        wg.Name = name.Trim();
+        wg.Members = members;
+        if (!note.IsNullOrEmpty())
+        {
+            wg.Note = note;
+        }
+        
+        bwg.Update(wg);
+        users = bwg.GetUsersNames(wg.Members, '、');
+        string query = Request.Url.Query;
+        Business.Platform.Log.Add("修改了工作组", string.Concat("修改前：",oldxml,"修改后："+wg.Serialize()), Business.Platform.Log.Types.组织机构);
+        
+        <script type="text/javascript">
+            parent.frames[0].treecng("1");
+            alert('保存成功!');
+            window.location = 'WorkGroup' + '@query';
+        </script>
+    }
+    
+    //删除
+    if (!Request.Form["DeleteBut"].IsNullOrEmpty() && IsPost && wg != null)
+    {
+        string oldxml = wg.Serialize();
+        bwg.Delete(wg.ID);
+        string query = Request.Url.Query;
+        Business.Platform.Log.Add("删除了工作组", oldxml, Business.Platform.Log.Types.组织机构);  
+        <script type="text/javascript">
+            parent.frames[0].treecng("1");
+            alert('删除成功!');
+            window.location = 'Empty' + '@query';
+        </script>      
+    }
+
+    <script type="text/javascript">
+    var win = new RoadUI.Window();
+    var validate = new RoadUI.Validate();
+    </script>
+    <form action="" method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+        <tr>
+            <th style="width:80px;">名称：</th>
+            <td><input type="text" id="Name" name="Name" class="mytext" validate="empty,minmax" value="@name" max="100" style="width:75%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">成员：</th>
+            <td><input type="text" id="Members" name="Members" class="mymember" validate="empty" value="@members" style="width:65%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">备注：</th>
+            <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;">@note</textarea></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">人员：</th>
+            <td>@users</td>
+        </tr>
+    </table>
+    <div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+        <input type="submit" class="mybutton" onclick="return validate.validateForm(document.forms[0]);" name="Save" value="保存" />
+        <input type="submit" class="mybutton" name="DeleteBut" onclick="return confirm('您真的要删除该工作组吗?');" value="删除" />
+    </div>
+    </form>
+
+}

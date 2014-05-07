@@ -1,0 +1,7 @@
+﻿@{
+    new Business.Platform.OnlineUsers().Remove(Business.Platform.Users.CurrentUserID);
+    Session.RemoveAll();
+    <script type="text/javascript">
+        top.location = "/";
+    </script>
+}

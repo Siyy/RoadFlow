@@ -1,0 +1,90 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string lineID = Request.QueryString["id"];
+    string fromID = Request.QueryString["from"];
+    string toID = Request.QueryString["to"];
+    
+}
+<form action="" method="post">
+    <div id="div_custom" style="width:96%; margin:8px auto 0 auto; display:block;">
+        <div>
+            <div>方法名称：</div><div style="margin-top:8px;"><input type="text" class="mytext" id="custom_method" style="width:90%;" /></div>
+        </div>
+        <div style="height:10px;"></div>
+        <div>
+            <div>条件不满足提示信息：</div><div style="margin-top:8px;"><input type="text" class="mytext" id="custom_msg" style="width:90%;" /></div>
+        </div>
+        <div style="margin-top:10px; font-weight:bold;">方法说明：</div>
+        <div style="line-height:21px; padding-left:12px;">
+            <div>1.方法名称格式为：类名.方法名（例：FlowCustomEvent.Test1）</div>
+            <div>2.方法返回类型为 bool 类型的 True 时条件满足,返回其它类型且字符串值不为 "1" 时条件不满足</div>
+            <div>3.方法返回类型为 bool 类型时提示信息为上面输入的信息，否则提示返回的值</div>
+            <div>4.方法访问限定符为 Public</div>
+            <div>5.类方法应写在 App_Code 下</div>
+        </div>
+    </div>
+
+    <div style="width:100%; margin:10px auto 10px auto; text-align:center;">
+        <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
+        <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
+    </div>
+    </form>
+
+    <script type="text/javascript">
+        var fieldsOptions = '';
+        var frame=null;
+        var openerid = "@Request.QueryString["openerid"]";
+        var lineid="@lineID";
+        var fromid="@fromID";
+        var toid="@toID";
+        $(function(){
+            var iframes = top.frames;
+            for (var i = 0; i < iframes.length; i++)
+            {
+                if (iframes[i].name == openerid + "_iframe")
+                {
+                    frame = iframes[i]; break;
+                }
+            }
+            if (frame == null) return;
+
+            var json=frame.wf_json;
+            var line=null;
+            if(json)
+            {
+                var lines=json.lines;
+                if(lines && lines.length>0)
+                {
+                    for(var i=0;i<json.lines.length;i++)
+                    {
+                        if(json.lines[i].id==lineid)
+                        {
+                            line=json.lines[i];
+                            break;
+                        }
+                    }
+                }
+            }
+            if(line)
+            {
+                $("#custom_method").val(line.customMethod);
+                $("#custom_msg").val(line.noaccordMsg);
+            }
+        });
+        
+        function confirm1()
+        {
+            var line={};
+            line.id=lineid;
+            line.from=fromid;
+            line.to=toid;
+            line.customMethod=$("#custom_method").val()||"";
+            line.noaccordMsg=$("#custom_msg").val()||"";
+            line.sql="";
+
+            frame.addLine(line);
+
+            new RoadUI.Window().close();
+        }
+    </script>

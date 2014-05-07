@@ -1,0 +1,206 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string editID = Request.QueryString["id"];
+    string title = string.Empty;
+    string address = string.Empty;
+    string type = string.Empty;
+    string openModel = string.Empty;
+    string width = string.Empty;
+    string height = string.Empty;
+    string params1 = string.Empty;
+    string note = string.Empty;
+
+    Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
+    Data.Model.AppLibrary appLibrary = null;
+    if(editID.IsGuid())
+    {
+        appLibrary = bappLibrary.Get(editID.ToGuid());
+        if(appLibrary!=null && !IsPost)
+        {
+            title = appLibrary.Title;
+            address = appLibrary.Address;
+            type = appLibrary.Type;
+            openModel = appLibrary.OpenMode.ToString();
+            width = appLibrary.Width.ToString();
+            height = appLibrary.Height.ToString();
+            params1 = appLibrary.Params;
+            note = appLibrary.Note;
+        }
+    }
+    
+    
+    if (IsPost)
+    {
+        
+        AntiForgery.Validate();
+        title = Request.Form["Title"];
+        address = Request.Form["Address"];
+        type = Request.Form["Type"];
+        openModel = Request.Form["OpenModel"];
+        width = Request.Form["Width"];
+        height = Request.Form["Height"];
+        params1 = Request.Form["Params"];
+        note = Request.Form["Note"];
+        if(title.IsNullOrEmpty() || address.IsNullOrEmpty() || type.IsNullOrEmpty())
+        {
+            <script type="text/javascript">
+                alert("数据验证错误!");
+            </script>
+        }
+        else
+        {
+            bool isAdd = appLibrary == null;
+            string oldXML = appLibrary.Serialize();
+            if (isAdd)
+            {
+                isAdd = true;
+                appLibrary = new Data.Model.AppLibrary();
+                appLibrary.ID = Guid.NewGuid();
+            }
+
+            appLibrary.Address = address.Trim();
+            appLibrary.Height = height.ToIntOrNull();
+            appLibrary.Note = note;
+            appLibrary.OpenMode = openModel.ToInt();
+            appLibrary.Params = params1;
+            appLibrary.Title = title;
+            appLibrary.Type = type.Trim();
+            appLibrary.Width = width.ToIntOrNull();
+            string url = "/Platform/AppLibrary/List" + Request.Url.Query;
+            if (isAdd)
+            {
+                bappLibrary.Add(appLibrary);
+                Business.Platform.Log.Add("添加了应用程序库", appLibrary.Serialize(), Business.Platform.Log.Types.角色应用);
+                <script type="text/javascript">
+                    new RoadUI.Window().reloadOpener('@url');
+                    alert("添加成功!");
+                </script>
+            }
+            else
+            {
+                bappLibrary.Update(appLibrary);
+                Business.Platform.Log.Add("修改了应用程序库", string.Format("修改前:{0}修改后:{1}", oldXML, appLibrary.Serialize()),
+                    Business.Platform.Log.Types.角色应用);
+                <script type="text/javascript">
+                    new RoadUI.Window().reloadOpener('@url');
+                    alert("修改成功!");
+                </script>
+            }
+            bappLibrary.ClearCache();
+            new Business.Platform.RoleApp().ClearAllDataTableCache();
+        }
+    }
+
+    string typeOptions = new Business.Platform.AppLibrary().GetTypeOptions(type);
+    string openOptions = new Business.Platform.Dictionary().GetOptionsByCode("appopenmodel", value: openModel);
+    
+}
+<form method="post" action="" onsubmit="return new RoadUI.Validate().validateForm(this);">
+@AntiForgery.GetHtml()
+<br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width: 80px;">
+            应用名称：
+        </th>
+        <td>
+            <input type="text" name="Title" id="Title" class="mytext" value="@title" validate="empty" style="width: 75%" />
+        </td>
+    </tr>
+    <tr>
+        <th>
+            应用地址：
+        </th>
+        <td>
+            <input type="text" name="Address" class="mytext" value="@address" validate="empty" style="width: 75%"/>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            应用类型：
+        </th>
+        <td>
+            <input type="text" name="Type" id="Type" class="mytext" value="@type" validate="empty" style="width: 120px;" />
+            <select name="TypeSelect" id="TypeSelect" class="myselect" runat="server" onchange="typeChange(this.value);">
+            <option value=""></option>
+            @Html.Raw(typeOptions)
+            </select>
+            <span style="msg"></span>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            打开方式：
+        </th>
+        <td>
+            <select name="OpenModel" id="OpenModel" class="myselect" runat="server" onchange="openModelChange(this.value);">
+            @Html.Raw(openOptions)
+            </select>
+        </td>
+    </tr>
+    <tr id="winsizetr" style="display: none;">
+        <th>
+            窗口大小：
+        </th>
+        <td>
+            宽度：<input type="text" name="Width" class="mytext" value="@width" validate="int,canempty" style="width: 80px;"/>
+            高度：<input type="text" name="Height" class="mytext" value="@height" validate="int,canempty" style="width: 80px;"/>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            相关参数：
+        </th>
+        <td>
+            <input type="text" name="Params" class="mytext" value="@params1" style="width: 95%"/>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            备注说明：
+        </th>
+        <td>
+            <textarea class="mytext" name="Note" cols="1" rows="1" value="@note" style="width: 95%; height: 50px;"></textarea>
+        </td>
+    </tr>
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="closewin();" />
+    </div>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            $("#OpenModel").change();
+        });
+        function typeChange(value)
+        {
+            $("#TypeSelect option").each(function ()
+            {
+                if ($(this).val() == value)
+                {
+                    $("#Type").val(!$(this).val() ? "" : $(this).text());
+                    return false;
+                }
+            });
+        }
+        function openModelChange(value)
+        {
+            if ("0" == value)
+            {
+                $("#winsizetr").hide();
+            }
+            else
+            {
+                $("#winsizetr").show();
+            }
+        }
+        function closewin()
+        {
+            win.close();
+            return false;
+        }
+    </script>
+</form>

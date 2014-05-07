@@ -1,0 +1,8 @@
+﻿@{
+    string code;
+    System.IO.MemoryStream ms = Utility.Tools.GetValidateImg(out code);
+    Session[Utility.Keys.SessionKeys.ValidateCode.ToString()] = code;
+    Response.ClearContent();
+    Response.ContentType = "image/gif";
+    Response.BinaryWrite(ms.ToArray());
+}

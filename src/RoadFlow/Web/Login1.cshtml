@@ -1,0 +1,149 @@
+﻿@{
+    Page.Title = "";
+    Layout = "~/_SiteLayout.cshtml";
+
+    Page.CheckApp = false;
+    Page.CheckUrl = false;
+    Page.CheckLogin = false;
+
+    string account = string.Empty;
+    string password = string.Empty;
+    string force = string.Empty;
+    string isVcodeSessionKey = Utility.Keys.SessionKeys.IsValidateCode.ToString();
+    string forcescript="";
+    if(IsPost)
+    {
+        account = Request.Form["Account"];
+        password = Request.Form["Password"];
+        force = Request.Form["Force"];
+        string vcode=Request.Form["VCode"];
+        string vcodeSessionKey=Utility.Keys.SessionKeys.ValidateCode.ToString();
+
+        if (Session[isVcodeSessionKey] !=null && "1" == Session[isVcodeSessionKey].ToString() && (Session[vcodeSessionKey] == null
+            || string.Compare(Session[vcodeSessionKey].ToString(), vcode.Trim(), true) != 0))
+        {
+            Business.Platform.Log.Add("用户登录失败", string.Concat("用户:", account, "登录失败，验证码错误"), Business.Platform.Log.Types.用户登录);
+            <script type="text/javascript">
+                alert('验证码错误!');
+            </script>
+            
+        }
+        else if (account.IsNullOrEmpty() || password.IsNullOrEmpty())
+        {
+            Session[isVcodeSessionKey] = "1";
+            Business.Platform.Log.Add("用户登录失败", string.Concat("用户:", account, "登录失败，帐号或密码为空"), Business.Platform.Log.Types.用户登录);
+            <script type="text/javascript">
+                alert('帐号或密码不能为空!');
+            </script>
+        }
+        else
+        {
+            Business.Platform.Users busers = new Business.Platform.Users();
+            var user = busers.GetByAccount(account.Trim());
+
+            if (user == null || string.Compare(user.Password, busers.GetUserEncryptionPassword(user.ID.ToString(), password.Trim()), false) != 0)
+            {
+                Session[isVcodeSessionKey] = "1";
+                Business.Platform.Log.Add("用户登录失败", string.Concat("用户:", account, "登录失败，帐号或密码错误"), Business.Platform.Log.Types.用户登录);
+                <script type="text/javascript">
+                    alert('帐号或密码错误!');
+                </script>
+            }
+            else if (user.Status == 1)
+            {
+                Session[isVcodeSessionKey] = "1";
+                Business.Platform.Log.Add("用户登录失败", string.Concat("用户:", account, "登录失败，帐号已被冻结"), Business.Platform.Log.Types.用户登录);
+                <script type="text/javascript">
+                    alert('帐号已被冻结!');
+                </script>
+            }
+            else
+            {
+                Business.Platform.OnlineUsers bou = new Business.Platform.OnlineUsers();
+                var onUser = bou.Get(user.ID);
+                if (onUser!=null && "1" != force)
+                {
+                    string ip=onUser.IP;
+                    Session.Remove(isVcodeSessionKey);
+                    forcescript = "if(confirm('您的帐号已经在" + ip + "登录,您要强行登录吗?')){$('#Account').val('" + account + "');$('#Password').val('"+password+"');$('#Force').val('1');$('#form1').submit();}";
+                }
+                else
+                {
+                    Guid uniqueID = Guid.NewGuid();
+                    Session[Utility.Keys.SessionKeys.UserID.ToString()] = user.ID;
+                    Session[Utility.Keys.SessionKeys.UserUniqueID.ToString()] = uniqueID;
+                    bou.Add(user, uniqueID);
+                    Session.Remove(isVcodeSessionKey);
+                    Business.Platform.Log.Add("用户登录成功",string.Concat("用户:",user.Name,"(",user.ID,")登录成功"), Business.Platform.Log.Types.用户登录);
+                    <script type="text/javascript">
+                        top.location = "/";
+                    </script>
+                }
+            }
+        }
+    }
+}
+
+<form method="post" action="" id="form1">
+<br />
+<input type="hidden" id="Force" name="Force" value="0" />
+<table cellpadding="0" cellspacing="0" border="0" style="width:95%; margin:0 auto;">
+    <tr>
+        <td style="width:70px; height:45px; text-align:right;">帐号：</td>
+        <td><input type="text" class="mytext" id="Account" name="Account" value="@account" maxlength="50" style="width:170px;" /></td>
+    </tr>
+    <tr>
+        <td style="height:45px; text-align:right;">密码：</td>
+        <td><input type="password" class="mytext" id="Password" name="Password" maxlength="50" style="width:170px;" /></td>
+    </tr>
+    <tr id="novcode" style="display:none;">
+        <td style="height:45px; text-align:right;">验证码：</td>
+        <td><input type="text" class="mytext" id="VCode" name="VCode" maxlength="4" style="width:80px;" />
+            <img alt="" src="/VCode?@DateTime.Now.Ticks" onclick="cngimg();" style="vertical-align:middle;" id="VcodeImg" />
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td><input type="submit" value="确认登录" class="mybutton" onclick="return checkForm();" /></td>
+    </tr>
+</table>
+</form>
+<script type="text/javascript">
+    var isVcode = '1' == '@Session[isVcodeSessionKey]';
+    $(function ()
+    {
+        if (isVcode)
+        {
+            top.win.resize(300, 230);
+            $("#novcode").show();
+        }
+        @Html.Raw(forcescript)
+    });
+    function checkForm()
+    {
+        var form1 = document.forms[0];
+        if ($.trim(form1.Account.value).length == 0)
+        {
+            alert("帐号不能为空!");
+            form1.Account.focus();
+            return false;
+        }
+        if ($.trim(form1.Password.value).length == 0)
+        {
+            alert("密码不能为空!");
+            form1.Password.focus();
+            return false;
+        }
+        if (isVcode && form1.VCode && $.trim(form1.VCode.value).length == 0)
+        {
+            alert("验证码不能为空!");
+            form1.VCode.focus();
+            return false;
+        }
+        return true;
+    }
+    function cngimg()
+    {
+        $('#VcodeImg').attr('src', '/VCode?' + new Date().toString());
+    }
+</script>

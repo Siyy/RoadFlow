@@ -1,0 +1,33 @@
+﻿@{
+    if(!Check.CheckUrl())
+    {
+        Response.Write("");
+        Response.End();
+    }
+    string id = Request.QueryString["id"];
+    Guid gid;
+    if(id.IsNullOrEmpty())
+    {
+        Response.Write("");
+        Response.End();
+    }
+    Business.Platform.Organize borg = new Business.Platform.Organize();
+    Business.Platform.Users buser = new Business.Platform.Users();
+    if(id.StartsWith(Business.Platform.Users.PREFIX))
+    {
+        Guid uid = buser.RemovePrefix1(id).ToGuid();
+        Response.Write(borg.GetAllParentNames(buser.GetMainStation(uid)));
+        Response.Write(" / ");
+        Response.Write(buser.GetName(uid));
+        Response.End();
+    }
+    else if(id.StartsWith(Business.Platform.WorkGroup.PREFIX))
+    {
+        Response.Write(new Business.Platform.WorkGroup().GetUsersNames(Business.Platform.WorkGroup.RemovePrefix(id).ToGuid(),'、'));
+    }
+    else if(id.IsGuid(out gid))
+    {
+        Response.Write(borg.GetAllParentNames(gid));
+    }
+    Response.Write("");
+}

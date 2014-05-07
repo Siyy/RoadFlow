@@ -1,0 +1,68 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string id = Request.QueryString["id"];
+    Business.Platform.Dictionary bdict=new Business.Platform.Dictionary();
+    Validation.RequireFields("Title");
+    if(IsPost && Validation.IsValid() && id.IsGuid())
+    {
+        string title = Request.Form["Title"];
+        string code = Request.Form["Code"];
+        string values = Request.Form["Values"];
+        string note = Request.Form["Note"];
+        string other = Request.Form["Other"];
+
+        Data.Model.Dictionary dict = new Data.Model.Dictionary();
+        dict.ID = Guid.NewGuid();
+        dict.Code = code.IsNullOrEmpty() ? null : code.Trim();
+        dict.Note = note.IsNullOrEmpty() ? null : note.Trim();
+        dict.Other = other.IsNullOrEmpty() ? null : other.Trim();
+        dict.ParentID = id.ToGuid();
+        dict.Sort = bdict.GetMaxSort(id.ToGuid());
+        dict.Title = title.Trim();
+        dict.UseCache = false;
+        dict.Value = values.IsNullOrEmpty() ? null : values.Trim();
+
+        bdict.Add(dict);
+
+        bdict.RefreshCache();
+
+        Business.Platform.Log.Add("添加了数据字典项", dict.Serialize(), Business.Platform.Log.Types.数据字典);
+        
+        <script type="text/javascript">
+            parent.frames[0].reLoad('@id');
+            alert("添加成功");
+        </script>
+        
+    }
+}
+
+<form action="" method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+        <tr>
+            <th style="width:80px;">标题：</th>
+            <td><input type="text" id="Title" name="Title" class="mytext" value="" validate="empty" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">唯一代码：</th>
+            <td><input type="text" id="Code" name="Code" class="mytext" validate="canempty,ajax" validate_url="CheckCode" value="" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">值：</th>
+            <td><input type="text" id="Values" name="Values" class="mytext" value="" maxlength="100" style="width:70%" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">备注：</th>
+            <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;"></textarea></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">其它：</th>
+            <td><textarea id="Other" name="Other" class="mytext" style="width:90%; height:50px;"></textarea></td>
+        </tr>
+    </table>
+    <div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+        <input type="submit" class="mybutton" value="保存" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+        <input type="button" class="mybutton" value="返回" onclick="window.location='Body'+'@Request.Url.Query';" />
+    </div>
+    </form>

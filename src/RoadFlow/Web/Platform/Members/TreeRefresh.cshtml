@@ -1,0 +1,96 @@
+﻿@{
+    string id = Request.QueryString["refreshid"];
+    string showtype = Request.QueryString["showtype"];
+
+    System.Text.StringBuilder json = new System.Text.StringBuilder("[", 1000);
+
+    if ("1" == showtype)//显示工作组
+    {
+        Business.Platform.WorkGroup BWorkGroup = new Business.Platform.WorkGroup();
+        var workGroups = BWorkGroup.GetAll();
+
+        int countwg = workGroups.Count;
+        int iwg = 0;
+        foreach(var wg in workGroups)
+        {
+            json.Append("{");
+            json.AppendFormat("\"id\":\"{0}\",", wg.ID);
+            json.AppendFormat("\"parentID\":\"{0}\",", Guid.Empty);
+            json.AppendFormat("\"title\":\"{0}\",", wg.Name);
+            json.AppendFormat("\"ico\":\"{0}\",", "");
+            json.AppendFormat("\"link\":\"{0}\",", "");
+            json.AppendFormat("\"type\":\"{0}\",", 5);
+            json.AppendFormat("\"hasChilds\":\"{0}\",", 0);
+            json.Append("\"childs\":[");
+            json.Append("]");
+            json.Append("}");
+            if (iwg++ < countwg - 1)
+            {
+                json.Append(",");
+            }
+        }
+        
+        json.Append("]");
+        json.Append("}");
+        Response.Write(json.ToString());
+        Response.End();
+    }
+
+
+    Guid orgID;
+    if (!id.IsGuid(out orgID))
+    {
+        json.Append("]");
+        Response.Write(json.ToString());
+    }
+
+    Business.Platform.Organize BOrganize = new Business.Platform.Organize();
+    var childOrgs = BOrganize.GetChilds(orgID);
+    
+    int count = childOrgs.Count;
+    int i = 0;
+    foreach (var org in childOrgs)
+    {
+        json.Append("{");
+        json.AppendFormat("\"id\":\"{0}\",", org.ID);
+        json.AppendFormat("\"parentID\":\"{0}\",", id);
+        json.AppendFormat("\"title\":\"{0}\",", org.Name);
+        json.AppendFormat("\"ico\":\"{0}\",", "");
+        json.AppendFormat("\"link\":\"{0}\",", "");
+        json.AppendFormat("\"type\":\"{0}\",", org.Type);
+        json.AppendFormat("\"hasChilds\":\"{0}\",", org.ChildsLength);
+        json.Append("\"childs\":[");
+        json.Append("]");
+        json.Append("}");
+        if (i++ < count - 1)
+        {
+            json.Append(",");
+        }
+    }
+ 
+    var userRelations = new Business.Platform.UsersRelation().GetAllByOrganizeID(orgID);
+    var users = new Business.Platform.Users().GetAllByOrganizeID(orgID);
+    int count1 = users.Count;
+    int j = 0;
+    foreach (var user in users)
+    {
+        var ur = userRelations.Find(p => p.UserID == user.ID);
+        json.Append("{");
+        json.AppendFormat("\"id\":\"{0}\",", user.ID);
+        json.AppendFormat("\"parentID\":\"{0}\",", id);
+        json.AppendFormat("\"title\":\"{0}{1}\",", user.Name, ur != null && ur.IsMain == 0 ? "<span style='color:#999;'>[兼职]</span>" : "");
+        json.AppendFormat("\"ico\":\"{0}\",", "/images/ico/contact_grey.png");
+        json.AppendFormat("\"link\":\"{0}\",", "");
+        json.AppendFormat("\"type\":\"{0}\",", "4");
+        json.AppendFormat("\"hasChilds\":\"{0}\",", "0");
+        json.Append("\"childs\":[");
+        json.Append("]");
+        json.Append("}");
+        if (j++ < count1 - 1)
+        {
+            json.Append(",");
+        }
+    }
+    json.Append("]");
+    Response.Write(json.ToString());
+}

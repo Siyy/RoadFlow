@@ -1,0 +1,31 @@
+﻿@{
+    string id = Request.QueryString["refreshid"];
+    Guid gid;
+    if (!id.IsGuid(out gid))
+    {
+        Response.Write("[]");
+    }
+    System.Text.StringBuilder json = new System.Text.StringBuilder("[", 1000);
+    Business.Platform.Dictionary BDict = new Business.Platform.Dictionary();
+    var childs = BDict.GetChilds(gid).OrderBy(p => p.Sort);
+    int i = 0;
+    int count = childs.Count();
+    foreach (var child in childs)
+    {
+        json.Append("{");
+        json.AppendFormat("\"id\":\"{0}\",", child.ID);
+        json.AppendFormat("\"parentID\":\"{0}\",", child.ParentID);
+        json.AppendFormat("\"title\":\"{0}\",", child.Title);
+        json.AppendFormat("\"ico\":\"{0}\",", "");
+        json.AppendFormat("\"hasChilds\":\"{0}\",", BDict.HasChilds(child.ID) ? "1" : "0");
+        json.Append("\"childs\":[");
+        json.Append("]");
+        json.Append("}");
+        if (i++ < count - 1)
+        {
+            json.Append(",");
+        }
+    }
+    json.Append("]");
+    Response.Write(json.ToString());
+}

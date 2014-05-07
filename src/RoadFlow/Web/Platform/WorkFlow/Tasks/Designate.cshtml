@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+
+    string taskid=Request.QueryString["taskid"];
+    Guid taskID;
+    Validation.RequireField("user");
+    if (IsPost && Validation.IsValid() && taskid.IsGuid(out taskID))
+    {
+        string user = Request.Form["user"];
+        string openerid = Request.QueryString["openerid"];
+
+        Business.Platform.WorkFlowTask btask = new Business.Platform.WorkFlowTask();
+        var users = new Business.Platform.Organize().GetAllUsers(user);
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        foreach(var user1 in users)
+        {
+            btask.DesignateTask(taskID, user1);
+
+            Business.Platform.Log.Add("管理员指派了流程任务", "将任务" + taskID + "指派给了：" + user1.Name + user1.ID, Business.Platform.Log.Types.流程相关);
+            
+            sb.Append(user1.Name);
+            sb.Append(",");
+        }
+        string userNames=sb.ToString().TrimEnd(',');
+        
+        <script type="text/javascript">
+            alert("已成功指派给：@userNames!");
+            new RoadUI.Window().reloadOpener();
+            new RoadUI.Window().close();
+        </script>
+    }
+}
+<form action="" method="post">
+    <div style="text-align:center; padding-top:50px;">
+    指派给：<input type="text" class="mymember" style="width:140px;" id="user" name="user" validate="empty" errmsg="请选择要指派的人员" />
+    <input type="submit" class="mybutton" value="确&nbsp;定" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+    <span type="msg"></span>
+    </div>
+</form>

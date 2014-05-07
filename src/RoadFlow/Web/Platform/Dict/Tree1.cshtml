@@ -1,0 +1,54 @@
+﻿@{
+    Business.Platform.Dictionary BDict = new Business.Platform.Dictionary();
+
+    string rootid = Request.QueryString["root"];
+    Guid rootID = Guid.Empty;
+    if(!rootid.IsNullOrEmpty())
+    {
+        if(!rootid.IsGuid(out rootID))
+        {
+            var dict = BDict.GetByCode(rootid);
+            if(dict!=null)
+            {
+                rootID = dict.ID;
+            }
+        }
+    }
+
+
+    var root = rootID != Guid.Empty ? BDict.Get(rootID) : BDict.GetRoot();
+    System.Text.StringBuilder json = new System.Text.StringBuilder("[", 1000);
+    json.Append("{");
+    json.AppendFormat("\"id\":\"{0}\",", root.ID);
+    json.AppendFormat("\"parentID\":\"{0}\",", root.ParentID);
+    json.AppendFormat("\"title\":\"{0}\",", root.Title);
+    json.AppendFormat("\"ico\":\"{0}\",", "/images/ico/role.gif");
+    json.AppendFormat("\"hasChilds\":\"{0}\",", BDict.HasChilds(root.ID) ? "1" : "0");
+    json.Append("\"childs\":[");
+
+    var childs = BDict.GetChilds(root.ID);
+    int i = 0;
+    int count = childs.Count;
+    foreach (var child in childs)
+    {
+        json.Append("{");
+        json.AppendFormat("\"id\":\"{0}\",", child.ID);
+        json.AppendFormat("\"parentID\":\"{0}\",", child.ParentID);
+        json.AppendFormat("\"title\":\"{0}\",", child.Title);
+        json.AppendFormat("\"ico\":\"{0}\",", "");
+        json.AppendFormat("\"hasChilds\":\"{0}\",", BDict.HasChilds(child.ID) ? "1" : "0");
+        json.Append("\"childs\":[");
+        json.Append("]");
+        json.Append("}");
+        if (i++ < count - 1)
+        {
+            json.Append(",");
+        }
+    }
+
+    json.Append("]");
+    json.Append("}");
+    json.Append("]");
+    Response.Write(json.ToString());
+    
+}
