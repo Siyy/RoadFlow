@@ -34,6 +34,7 @@
                 formattributeJSON.dbtablepk = json.dbtablepk;
                 formattributeJSON.dbtabletitle = json.dbtabletitle;
                 formattributeJSON.apptype = json.apptype;
+                formattributeJSON.autotitle = json.autotitle;
             }
             if (isNew)
             {
@@ -130,6 +131,14 @@
             me.execCommand('insertHtml', html);
         }
     };
+    UE.commands['formsubtable'] = {
+        execCommand: function (cmdName, html)
+        {
+            var me = this;
+            //range = me.selection.getRange()
+            me.execCommand('insertHtml', html);
+        }
+    };
     UE.commands['formopen'] = {
         execCommand: function (cmdName, id)
         {
@@ -217,6 +226,7 @@
             }
             else
             {
+                formattributeJSON.hasEditor = "0";
                 formid = formattributeJSON.id;
                 var html = me.getContent();
                 var $controls = $("[type1^='flow_']", me.document);
@@ -25985,6 +25995,7 @@ baidu.editor.ui = {};
         'formhidden': '~/dialogs/form/hidden.cshtml',
         'formselect': '~/dialogs/form/select.cshtml',
         'formfiles': '~/dialogs/form/files.cshtml',
+        'formsubtable': '~/dialogs/form/subtable.cshtml',
         'formopen': '~/dialogs/form/open.cshtml',
         'formnew': '~/dialogs/form/attribute.cshtml?new=1',
         'formsaveas': '~/dialogs/form/saveas.cshtml'
@@ -26117,7 +26128,7 @@ baidu.editor.ui = {};
         ok:['attachment', 'anchor', 'link', 'insertimage', 'map', 'gmap', 'insertframe', 'wordimage',
             'insertvideo', 'insertframe', 'edittip', 'edittable', 'edittd', 'scrawl', 'template', 'music', 'background', 'charts',
             'formattribute', 'formtext', 'formtextarea', 'formhtml', 'formradio', 'formcheckbox', 'formorg', 'formdictionary', 'formdatetime',
-            'formhidden', 'formselect', 'formfiles', 'formnew'
+            'formhidden', 'formselect', 'formfiles', 'formsubtable', 'formnew'
         ]
     };
 

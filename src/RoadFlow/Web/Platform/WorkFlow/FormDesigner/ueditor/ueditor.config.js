@@ -90,14 +90,14 @@
     "imagecenter", "inserttable", "deletetable", "mergeright", "mergedown", "splittorows", "splittocols", "splittocells", "mergecells",
     "insertcol", "insertrow", "deletecol", "deleterow", "insertparagraphbeforetable", "charts", "preview", "print", "help", "|",
     "formtext", "formtextarea", "formradio", "formcheckbox", "formhidden", "formselect", "formhtml", "formorg",
-    "formdictionary", "formdatetime", "formfiles", "|",
+    "formdictionary", "formdatetime", "formfiles", "formsubtable", "|",
     "formnew", "formopen", "formattribute", "formsave", "formsaveas", "formcompile"
 ]]
         //当鼠标放在工具栏上时显示的tooltip提示,留空支持自动多语言配置，否则以配置值为准
         , labelMap: {
             'anchor': '', 'undo': '', 'formattribute': '表单属性', 'formtext': '流程文本框', 'formtextarea': '流程文本域', 'formhtml': '流程HTML编辑器',
             'formradio': '流程单选按钮', 'formcheckbox': '流程复选框', 'formorg': '流程组织机构选择', 'formdictionary': '流程数据字典选择'
-            , 'formdatetime': '流程日期时间选择', 'formhidden': '流程隐藏域', 'formselect': '流程下拉列表框', 'formfiles': '流程附件管理',
+            , 'formdatetime': '流程日期时间选择', 'formhidden': '流程隐藏域', 'formselect': '流程下拉列表框', 'formfiles': '流程附件管理', 'formsubtable': '流程从表',
             'formnew': '新建表单', 'formopen': '打开表单', 'formsave': '保存表单', 'formsaveas': '另存表单', 'formcompile': '发布表单'
         }
         //webAppKey

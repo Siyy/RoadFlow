@@ -609,8 +609,11 @@
              //    step.forms.push({ id: $(this).attr("val"), name:$spans.eq(0).text(), type:$spans.eq(1).text(), srot:i });
              //});
              var form_type=$('#form_types').val();
-             var form_forms=$("#form_forms");
-             step.forms.push({ id: form_forms.val(), name:"", type:form_type, srot:0 });
+             var form_forms=$("#form_forms").val();
+             if(form_forms.length > 0 && form_type.length > 0)
+             {
+                 step.forms.push({ id: form_forms, name:"", type:form_type, srot:0 });
+             }
                                                                                                  
              step.buttons=[];
              $("#button_Select div ul").each(function(i){

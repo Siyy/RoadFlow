@@ -1920,6 +1920,14 @@ div.edui-box {
     width: 400px;
     height: 280px;
 }
+/*formsubtable-dialog*/
+.edui-default  .edui-for-formsubtable .edui-icon {
+    background: url(../images/formico/subtable.gif) no-repeat 2px 3px!important;
+}
+.edui-default .edui-for-formsubtable .edui-dialog-content {
+    width: 700px;
+    height: 460px;
+}
 /*formsave-dialog*/
 .edui-default  .edui-for-formsave .edui-icon {
     background: url(../images/formico/save.gif) no-repeat 2px 3px!important;

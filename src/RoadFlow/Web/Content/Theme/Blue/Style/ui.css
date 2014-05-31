@@ -91,13 +91,13 @@
 /*button*/
 
 /*tab1*/
-.mytab{height: 26px;line-height: 26px;background-color: #3c97dc;background:transparent url(../Images/tab/bg1.gif) repeat-x;
-  overflow: hidden;white-space: nowrap; padding-top:2px; position: relative; padding-left:2px; border-bottom:1px solid #284f8e;}
+.mytab{height: 26px;line-height: 26px;background-color: #f0f6ff;background:transparent url(../Images/tab/bg1.gif) repeat-x;
+  overflow: hidden;white-space: nowrap; padding-top:2px; position: relative; padding-left:2px; border-bottom:1px solid #95b8e7;}
 .mytab ul{margin: 0;padding: 0;position: relative;}
-.mytabli1{background:url(../Images/tab/tab1.gif) repeat-x; padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px; border: solid 1px #284f8e;
-                    margin:2px 2px 0 0;background-color: #3c97dc;float: left;position: relative;list-style-type: none;cursor: pointer;}
-.mytabli2{background:url(../Images/tab/tab2.gif) repeat-x;padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px;border: solid 1px #284f8e;
-                    margin:2px 2px 0 0;background-color: #3c97dc;float: left;position: relative; font-weight:normal; list-style-type: none;cursor: pointer;}
+.mytabli1{background:url(../Images/tab/tab1.gif) repeat-x; padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px; border: solid 1px #95b8e7;
+                    margin:2px 2px 0 0;background-color: #95b8e7;float: left;position: relative;list-style-type: none;cursor: pointer;}
+.mytabli2{background:url(../Images/tab/tab2.gif) repeat-x;padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px;border: solid 1px #95b8e7;
+                    margin:2px 2px 0 0;background-color: #95b8e7;float: left;position: relative; font-weight:normal; list-style-type: none;cursor: pointer;}
 .mytab_div{display:none; padding-top:8px; margin:0 auto;}
 /*tab1*/
 

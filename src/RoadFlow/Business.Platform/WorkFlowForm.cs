@@ -169,6 +169,26 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 得到从表编辑模式选择
+        /// </summary>
+        /// <returns></returns>
+        public string GetEditmodeOptions(string value)
+        {
+            ListItem[] items = new ListItem[]{ 
+                new ListItem("无",""){ Selected=""==value},
+                new ListItem("文本框","text"){ Selected="text"==value},
+                new ListItem("文本域","textarea"){ Selected="textarea"==value},
+                new ListItem("下拉列表","select"){ Selected="select"==value},
+                new ListItem("复选框","checkbox"){ Selected="checkbox"==value},
+                new ListItem("日期时间","datetime"){ Selected="datetime"==value},
+                new ListItem("组织机构选择","org"){ Selected="org"==value},
+                new ListItem("数据字典选择","dict"){ Selected="dict"==value},
+                new ListItem("附件","files"){ Selected="files"==value}
+            };
+            return Utility.Tools.GetOptionsString(items);
+        }
+
+        /// <summary>
         /// 得到状态显示
         /// </summary>
         /// <param name="status"></param>
