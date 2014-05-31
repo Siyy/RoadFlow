@@ -19,7 +19,7 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
+#[Bb]in
 [Dd]ebug*/
 *.lib
 *.sbr
@@ -37,3 +37,5 @@ src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/tmp/*
 src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/upload*
 src/RoadFlow/Web/Platform/WorkFlow/Sign/*
 !src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/Uploader.cs
+src/RoadFlow/Web/[Bb]in/*
+!src/RoadFlow/Web/[Bb]in/*.refresh
