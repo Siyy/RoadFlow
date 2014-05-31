@@ -9,6 +9,7 @@
     string name = Request["name"];
     string att = Request["att"];
     string id = Request["id"];
+    string subtable = Request["subtable"];
     if(name.IsNullOrEmpty())
     {
         Response.Write("表单名称不能为空!");
@@ -31,8 +32,8 @@
         wff = new Data.Model.WorkFlowForm();
         wff.ID = formID;
         wff.CreateUserID = Business.Platform.Users.CurrentUserID;
-        wff.CreateUserName = Business.Platform.Users.CurrentUsreName;
-        wff.CreateTime = Utility.Tools.DateTime;
+        wff.CreateUserName = Business.Platform.Users.CurrentUserName;
+        wff.CreateTime = Utility.DateTimeNew.Now;
         wff.Status = 0;
         isAdd = true;
     }
@@ -43,8 +44,9 @@
 
     wff.Attribute = att;
     wff.Html = html;
-    wff.LastModifyTime = Utility.Tools.DateTime;
+    wff.LastModifyTime = Utility.DateTimeNew.Now;
     wff.Name = name;
+    wff.SubTableJson = subtable;
    
     if(isAdd)
     {

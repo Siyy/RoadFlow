@@ -67,8 +67,8 @@
 /*window*/
 
 /*text*/
-.text1{background:#ffffff url(../images/public/textbg.gif) repeat-x; border:1px solid #b7b6b4; line-height:21px; vertical-align:middle; height:21px; padding-left:2px;}
-.text2{background:#ffffff url(../images/public/textbg.gif) repeat-x; border:1px solid #3399ff; line-height:21px; vertical-align:middle; height:21px; padding-left:2px;}
+.text1{background:#ffffff url(../images/public/textbg.gif) repeat-x; border:1px solid #b7b6b4; line-height:21px; vertical-align:middle; height:21px; padding-left:2px;  margin:0;}
+.text2{background:#ffffff url(../images/public/textbg.gif) repeat-x; border:1px solid #3399ff; line-height:21px; vertical-align:middle; height:21px; padding-left:2px;  margin:0;}
 /*text*/
 
 /*disabled text*/
@@ -78,6 +78,7 @@
 /*validate*/
 .validate1{display:inline-block; height:18px; width:18px; vertical-align:middle; margin-left:4px; border:none; background:url(../images/validate/right.png) no-repeat left center; _background:none; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/validate/right.png',sizingMethod='crop'); }
 .validate2{display:inline-block; height:18px; vertical-align:middle; margin-left:4px; padding:5px 3px 0 0; border:1px solid #ffcc5d; padding-left:18px; background:#fffdcf url(../images/validate/error.png) no-repeat left center; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/validate/error.png',sizingMethod='crop'); }
+.validate3{display:inline-block; height:18px; width:18px; vertical-align:middle; background:url(../images/validate/error.png) no-repeat center; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/validate/error.png',sizingMethod='crop'); }
 /*validate*/
 
 /*select*/

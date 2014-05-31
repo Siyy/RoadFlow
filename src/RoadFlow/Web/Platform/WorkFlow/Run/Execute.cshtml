@@ -18,7 +18,7 @@
 
     if(params1.IsNullOrEmpty())
     {
-        Response.Write("参数为空");
+        Response.Write("参数为空!");
         Response.End();
     }
     
@@ -33,10 +33,10 @@
     var wfInstalled=bworkFlow.GetWorkFlowRunModel(flowid);
     if(wfInstalled==null)
     {
-        Response.Write("未找到流程运行时实体");
+        Response.Write("未找到流程运行时实体,请确认流程是否已安装!");
         Response.End();
     }
-
+    
     //流程标题
     string titleField = Request.Form["Form_TitleField"];
     string title = Request.Form[titleField];
@@ -45,12 +45,11 @@
         title = "未命名任务";
     }
 
+    //保存业务数据
+    instanceid = bworkFlow.SaveFromData(instanceid);
 
     Data.Model.WorkFlowExecute.Execute execute = new Data.Model.WorkFlowExecute.Execute();
 
-    //保存业务数据
-    instanceid = bworkFlow.SaveFromData(instanceid);
-    
     execute.Comment = comment.IsNullOrEmpty() ? "" : comment.Trim();
     switch(opation)
     {
@@ -65,6 +64,9 @@
             break;
         case "completed":
             execute.ExecuteType = Data.Model.WorkFlowExecute.EnumType.ExecuteType.Completed;
+            break;
+        case "redirect":
+            execute.ExecuteType = Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect;
             break;
     }
     execute.FlowID = flowid.ToGuid();
@@ -99,7 +101,13 @@
                         break;
                     case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Completed:
                         break;
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect:
+                        break;
                 }
+            }
+            if (execute.ExecuteType == Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect)
+            {
+                execute.Steps.Add(Guid.Empty, borganize.GetAllUsers(member));
             }
         }
     }
@@ -133,7 +141,7 @@
     }
     
     //判断流转条件
-    if(steps.Count() > 0 && execute.ExecuteType == Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit)
+    if(execute.Steps.Count() > 0 && execute.ExecuteType == Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit)
     {
         System.Text.StringBuilder nosubmitMsg = new System.Text.StringBuilder();
         List<Guid> removeIDList = new List<Guid>();
@@ -151,15 +159,34 @@
                     if (objType != boolType && "1" != obj.ToString())
                     {
                         removeIDList.Add(step.Key);
-                        nosubmitMsg.Append(obj.ToString());
+                        //nosubmitMsg.Append(obj.ToString());
                         nosubmitMsg.Append("\\n");
                     }
                     else if (objType == boolType && !(bool)obj)
                     {
                         removeIDList.Add(step.Key);
-                        nosubmitMsg.Append(line.NoAccordMsg);
+                        //nosubmitMsg.Append(line.NoAccordMsg);
                         nosubmitMsg.Append("\\n");
                     }
+                }
+                else if(!line.SqlWhere.IsNullOrEmpty())
+                {
+                    if(wfInstalled.DataBases.Count()==0)
+                    {
+                        removeIDList.Add(step.Key);
+                        //nosubmitMsg.Append("流程未设置数据连接");
+                        nosubmitMsg.Append("\\n");
+                    }
+                    else 
+                    {
+                       if(!btask.TestLineSql(wfInstalled.DataBases.First().LinkID, wfInstalled.DataBases.First().Table,
+                            wfInstalled.DataBases.First().PrimaryKey, instanceid, line.SqlWhere))
+                       {
+                           removeIDList.Add(step.Key);
+                           //nosubmitMsg.Append(string.Concat("条件未满足"));
+                           nosubmitMsg.Append("\\n");
+                       }
+                    } 
                 }
             }
         }
@@ -168,9 +195,10 @@
             execute.Steps.Remove(rid);
         }
 
-        if (nosubmitMsg.Length>0)
+
+        if (execute.Steps.Count==0)
         {
-            Response.Write(string.Format("<script type=\"text/javascript\">alert('{0}');top.mainDialog.close();</script>", nosubmitMsg.ToString()));
+            Response.Write("<script type=\"text/javascript\">alert('后续所有步骤流转条件均不符合,任务未提交!');top.mainDialog.close();</script>");
             Response.End();
         }
     }

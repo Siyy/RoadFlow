@@ -137,7 +137,7 @@ namespace Business.Platform
                     wf = new Data.Model.WorkFlow();
                     isAdd = true;
                     wf.ID = flowID;
-                    wf.CreateDate = Utility.Tools.DateTime;
+                    wf.CreateDate = Utility.DateTimeNew.Now;
                     wf.CreateUserID = Business.Platform.Users.CurrentUserID;
                     wf.Status = 1;
                 }
@@ -861,6 +861,10 @@ namespace Business.Platform
         /// <returns></returns>
         public Bitmap CreateSignImage(string UserName)
         {
+            if (UserName.IsNullOrEmpty())
+            {
+                return null;
+            }
             System.Random rand = new Random(UserName.GetHashCode());
             Size ImageSize = Size.Empty;
             Font myFont = new Font("隶书", 16);
@@ -1021,14 +1025,25 @@ namespace Business.Platform
                     Business.Platform.Log.Add(ex);
                 }
                 
-                string sql = instanceid.IsNullOrEmpty() ?
-                    string.Format("SELECT * FROM {0} WHERE 1=0", dbtable)
-                    : string.Format("SELECT * FROM {0} WHERE {1}='{2}'", dbtable, dbtablepk, instanceid);
-                System.Data.IDbDataAdapter dataAdapter = bdbconn.GetDataAdapter(dbconn, sql, conn);
+                string sql = string.Empty;
+                List<System.Data.IDataParameter> parList = new List<System.Data.IDataParameter>();
+                if(instanceid.IsNullOrEmpty())
+                {
+                    sql = string.Format("SELECT * FROM {0} WHERE 1=0", dbtable);
+                }
+                else
+                {
+                    sql = string.Format("SELECT * FROM {0} WHERE {1}=@pk", dbtable, dbtablepk);
+                    switch (dbconn.Type)
+                    { 
+                        case "SqlServer":
+                            parList.Add(new System.Data.SqlClient.SqlParameter("@pk", instanceid));
+                            break;
+                    }
+                }
+                System.Data.IDbDataAdapter dataAdapter = bdbconn.GetDataAdapter(conn, dbconn.Type, sql, parList.ToArray());
                 System.Data.DataSet ds = new System.Data.DataSet();
-                
                 dataAdapter.Fill(ds);
-                
                 System.Data.DataTable schemaDt = bdbconn.GetTableSchema(conn, dbtable, dbconn.Type);
                 System.Data.DataTable dt = ds.Tables[0];
                 bool isNew = dt.Rows.Count == 0;
@@ -1036,7 +1051,8 @@ namespace Business.Platform
                 {
                     dt.Rows.Add(dt.NewRow());
                 }
-                
+
+                #region 保存主表数据
                 for (int i = 0; i < dt.Columns.Count; i++)
                 {
                     string colnumName = dt.Columns[i].ColumnName;
@@ -1052,48 +1068,12 @@ namespace Business.Platform
                     }
                     var colnum = dt.Columns[i];
                     string colnumDataType = colnum.DataType.FullName;
-                    bool isSet = false;
                     string defaultValue = string.Empty;
+
                     System.Data.DataRow[] schemaDrs = schemaDt.Select(string.Format("f_name='{0}'", colnumName));
                     bool hasDefault = schemaDrs.Length > 0 && schemaDrs[0]["cdefault"].ToString() != "0";//列是否有默认值
                     bool hasNull = schemaDrs.Length > 0 && schemaDrs[0]["is_null"].ToString() != "0";//列是否可以为空
-                    switch (colnumDataType)
-                    {
-                        case "System.Int16":
-                        case "System.Int32":
-                        case "System.Int64":
-                        case "System.UInt16":
-                        case "System.UInt32":
-                        case "System.UInt64":
-                            isSet = value.IsInt();
-                            defaultValue = int.MinValue.ToString();
-                            break;
-                        case "System.String":
-                            isSet = value != null;
-                            defaultValue = "";
-                            break;
-                        case "System.Guid":
-                            isSet = value.IsGuid();
-                            defaultValue = Guid.Empty.ToString();
-                            break;
-                        case "System.Decimal":
-                            isSet = value.IsDecimal();
-                            defaultValue = decimal.MinValue.ToString();
-                            break;
-                        case "System.Double":
-                        case "System.Single":
-                            isSet = value.IsDouble();
-                            defaultValue = Double.MinValue.ToString();
-                            break;
-                        case "System.DateTime":
-                            isSet = value.IsDateTime();
-                            defaultValue = DateTime.MinValue.ToString();
-                            break;
-                        case "System.Object":
-                            isSet = value != null;
-                            defaultValue = "";
-                            break;
-                    }
+                    bool isSet = getColnumIsValue(colnumDataType, value, out defaultValue);
                     if (isSet)
                     {
                         dt.Rows[0][colnumName] = value;
@@ -1112,14 +1092,9 @@ namespace Business.Platform
                             }
                         }
                     }
-                    
                 }
-                
-                //设置标题字段值
-                //if (dt.Rows[0][dbtabletitle].ToString().IsNullOrEmpty())
-                //{
-                //    dt.Rows[0][dbtabletitle] = System.Web.HttpContext.Current.Request.Form["Flow_Title"] ?? "未命名任务";
-                //}
+                #endregion
+
                 #region 设置主键值
                 bool isIdentity = false;
                 if (isNew)
@@ -1146,15 +1121,16 @@ namespace Business.Platform
                     }
                 }
                 #endregion
+
+                #region 执行保存
                 switch (dbconn.Type)
                 {
                     case "SqlServer":
                         System.Data.SqlClient.SqlCommandBuilder scb = new System.Data.SqlClient.SqlCommandBuilder((System.Data.SqlClient.SqlDataAdapter)dataAdapter);
-                        //System.Web.HttpContext.Current.Response.Write(scb.GetUpdateCommand().Parameters["@p5"].TypeName+"--");
-                        //System.Web.HttpContext.Current.Response.End();
                         break;
                 }
                 dataAdapter.Update(ds);
+                #endregion
 
                 #region 如果是新增，又是自增列则查询刚插入的自增列值
                 if (isNew && isIdentity)
@@ -1169,14 +1145,205 @@ namespace Business.Platform
                                 if (obj != null)
                                 {
                                     instanceid = obj.ToString();
+                                    dt.Rows[0][dbtablepk] = instanceid;
                                 }
                             }
                             break;
                     }
                 }
                 #endregion
+
+                #region 保存从表数据
+                
+                string flowSubTableIDString = System.Web.HttpContext.Current.Request.Form["flowsubtable_id"] ?? "";
+                string[] flowSubTableIDArray = flowSubTableIDString.Split(',');
+                foreach (string flowSubTableID in flowSubTableIDArray)
+                {
+                    string secondtable = System.Web.HttpContext.Current.Request.Form["flowsubtable_" + flowSubTableID + "_secondtable"];
+                    string primarytablefiled = System.Web.HttpContext.Current.Request.Form["flowsubtable_" + flowSubTableID + "_primarytablefiled"];
+                    string secondtableprimarykey = System.Web.HttpContext.Current.Request.Form["flowsubtable_" + flowSubTableID + "_secondtableprimarykey"];
+                    string secondtablerelationfield = System.Web.HttpContext.Current.Request.Form["flowsubtable_" + flowSubTableID + "_secondtablerelationfield"];
+                    if (secondtable.IsNullOrEmpty() || primarytablefiled.IsNullOrEmpty() || secondtableprimarykey.IsNullOrEmpty() || secondtablerelationfield.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+                    string primyarTableFeldValue = dt.Rows[0][primarytablefiled].ToString();
+                    if (primyarTableFeldValue.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+                    string subSql = string.Format("SELECT * FROM {0} WHERE {1}=@pk", secondtable, secondtablerelationfield);
+                    List<System.Data.IDataParameter> parList1 = new List<System.Data.IDataParameter>();
+                    switch (dbconn.Type)
+                    { 
+                        case "SqlServer":
+                            parList1.Add(new System.Data.SqlClient.SqlParameter("@pk", primyarTableFeldValue));
+                            break;
+                    }
+                    string[] colGuidArray = (System.Web.HttpContext.Current.Request.Form["hidden_guid_" + flowSubTableID] ?? "").Split(',');
+                    System.Data.IDbDataAdapter dataAdapter1 = bdbconn.GetDataAdapter(conn, dbconn.Type, subSql, parList1.ToArray());
+                    System.Data.DataSet ds1 = new System.Data.DataSet();
+                    dataAdapter1.Fill(ds1);
+                    System.Data.DataTable schemaDt1 = bdbconn.GetTableSchema(conn, secondtable, dbconn.Type);
+                    System.Data.DataTable dt1 = ds1.Tables[0];
+                    bool isInitNew = dt1.Rows.Count == 0;
+                    foreach (string colGuid in colGuidArray)
+                    {
+                        bool isNew1 = true;
+                        System.Data.DataRow dr1 = null;
+                        foreach (System.Data.DataRow dr in dt1.Rows)
+                        {
+                            if (string.Compare(dr[secondtableprimarykey].ToString(), colGuid, 0) == 0)
+                            {
+                                dr1 = dr;
+                                isNew1 = false;
+                                break;
+                            }
+                        }
+                       
+                        if (isNew1)
+                        {
+                            dr1 = dt1.NewRow();
+                            dr1[secondtablerelationfield] = primyarTableFeldValue;
+                            dt1.Rows.Add(dr1);
+                            
+                            isNew1 = true;
+                        }
+                    
+                        #region 循环保存列数据
+                        for (int i = 0; i < dt1.Columns.Count; i++)
+                        {
+                            string colnumName1 = dt1.Columns[i].ColumnName;
+                            if (string.Compare(colnumName1, secondtableprimarykey, true) == 0
+                                 || string.Compare(colnumName1, secondtablerelationfield,0) ==0 )
+                            {
+                                continue;
+                            }
+
+                            string value1 = System.Web.HttpContext.Current.Request.Form[flowSubTableID + "_" + colGuid + "_" + secondtable + "_" + colnumName1];
+                            if (value1 == null && !isNew1)
+                            {
+                                continue;
+                            }
+                            var colnum1 = dt1.Columns[i];
+                            string colnumDataType1 = colnum1.DataType.FullName;
+                            string defaultValue1 = string.Empty;
+
+                            System.Data.DataRow[] schemaDrs1 = schemaDt1.Select(string.Format("f_name='{0}'", colnumName1));
+                            bool hasDefault1 = schemaDrs1.Length > 0 && schemaDrs1[0]["cdefault"].ToString() != "0";//列是否有默认值
+                            bool hasNull1 = schemaDrs1.Length > 0 && schemaDrs1[0]["is_null"].ToString() != "0";//列是否可以为空
+                            bool isSet1 = getColnumIsValue(colnumDataType1, value1, out defaultValue1);
+                            if (isSet1)
+                            {
+                                dr1[colnumName1] = value1;
+                            }
+                            else
+                            {
+                                if (!hasDefault1)
+                                {
+                                    if (hasNull1)
+                                    {
+                                        dr1[colnumName1] = DBNull.Value;
+                                    }
+                                    else
+                                    {
+                                        dr1[colnumName1] = defaultValue1;
+                                    }
+                                }
+                            }
+                        }
+
+                        #endregion
+                    }
+                    #region 删除多余行
+                    if (!isInitNew)
+                    {
+                        for (int i = 0; i < dt1.Rows.Count; i++)
+                        {
+                            bool isIn = false;
+                            foreach (string colGuid in colGuidArray)
+                            {
+                                if (dt1.Rows[i][secondtableprimarykey].ToString().IsNullOrEmpty() || string.Compare(dt1.Rows[i][secondtableprimarykey].ToString(), colGuid, 0) == 0)
+                                {
+                                    isIn = true;
+                                    break;
+                                }
+                            }
+                            if (!isIn)
+                            {
+                                dt1.Rows[i].Delete();
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region 执行保存
+                    switch (dbconn.Type)
+                    {
+                        case "SqlServer":
+                            System.Data.SqlClient.SqlCommandBuilder scb1 = new System.Data.SqlClient.SqlCommandBuilder((System.Data.SqlClient.SqlDataAdapter)dataAdapter1);
+                            break;
+                    }
+                    dataAdapter1.Update(ds1);
+                    #endregion
+
+                }
+                
+                #endregion
+
                 return instanceid;
             }
+        }
+
+        /// <summary>
+        /// 判断列是否有值
+        /// </summary>
+        /// <param name="colnumDataType"></param>
+        /// <param name="value"></param>
+        /// <param name="defaultValue">默认值</param>
+        /// <returns></returns>
+        private bool getColnumIsValue(string colnumDataType, string value, out string defaultValue)
+        {
+            bool isSet = false;
+            defaultValue = null;
+            switch (colnumDataType)
+            {
+                case "System.Int16":
+                case "System.Int32":
+                case "System.Int64":
+                case "System.UInt16":
+                case "System.UInt32":
+                case "System.UInt64":
+                    isSet = value.IsInt();
+                    defaultValue = int.MinValue.ToString();
+                    break;
+                case "System.String":
+                    isSet = value != null;
+                    defaultValue = "";
+                    break;
+                case "System.Guid":
+                    isSet = value.IsGuid();
+                    defaultValue = Guid.Empty.ToString();
+                    break;
+                case "System.Decimal":
+                    isSet = value.IsDecimal();
+                    defaultValue = decimal.MinValue.ToString();
+                    break;
+                case "System.Double":
+                case "System.Single":
+                    isSet = value.IsDouble();
+                    defaultValue = Double.MinValue.ToString();
+                    break;
+                case "System.DateTime":
+                    isSet = value.IsDateTime();
+                    defaultValue = DateTime.MinValue.ToString();
+                    break;
+                case "System.Object":
+                    isSet = value != null;
+                    defaultValue = "";
+                    break;
+            }
+            return isSet;
         }
 
         /// <summary>
@@ -1216,8 +1383,15 @@ namespace Business.Platform
                     System.Web.HttpContext.Current.Response.Write("连接数据库出错：" + ex.Message);
                     Business.Platform.Log.Add(ex);
                 }
-                string sql = string.Format("SELECT * FROM {0} WHERE {1}='{2}'", table, pk, instanceid);
-                System.Data.IDbDataAdapter dataAdapter = bdbconn.GetDataAdapter(dbconn, sql, conn);
+                List<System.Data.IDataParameter> parList = new List<System.Data.IDataParameter>();
+                switch (dbconn.Type)
+                { 
+                    case "SqlServer":
+                        parList.Add(new System.Data.SqlClient.SqlParameter("@pk", instanceid));
+                        break;
+                }
+                string sql = string.Format("SELECT * FROM {0} WHERE {1}=@pk", table, pk);
+                System.Data.IDbDataAdapter dataAdapter = bdbconn.GetDataAdapter(conn, dbconn.Type, sql, parList.ToArray());
                 System.Data.DataSet ds = new System.Data.DataSet();
                 dataAdapter.Fill(ds);
                 System.Data.DataTable dt = ds.Tables[0];
@@ -1230,6 +1404,97 @@ namespace Business.Platform
                     }
                 }
 
+            }
+            return jsonData;
+        }
+
+        /// <summary>
+        /// 得到实例数据
+        /// </summary>
+        /// <param name="connid"></param>
+        /// <param name="table"></param>
+        /// <param name="pk"></param>
+        /// <param name="instanceid"></param>
+        /// <returns>json字符串</returns>
+        public string GetFormDataJsonString(string connid, string table, string pk, string instanceid)
+        {
+            LitJson.JsonData jsonData = GetFormData(connid, table, pk, instanceid);
+            return GetFormDataJsonString(jsonData);
+        }
+
+        
+        /// <summary>
+        /// 得到实例数据
+        /// </summary>
+        /// <param name="jsonData"></param>
+        /// <returns>json字符串</returns>
+        public string GetFormDataJsonString(LitJson.JsonData jsonData)
+        {
+            string json = jsonData.ToJson();
+            return json.IsNullOrEmpty() ? "{}" : json;
+        }
+
+        /// <summary>
+        /// 得到从表数据
+        /// </summary>
+        /// <param name="connID">连接ID</param>
+        /// <param name="secondTable">从表名称</param>
+        /// <param name="relationField">关联字段</param>
+        /// <param name="fieldValue">关联字段值</param>
+        /// <param name="sortField">排序字段</param>
+        /// <returns></returns>
+        public LitJson.JsonData GetSubTableData(string connID, string secondTable, string relationField, string fieldValue, string sortField = "")
+        {
+            LitJson.JsonData jsonData = new LitJson.JsonData();
+            if (fieldValue.IsNullOrEmpty())
+            {
+                return jsonData;
+            }
+            Business.Platform.DBConnection bdbconn = new Business.Platform.DBConnection();
+            Data.Model.DBConnection dbconn = bdbconn.Get(connID.ToGuid());
+            if (dbconn == null)
+            {
+                return "";
+            }
+
+            using (System.Data.IDbConnection conn = bdbconn.GetConnection(dbconn))
+            {
+                if (conn == null)
+                {
+                    return "";
+                }
+                try
+                {
+                    conn.Open();
+                }
+                catch (Exception ex)
+                {
+                    System.Web.HttpContext.Current.Response.Write("连接数据库出错：" + ex.Message);
+                    Business.Platform.Log.Add(ex);
+                }
+                List<System.Data.IDataParameter> parList = new List<System.Data.IDataParameter>();
+                switch (dbconn.Type)
+                {
+                    case "SqlServer":
+                        parList.Add(new System.Data.SqlClient.SqlParameter("@fieldvalue", fieldValue));
+                        break;
+                }
+                string sql = string.Format("SELECT * FROM {0} WHERE {1}=@fieldvalue {2}", secondTable, relationField,
+                    (sortField.IsNullOrEmpty() ? "" : string.Concat("ORDER BY ", sortField)));
+                System.Data.IDbDataAdapter dataAdapter = bdbconn.GetDataAdapter(conn, dbconn.Type, sql, parList.ToArray());
+                System.Data.DataSet ds = new System.Data.DataSet();
+                dataAdapter.Fill(ds);
+                System.Data.DataTable dt = ds.Tables[0];
+                //jsonData.SetJsonType(LitJson.JsonType.Array);
+                foreach (System.Data.DataRow dr in dt.Rows)
+                {
+                    LitJson.JsonData data = new LitJson.JsonData();
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data[secondTable + "_" + dt.Columns[i].ColumnName] = dr[dt.Columns[i].ColumnName].ToString();
+                    }
+                    jsonData.Add(data);
+                }
             }
             return jsonData;
         }
@@ -1305,6 +1570,7 @@ namespace Business.Platform
             }
             return sb.ToString() + "}";
         }
+
         
     }
     

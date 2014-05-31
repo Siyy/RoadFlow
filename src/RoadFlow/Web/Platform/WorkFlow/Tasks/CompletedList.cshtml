@@ -28,14 +28,19 @@
         date2 = Request.QueryString["date2"];
     }
 
-    string query = string.Format("&appid={0}&tabid={1}&title={2}&flowid={3}&sender={4}&date1={5}&date2={6}&pagesize={7}&pagenumber={8}",
-        Request.QueryString["appid"], Request.QueryString["tabid"], title.UrlEncode(), flowid, sender, date1, date2,
+    string query2 = string.Format("&appid={0}&tabid={1}&title={2}&flowid={3}&sender={4}&date1={5}&date2={6}",
+        Request.QueryString["appid"], Request.QueryString["tabid"], title.UrlEncode(), flowid, sender, date1, date2
+        );
+
+    string query = string.Format("{0}&pagesize={1}&pagenumber={2}",
+        query2,
         Request.QueryString["pagesize"], Request.QueryString["pagenumber"]
         );
+   
     string pager;
 
     var taskList = bworkFlowTask.GetTasks(Business.Platform.Users.CurrentUserID,
-       out pager, query, title, flowid, sender, date1, date2, 1);
+       out pager, query2, title, flowid, sender, date1, date2, 1);
 
     string flowOptions = bworkFlow.GetOptions(flowid);
 }

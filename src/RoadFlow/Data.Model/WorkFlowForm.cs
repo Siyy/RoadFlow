@@ -50,6 +50,12 @@ namespace Data.Model
         public string Html { get; set; }
 
         /// <summary>
+        /// 从表设置数据
+        /// </summary>
+        [DisplayName("从表设置数据")]
+        public string SubTableJson { get; set; }
+
+        /// <summary>
         /// 相关属性
         /// </summary>
         [DisplayName("相关属性")]

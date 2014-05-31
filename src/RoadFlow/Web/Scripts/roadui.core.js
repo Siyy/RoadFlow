@@ -13,6 +13,16 @@ RoadUI.Core = {
                 guid += "-";
             }
         }
+        //$.ajax({
+        //    url: "/Platform/System/GetGuid", async: false, cache: false, success: function (txt)
+        //    {
+        //        guid = txt;
+        //    }
+        //});
+        //if (!isMiddline)
+        //{
+        //    guid = guid.replaceAll('-', '');
+        //}
         return guid;
     },
     query: function (name)
@@ -243,6 +253,20 @@ Date.prototype.format = function (format)
         }
     }
     return format;
+};
+Array.prototype.unique = function ()
+{
+    var res = [];
+    var json = {};
+    for (var i = 0; i < this.length; i++)
+    {
+        if (!json[this[i]])
+        {
+            res.push(this[i]);
+            json[this[i]] = 1;
+        }
+    }
+    return res;
 };
 
 var currentFocusObj = null; //当前焦点对象

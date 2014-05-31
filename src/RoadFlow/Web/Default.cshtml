@@ -27,12 +27,12 @@
         <div style="height:18px;"></div>
         <div style="padding-right:20px;">
             <div>
-                <span style="margin-right:0px; background:url(/images/ico/member.gif) no-repeat left; padding-left:18px;">欢迎您:@userName</span>
+                <span style="margin-right:0px; background:url(/images/ico/member.gif) no-repeat left; padding-left:18px;">欢迎您：@userName</span>
                 <span style="margin-right:6px;"></span>
-                <span style="margin-right:6px;">日期:<span id="CurrentDateTimeSpan">@dateTime</span></span>
-                <span style="">主题:</span>
-                <span class="mainTheme_bluelight" onclick="changeTheme('BlueLight');"></span>
+                <span style="margin-right:6px;">日期：<span id="CurrentDateTimeSpan">@dateTime</span></span>
+                <span style="">主题：</span>
                 <span class="mainTheme_blue" onclick="changeTheme('Blue');"></span>
+                <span class="mainTheme_bluelight" onclick="changeTheme('BlueLight');"></span>
                 <span class="mainTheme_green" onclick="changeTheme('Green');"></span>
             </div>
             <div style="margin-top:8px;">
@@ -99,7 +99,7 @@
         openApp("/Home", 0, "首页", "index");
 
         //初始化主题按钮样式
-        var theme = $.cookies.get("theme_platform") || "BlueLight";
+        var theme = $.cookies.get("theme_platform") || "Blue";
         changeTheme(theme);
     });
 

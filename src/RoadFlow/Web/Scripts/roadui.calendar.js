@@ -12,7 +12,7 @@
             var maxDate = $(this).attr("maxdate");
             if (istime != null && (istime.toLowerCase() == "true" || istime == "1"))
                 format = "yyyy/MM/dd HH:mm";
-            $(this).addClass("mytext").bind("click", function ()
+            $(this).removeClass().addClass("mytext").bind("click", function ()
             {
                 var opts = { dateFmt: format };
                 if (minDate)

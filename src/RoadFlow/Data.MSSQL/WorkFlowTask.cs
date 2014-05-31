@@ -197,9 +197,13 @@ namespace Data.MSSQL
         /// <summary>
         /// 更新打开时间
         /// </summary>
-        public void UpdateOpenTime(Guid id, DateTime openTime)
+        /// <param name="id"></param>
+        /// <param name="openTime"></param>
+        /// <param name="isStatus">是否将状态更新为1</param>
+        public void UpdateOpenTime(Guid id, DateTime openTime, bool isStatus = false)
         {
-            string sql = "UPDATE WorkFlowTask SET OpenTime=@OpenTime WHERE ID=@ID AND OpenTime IS NULL";
+            string sql = "UPDATE WorkFlowTask SET OpenTime=@OpenTime " + (isStatus ? ", Status=1" : "") + " WHERE ID=@ID AND OpenTime IS NULL";
+            
             SqlParameter[] parameters = new SqlParameter[]{
                 openTime==DateTime.MinValue? new SqlParameter("@OpenTime", SqlDbType.DateTime){ Value = DBNull.Value} :
                     new SqlParameter("@OpenTime", SqlDbType.DateTime){ Value = openTime },
@@ -224,8 +228,8 @@ namespace Data.MSSQL
         public List<Data.Model.WorkFlowTask> GetTasks(Guid userID, out string pager, string query="", string title="", string flowid="", string sender="", string date1="", string date2="", int type=0)
         {
             List<SqlParameter> parList = new List<SqlParameter>();
-            StringBuilder sql = new StringBuilder("SELECT *,ROW_NUMBER() OVER(ORDER BY ReceiveTime DESC) AS PagerAutoRowNumber FROM WorkFlowTask WHERE ReceiveID=@ReceiveID");
-            sql.Append(type == 0 ? " AND Status=0" : " AND Status IN(2,3)");
+            StringBuilder sql = new StringBuilder("SELECT *,ROW_NUMBER() OVER(ORDER BY " + (type == 0 ? "ReceiveTime DESC" : "CompletedTime1 DESC") + ") AS PagerAutoRowNumber FROM WorkFlowTask WHERE ReceiveID=@ReceiveID");
+            sql.Append(type == 0 ? " AND Status IN(0,1)" : " AND Status IN(2,3)");
             parList.Add(new SqlParameter("@ReceiveID", SqlDbType.UniqueIdentifier) { Value = userID });
             if (!title.IsNullOrEmpty())
             {
@@ -288,7 +292,7 @@ namespace Data.MSSQL
         {
             List<SqlParameter> parList = new List<SqlParameter>();
             StringBuilder sql = new StringBuilder(@"SELECT a.*,ROW_NUMBER() OVER(ORDER BY a.SenderTime DESC) AS PagerAutoRowNumber FROM WorkFlowTask a
-                WHERE a.ID=(SELECT TOP 1 ID FROM WorkFlowTask WHERE FlowID=a.FlowID AND GroupID=a.GroupID AND PrevID='00000000-0000-0000-0000-000000000000')");
+                WHERE a.ID=(SELECT TOP 1 ID FROM WorkFlowTask WHERE FlowID=a.FlowID AND GroupID=a.GroupID ORDER BY Sort DESC)");
 
             if (flowID != null && flowID.Length > 0)
             {
@@ -535,11 +539,20 @@ namespace Data.MSSQL
         /// <returns></returns>
         public List<Data.Model.WorkFlowTask> GetTaskList(Guid taskID)
         {
-            string sql = "SELECT * FROM WorkFlowTask WHERE PrevID=(SELECT PrevID FROM WorkFlowTask WHERE ID=@ID)";
             SqlParameter[] parameters = new SqlParameter[]{
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier){ Value = taskID }
 			};
-            SqlDataReader dataReader = dbHelper.GetDataReader(sql, parameters);
+            var prevID = dbHelper.GetFieldValue("SELECT PrevID FROM WorkFlowTask WHERE ID=@ID", parameters.ToArray());
+            Guid pid;
+            if (prevID.IsGuid(out pid) && pid.IsEmptyGuid())
+            {
+                return new List<Model.WorkFlowTask>() { Get(taskID) };
+            }
+            string sql = "SELECT * FROM WorkFlowTask WHERE PrevID=@PrevID";
+            SqlParameter[] parameters1 = new SqlParameter[]{
+                new SqlParameter("@PrevID", SqlDbType.UniqueIdentifier){ Value = pid }
+			};
+            SqlDataReader dataReader = dbHelper.GetDataReader(sql, parameters1);
             List<Data.Model.WorkFlowTask> List = DataReaderToList(dataReader);
             dataReader.Close();
             return List;
@@ -617,6 +630,22 @@ namespace Data.MSSQL
             bool has = dataReader.HasRows;
             dataReader.Close();
             return has;
+        }
+
+        /// <summary>
+        /// 得到一个任务的状态
+        /// </summary>
+        /// <param name="taskID"></param>
+        /// <returns></returns>
+        public int GetTaskStatus(Guid taskID)
+        {
+            string sql = "SELECT Status FROM WorkFlowTask WHERE ID=@ID";
+            SqlParameter[] parameters = new SqlParameter[]{
+                new SqlParameter("@ID", SqlDbType.UniqueIdentifier){ Value = taskID }
+			};
+            string status = dbHelper.GetFieldValue(sql, parameters);
+            int s;
+            return status.IsInt(out s) ? s : -1;
         }
     }
 }

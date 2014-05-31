@@ -1,0 +1,10 @@
+﻿body { margin: 0px; font-size: 12px; }
+table, td, th, p, div, span, label { font-size: 12px; }
+p { margin: 8px 0px; }
+.flowformtable { background-color:#dddddd; }
+.flowformtable tbody tr td { background:#ffffff; padding:5px 0 5px 3px;}
+.flowformtable thead tr td { background:#ffffff; padding:5px 0 5px 3px;}
+
+.flowformsubtable { background-color:#dddddd; }
+.flowformsubtable tbody tr td { background:#ffffff; padding:5px 0 5px 3px;}
+.flowformsubtable thead tr td { background:#ffffff; padding:5px 0 5px 3px;}

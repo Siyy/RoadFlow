@@ -4,6 +4,7 @@
     Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
     string link_DBConnOptions = bdbConn.GetAllOptions();
     string typeOptions = new Business.Platform.AppLibrary().GetTypeOptions("");
+    string validatePromptType = new Business.Platform.WorkFlowForm().GetValidatePropTypeRadios("validatealerttype","","");
 }
 <br />
 <script type="text/javascript" src="../internal.js"></script>
@@ -39,6 +40,10 @@
         <th>任务标题:</th>
         <td><input type="checkbox" value="1" id="autotitle" style="vertical-align:middle;"/><label for="autotitle" style="vertical-align:middle;">自动生成任务标题</label></td>
     </tr>
+    <tr>
+        <th>验证提示:</th>
+        <td>@Html.Raw(validatePromptType)</td>
+    </tr>
 </table>
 <script type="text/javascript">
     var attJSON = parent.formattributeJSON;
@@ -60,6 +65,7 @@
             $("#type").val(attJSON.apptype || "");
             $("#autotitle").prop("checked", attJSON.autotitle)
             $("#typeselect").val(attJSON.apptype || "");
+            $("input[name='validatealerttype'][value='" + attJSON.validatealerttype + "']").prop('checked', true);
         }
     });
     function db_change(obj, table)
@@ -97,7 +103,7 @@
         json.dbtabletitle = $("#dbtitle").val();
         json.apptype = $("#type").val();
         json.autotitle = $("#autotitle").prop("checked");
-
+        json.validatealerttype = $(":checked[name='validatealerttype']").val();
         editor.execCommand("formattribute", json, isnew);
         dialog.close();
     }

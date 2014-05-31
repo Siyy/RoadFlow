@@ -31,8 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitJSON">
-      <HintPath>F:\TDDownload\LitJSON\LitJSON.dll</HintPath>
+    <Reference Include="LitJSON, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Source\Web\bin\LitJSON.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

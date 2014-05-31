@@ -89,9 +89,10 @@
     "directionalityltr", "directionalityrtl", "removeformat", "formatmatch", "imagenone", "imageleft", "imageright",
     "imagecenter", "inserttable", "deletetable", "mergeright", "mergedown", "splittorows", "splittocols", "splittocells", "mergecells",
     "insertcol", "insertrow", "deletecol", "deleterow", "insertparagraphbeforetable", "charts", "preview", "print", "help", "|",
+    "formnew", "formopen", "formattribute", "|",
     "formtext", "formtextarea", "formradio", "formcheckbox", "formhidden", "formselect", "formhtml", "formorg",
     "formdictionary", "formdatetime", "formfiles", "formsubtable", "|",
-    "formnew", "formopen", "formattribute", "formsave", "formsaveas", "formcompile"
+    "formsave", "formsaveas", "formcompile"
 ]]
         //当鼠标放在工具栏上时显示的tooltip提示,留空支持自动多语言配置，否则以配置值为准
         , labelMap: {
@@ -135,7 +136,7 @@
 
         //,autoClearinitialContent:true //是否自动清除编辑器初始内容，注意：如果focus属性设置为true,这个也为真，那么编辑器一上来就会触发导致初始化的内容看不到了
 
-        //,iframeCssUrl: URL + '/themes/iframe.css' //给编辑器内部引入一个css文件
+        , iframeCssUrl: '/Platform/themes/WorkFlow/FormDesigner/Forms/Public/flowform.css' //给编辑器内部引入一个css文件
 
         //,textarea:'editorValue' // 提交表单时，服务器获取编辑器提交内容的所用的参数，多实例时可以给容器name属性，会将name给定的值最为每个实例的键值，不用每次实例化的时候都设置这个值
 
@@ -152,7 +153,7 @@
         //,imagePopup:true      //图片操作的浮层开关，默认打开
 
         //如果自定义，最好给p标签如下的行高，要不输入中文时，会有跳动感
-        //,initialStyle:'p{line-height:1em}'//编辑器层级的基数,可以用来改变字体等
+        , initialStyle: 'p,table,div,span,label{line-height:1em; font-size: 12px; }'//编辑器层级的基数,可以用来改变字体等
 
         //,autoSyncData:true //自动同步编辑器要提交的数据
         //,emotionLocalization:false //是否开启表情本地化，默认关闭。若要开启请确保emotion文件夹下包含官网提供的images表情文件夹
@@ -277,17 +278,18 @@
         //  ]
 
         //右键菜单的内容，可以参考plugins/contextmenu.js里边的默认菜单的例子，label留空支持国际化，否则以此配置为准
-//        ,contextMenu:[
-//            {
-//                label:'',       //显示的名称
-//                cmdName:'selectall',//执行的command命令，当点击这个右键菜单时
-//                //exec可选，有了exec就会在点击时执行这个function，优先级高于cmdName
-//                exec:function () {
-//                    //this是当前编辑器的实例
-//                    //this.ui._dialogs['inserttableDialog'].open();
-//                }
-//            }
-//           ]
+        //,contextMenu:[
+        //    {
+        //        label:'test',       //显示的名称
+        //        cmdName:'selectall',//执行的command命令，当点击这个右键菜单时
+        //        //exec可选，有了exec就会在点击时执行这个function，优先级高于cmdName
+        //        exec:function () {
+        //            //this是当前编辑器的实例
+        //            //this.ui._dialogs['inserttableDialog'].open();
+
+        //        }
+        //    }
+        //   ]
 
         //快捷菜单
         //,shortcutMenu:["fontfamily","fontsize","bold","italic","underline","forecolor","backcolor","insertorderedlist","insertunorderedlist"]

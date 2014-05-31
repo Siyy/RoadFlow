@@ -23,8 +23,8 @@ namespace Data.MSSQL
         public int Add(Data.Model.WorkFlowForm model)
         {
             string sql = @"INSERT INTO WorkFlowForm
-				(ID,Name,CreateUserID,CreateUserName,CreateTime,LastModifyTime,Html,Attribute,Status) 
-				VALUES(@ID,@Name,@CreateUserID,@CreateUserName,@CreateTime,@LastModifyTime,@Html,@Attribute,@Status)";
+				(ID,Name,CreateUserID,CreateUserName,CreateTime,LastModifyTime,Html,SubTableJson,Attribute,Status) 
+				VALUES(@ID,@Name,@CreateUserID,@CreateUserName,@CreateTime,@LastModifyTime,@Html,@SubTableJson,@Attribute,@Status)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
@@ -33,6 +33,7 @@ namespace Data.MSSQL
 				new SqlParameter("@CreateTime", SqlDbType.DateTime, 8){ Value = model.CreateTime },
 				new SqlParameter("@LastModifyTime", SqlDbType.DateTime, 8){ Value = model.LastModifyTime },
 				model.Html == null ? new SqlParameter("@Html", SqlDbType.Text, -1) { Value = DBNull.Value } : new SqlParameter("@Html", SqlDbType.Text, -1) { Value = model.Html },
+				model.SubTableJson == null ? new SqlParameter("@SubTableJson", SqlDbType.Text, -1) { Value = DBNull.Value } : new SqlParameter("@SubTableJson", SqlDbType.Text, -1) { Value = model.SubTableJson },
 				model.Attribute == null ? new SqlParameter("@Attribute", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Attribute", SqlDbType.VarChar, -1) { Value = model.Attribute },
 				new SqlParameter("@Status", SqlDbType.Int, -1){ Value = model.Status }
 			};
@@ -45,7 +46,7 @@ namespace Data.MSSQL
         public int Update(Data.Model.WorkFlowForm model)
         {
             string sql = @"UPDATE WorkFlowForm SET 
-				Name=@Name,CreateUserID=@CreateUserID,CreateUserName=@CreateUserName,CreateTime=@CreateTime,LastModifyTime=@LastModifyTime,Html=@Html,Attribute=@Attribute,Status=@Status
+				Name=@Name,CreateUserID=@CreateUserID,CreateUserName=@CreateUserName,CreateTime=@CreateTime,LastModifyTime=@LastModifyTime,Html=@Html,SubTableJson=@SubTableJson,Attribute=@Attribute,Status=@Status
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
@@ -54,6 +55,7 @@ namespace Data.MSSQL
 				new SqlParameter("@CreateTime", SqlDbType.DateTime, 8){ Value = model.CreateTime },
 				new SqlParameter("@LastModifyTime", SqlDbType.DateTime, 8){ Value = model.LastModifyTime },
 				model.Html == null ? new SqlParameter("@Html", SqlDbType.Text, -1) { Value = DBNull.Value } : new SqlParameter("@Html", SqlDbType.Text, -1) { Value = model.Html },
+				model.SubTableJson == null ? new SqlParameter("@SubTableJson", SqlDbType.Text, -1) { Value = DBNull.Value } : new SqlParameter("@SubTableJson", SqlDbType.Text, -1) { Value = model.SubTableJson },
 				model.Attribute == null ? new SqlParameter("@Attribute", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Attribute", SqlDbType.VarChar, -1) { Value = model.Attribute },
 				new SqlParameter("@Status", SqlDbType.Int, -1){ Value = model.Status },
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID }
@@ -90,8 +92,10 @@ namespace Data.MSSQL
                 if (!dataReader.IsDBNull(6))
                     model.Html = dataReader.GetString(6);
                 if (!dataReader.IsDBNull(7))
-                    model.Attribute = dataReader.GetString(7);
-                model.Status = dataReader.GetInt32(8);
+                    model.SubTableJson = dataReader.GetString(7);
+                if (!dataReader.IsDBNull(8))
+                    model.Attribute = dataReader.GetString(8);
+                model.Status = dataReader.GetInt32(9);
                 List.Add(model);
             }
             return List;

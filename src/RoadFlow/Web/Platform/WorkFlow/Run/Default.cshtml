@@ -55,12 +55,27 @@
     Guid taskgid;
     if(taskid.IsGuid(out taskgid))
     {
-        btask.UpdateOpenTime(taskgid, Utility.DateTimeNew.Now);
+        btask.UpdateOpenTime(taskgid, Utility.DateTimeNew.Now, true);
+        
+        var task=btask.Get(taskgid);
+        if(task!=null)
+        {
+            if ("1" != display && task.Status.In(2,3,4,5))
+            {
+                Response.Write("<script type='text/javascript'>alert('该任务已处理,请刷新您的待办列表!');top.mainTab.closeTab();</script>");
+                Response.End();
+            }
+            else if("1" != display && task.ReceiveID!=Business.Platform.Users.CurrentUserID)
+            {
+                Response.Write("<script type='text/javascript'>alert('您不能处理当前任务,请刷新您的待办列表!');top.mainTab.closeTab();</script>");
+                Response.End();
+            }
+        }
     }
     
     var form = currentStep.Forms.First();//目前只显示一个表单
     var appLibrary = bappLibrary.Get(form.ID, true);
-    string src = appLibrary.Address; //bappLibrary.GetFlowRunAddress(appLibrary, query);
+    string src = appLibrary == null ? "" : appLibrary.Address; //bappLibrary.GetFlowRunAddress(appLibrary, query);
 
     int debugType = wfInstalled.Debug;
     wfInstalled.DebugUsers.RemoveAll(p=>p==null);
@@ -74,6 +89,7 @@
 @if ("0" == display)//display为0表示执行，1表示查看
 {
     <div class="toolbar" style="margin-top:0; border-top:none 0;">
+        <div>
         @foreach (var button in currentStep.Buttons)
         {
             Guid buttonID;
@@ -92,11 +108,13 @@
                 function @funName {@Html.Raw(button1.Script)}
             </script>
             }
-            else if(string.Compare(button.ID,"other_splitline",true)==0)//显示其它特定按钮如分隔线...
+            else if (string.Compare(button.ID, "other_splitline", true) == 0)//显示其它特定按钮如分隔线...
             { 
             <span class="toolbarsplit">&nbsp;</span>
             }
         }
+        </div>
+       
     </div>
     <input type="hidden" name="params" id="params" value="" />
         if (isDebug && debugType == 1)
@@ -110,16 +128,32 @@
 }
     <!--iframe id="flowMain" frameborder="0" style="width:100%; height:100%; margin:0;" scrolling="auto" src=""></iframe-->
     
+    <!--显示流程名称和当前步骤-->
+    <div style="margin:0px;">
+        @*@{
+            string flowname;
+            string stepname = bworkFlow.GetStepName(stepID, flowID, out flowname, true);
+            string showstr = "<span style='display:inline-block; height:20px; line-height:20px; padding:1px 8px; border:1px solid #d9efed; background:#edf7f6;'><span style='margin-right:4px;'>" + flowname + "</span>--<span style='margin-left:4px;'>" + stepname + "</span></span>";
+            @Html.Raw(showstr)
+         }*@
+    </div>
+    <!--显示流程名称和当前步骤-->
+
     <!--表单主体--> 
     <div style="margin:8px;">
-    @RenderPage(src)
+    @{
+        if (!src.IsNullOrEmpty())
+        {
+            @RenderPage(src)
+        }
+    }
     </div>
     <!--表单主体--> 
 
     <!--意见处理栏-->   
     @if (isSign && "0" == display)
     {
-    string commentsOptions = new Business.Platform.WorkFlowComment().GetOptionsStringByUserID(Business.Platform.Users.CurrentUserID);
+        string commentsOptions = new Business.Platform.WorkFlowComment().GetOptionsStringByUserID(Business.Platform.Users.CurrentUserID);
     <div style="height:12px; margin:16px 8px 8px 8px; border-bottom:1px dashed #ccc;"></div>
     <div style="height:30px; margin:15px auto 8px auto; text-align:left; width:95%;">
         处理意见：<select class="myselect" id="mycomment" style="margin-right:6px; width:100px;" onchange="$('#comment').val(this.value);"><option value=""></option>@Html.Raw(commentsOptions)</select>&nbsp;<input type="text" class="mytext" id="comment" name="comment" value="" style="width:70%; margin-right:6px;" />
@@ -127,12 +161,15 @@
         {
         <input type="hidden" value="" id="issign" name="issign" />
         <input type="button" class="mybutton" id="signbutton" onclick="sign();" value="&nbsp;&nbsp;签&nbsp;&nbsp;章&nbsp;&nbsp;"/>
-            string signFile = Server.MapPath("/Platform/WorkFlow/Sign/") + Business.Platform.Users.CurrentUserID + ".gif";
+            string signFile = string.Concat(Server.MapPath("/Platform/WorkFlow/Sign/"), Business.Platform.Users.CurrentUserID, ".gif");
             string signSrc = string.Concat("/Platform/WorkFlow/Sign/", Business.Platform.Users.CurrentUserID, ".gif");
             if (!System.IO.File.Exists(signFile))
             {
                 System.Drawing.Bitmap img = new Business.Platform.WorkFlow().CreateSignImage(Business.Platform.Users.CurrentUserName);
-                img.Save(signFile, System.Drawing.Imaging.ImageFormat.Gif);
+                if (img != null)
+                {
+                    img.Save(signFile, System.Drawing.Imaging.ImageFormat.Gif);
+                }
             }
             <img alt="" src="@signSrc" id="signimg" style="vertical-align:middle; display:none;" />
         }
@@ -156,5 +193,6 @@
     var isShow = "0" != "@display";//是否是查看模式
     var appid = '@Request.QueryString["appid"]';
     var query = '@Html.Raw(query)';
+    var instanceid='@instanceid';
 </script>
 <script type="text/javascript" src="common.js" ></script>

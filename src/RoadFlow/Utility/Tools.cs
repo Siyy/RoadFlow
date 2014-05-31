@@ -314,7 +314,7 @@ namespace Utility
             StringBuilder options = new StringBuilder(items.Length * 50);
             foreach (var item in items)
             {
-                options.AppendFormat("<option value=\"{0}\" {1}>", item.Value, item.Selected ? "selected=\"selected\"" : "");
+                options.AppendFormat("<option value=\"{0}\" {1}>", item.Value.Replace("\"","'"), item.Selected ? "selected=\"selected\"" : "");
                 options.Append(item.Text);
                 options.Append("</option>");
             }
@@ -332,7 +332,7 @@ namespace Utility
             {
                 string tempid = Guid.NewGuid().ToString("N");
                 options.AppendFormat("<input type=\"checkbox\" value=\"{0}\" {1} id=\"{2}\" name=\"{3}\" {4} style=\"vertical-align:middle\" />",
-                    item.Value,
+                    item.Value.Replace("\"", "'"),
                     values != null && values.Contains(item.Value) ? "checked=\"checked\"" : "",
                     string.Format("{0}_{1}", name, tempid),
                     name,
@@ -356,7 +356,7 @@ namespace Utility
             {
                 string tempid = Guid.NewGuid().ToString("N");
                 options.AppendFormat("<input type=\"radio\" value=\"{0}\" {1} id=\"{2}\" name=\"{3}\" {4} style=\"vertical-align:middle\" />",
-                    item.Value,
+                    item.Value.Replace("\"", "'"),
                     item.Selected ? "checked=\"checked\"" : "",
                     string.Format("{0}_{1}", name, tempid),
                     name,

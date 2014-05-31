@@ -62,9 +62,12 @@ namespace Business.Platform
         /// <summary>
         /// 更新打开时间
         /// </summary>
-        public void UpdateOpenTime(Guid id, DateTime openTime)
+        /// <param name="id"></param>
+        /// <param name="openTime"></param>
+        /// <param name="isStatus">是否将状态更新为1</param>
+        public void UpdateOpenTime(Guid id, DateTime openTime, bool isStatus = false)
         {
-            dataWorkFlowTask.UpdateOpenTime(id, openTime);
+            dataWorkFlowTask.UpdateOpenTime(id, openTime, isStatus);
         }
 
         /// <summary>
@@ -76,6 +79,23 @@ namespace Business.Platform
         public Guid GetFirstSnderID(Guid flowID, Guid groupID)
         {
             return dataWorkFlowTask.GetFirstSnderID(flowID, groupID);
+        }
+
+        /// <summary>
+        /// 得到一个流程实例的发起者部门
+        /// </summary>
+        /// <param name="flowID"></param>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        public Guid GetFirstSnderDeptID(Guid flowID, Guid groupID)
+        {
+            if (flowID.IsEmptyGuid() || groupID.IsEmptyGuid())
+            {
+                return Users.CurrentDeptID; 
+            }
+            var senderID = dataWorkFlowTask.GetFirstSnderID(flowID, groupID);
+            var dept = new Users().GetDeptByUserID(senderID);
+            return dept == null ? Guid.Empty : dept.ID;
         }
 
 
@@ -244,6 +264,9 @@ namespace Business.Platform
                     break;
                 case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit:
                     executeSubmit(executeModel);
+                    break;
+                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect:
+                    executeRedirect(executeModel);
                     break;
                 default:
                     result.DebugMessages = "流程处理类型为空";
@@ -525,10 +548,24 @@ namespace Business.Platform
                     result.Messages = "当前步骤设置为不能退回";
                     return;
                 case 1://单个退回
+                    var taskList = GetTaskList(currentTask.ID);
+                    if (taskList.Find(p => p.Status > 1) != null)
+                    {
+                        result.DebugMessages = "当前步骤他人已处理,不能退回";
+                        result.IsSuccess = false;
+                        result.Messages = "当前步骤他人已处理,不能退回";
+                    }
                     backTasks.Add(currentTask);
                     break;
                 case 2://全部退回
-                    backTasks.AddRange(GetTaskList(currentTask.ID));
+                    var taskList1 = GetTaskList(currentTask.ID);
+                    if (taskList1.Find(p => p.Status > 1) != null)
+                    {
+                        result.DebugMessages = "当前步骤他人已处理,不能退回";
+                        result.IsSuccess = false;
+                        result.Messages = "当前步骤他人已处理,不能退回";
+                    }
+                    backTasks.AddRange(taskList1);
                     break;
             }
 
@@ -630,6 +667,67 @@ namespace Business.Platform
             result.DebugMessages += "已完成";
             result.IsSuccess = true;
             result.Messages += "已完成";
+        }
+
+        private void executeRedirect(Data.Model.WorkFlowExecute.Execute executeModel)
+        {
+            Data.Model.WorkFlowTask currentTask = null;
+            bool isFirst = executeModel.StepID == wfInstalled.FirstStepID && executeModel.TaskID == Guid.Empty && executeModel.GroupID == Guid.Empty;
+            if (isFirst)
+            {
+                currentTask = createFirstTask(executeModel);
+            }
+            else
+            {
+                currentTask = Get(executeModel.TaskID);
+            }
+            if (currentTask == null)
+            {
+                result.DebugMessages = "未能创建或找到当前任务";
+                result.IsSuccess = false;
+                result.Messages = "未能创建或找到当前任务";
+                return;
+            }
+            else if (currentTask.Status.In(2, 3, 4))
+            {
+                result.DebugMessages = "当前任务已处理";
+                result.IsSuccess = false;
+                result.Messages = "当前任务已处理";
+                return;
+            }
+            else if (currentTask.Status == 5)
+            {
+                result.DebugMessages = "当前任务正在等待他人处理";
+                result.IsSuccess = false;
+                result.Messages = "当前任务正在等待他人处理";
+                return;
+            }
+            if (executeModel.Steps.First().Value.Count == 0)
+            {
+                result.DebugMessages = "未设置转交人员";
+                result.IsSuccess = false;
+                result.Messages = "未设置转交人员";
+                return;
+            }
+            else if (executeModel.Steps.First().Value.Count > 1)
+            {
+                result.DebugMessages = "当前任务只能转交给一个人员";
+                result.IsSuccess = false;
+                result.Messages = "当前任务只能转交给一个人员";
+                return;
+            }
+            string receiveName = currentTask.ReceiveName;
+            currentTask.ReceiveID = executeModel.Steps.First().Value.First().ID;
+            currentTask.ReceiveName = executeModel.Steps.First().Value.First().Name;
+            currentTask.OpenTime = null;
+            currentTask.Status = 0;
+            currentTask.Note = string.Format("该任务由{0}转交", receiveName);
+            Update(currentTask);
+            nextTasks.Add(currentTask);
+            result.DebugMessages = "转交成功";
+            result.IsSuccess = true;
+            result.Messages = string.Concat("已转交给：", currentTask.ReceiveName);
+            return;
         }
 
         /// <summary>
@@ -974,7 +1072,7 @@ namespace Business.Platform
             if (taskList.Count == 0) return false;
             foreach (var task in taskList)
             {
-                if (task.Status.In(2,3,4))
+                if (task.Status.In(1,2,3,4))
                 {
                     return false;
                 }
@@ -1004,7 +1102,7 @@ namespace Business.Platform
 
                     if (task.ID == taskID || task.Status == 4)
                     {
-                        Completed(task.ID, "", false, 0, "");
+                        Completed(task.ID, "", false, 1, "");
                     }
                 }
                 scope.Complete();
@@ -1029,13 +1127,11 @@ namespace Business.Platform
             {
                 return "该任务已处理";
             }
-            else if (task.ReceiveID == user.ID)
-            {
-                return "不能指派给任务接收者";
-            }
             string receiveName = task.ReceiveName;
             task.ReceiveID = user.ID;
             task.ReceiveName = user.Name;
+            task.OpenTime = null;
+            task.Status = 0;
             task.Note = string.Format("该任务由{0}指派", receiveName);
             Update(task);
 
@@ -1097,25 +1193,57 @@ namespace Business.Platform
         /// <param name="tasks"></param>
         public List<Data.Model.WorkFlowTask> Sort(List<Data.Model.WorkFlowTask> tasks)
         {
-            List<Data.Model.WorkFlowTask> list = new List<Data.Model.WorkFlowTask>();
-            if (tasks == null || tasks.Count == 0) return list;
-            var first = tasks.Find(p => p.PrevID == Guid.Empty);
-            if (first == null) return list;
-            else
-            {
-                list.Add(first);
-                sortAddList(first.ID, list, tasks);
-            }
-            return list;
+            return tasks.OrderBy(p => p.Sort).ToList();
         }
-        private void sortAddList(Guid taskID, List<Data.Model.WorkFlowTask> list, List<Data.Model.WorkFlowTask> tasks)
+       
+        /// <summary>
+        /// 得到一个任务的状态
+        /// </summary>
+        /// <param name="taskID"></param>
+        /// <returns></returns>
+        public int GetTaskStatus(Guid taskID)
         {
-            var taskList = tasks.FindAll(p => p.PrevID == taskID);
-            list.AddRange(taskList);
-            foreach (var task in taskList)
+            return dataWorkFlowTask.GetTaskStatus(taskID);
+        }
+
+        /// <summary>
+        /// 判断一个任务是否可以处理
+        /// </summary>
+        /// <param name="taskID"></param>
+        /// <returns></returns>
+        public bool IsExecute(Guid taskID)
+        {
+            return GetTaskStatus(taskID) <= 1;
+        }
+
+        /// <summary>
+        /// 判断sql流转条件是否满足
+        /// </summary>
+        /// <param name="linkID"></param>
+        /// <param name="table"></param>
+        /// <param name="tablepk"></param>
+        /// <param name="instabceID">实例ID</param>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public bool TestLineSql(Guid linkID, string table, string tablepk, string instabceID, string where)
+        {
+            if (instabceID.IsNullOrEmpty())
             {
-                sortAddList(task.ID, list, tasks);
+                return false;
             }
+            DBConnection dbconn = new DBConnection();
+            var conn = dbconn.Get(linkID);
+            if (conn == null)
+            {
+                return false;
+            }
+            string sql = "SELECT * FROM " + table + " WHERE " + tablepk + "='" + instabceID + "' AND " + where;
+            if (!dbconn.TestSql(conn, sql))
+            {
+                return false;
+            }
+            System.Data.DataTable dt = dbconn.GetDataTable(conn, sql);
+            return dt.Rows.Count > 0;
         }
     }
 }

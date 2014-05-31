@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
+using System.Data;
 
 namespace Business.Platform
 {
@@ -59,6 +60,20 @@ namespace Business.Platform
 		{
 			return dataWorkFlowForm.GetCount();
 		}
+
+        /// <summary>
+        /// 得到验证提示方式Radio字符串
+        /// </summary>
+        /// <returns></returns>
+        public string GetValidatePropTypeRadios(string name, string value, string att = "")
+        {
+            ListItem[] items = new ListItem[]{ 
+                new ListItem("弹出(alert)","0"){ Selected="0"==value},
+                new ListItem("图标和提示信息","1"){ Selected="1"==value},
+                new ListItem("图标","2"){ Selected="2"==value}
+            };
+            return Utility.Tools.GetRadioString(items, name, att);
+        }
 
         /// <summary>
         /// 得到流程文本框输入类型Radio字符串
@@ -216,6 +231,92 @@ namespace Business.Platform
         public string GetHeadHtml(string serverScript)
         {
             return "";
+        }
+
+        /// <summary>
+        /// 根据sql得到下拉列表项
+        /// </summary>
+        /// <param name="dbconn"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public string GetOptionsFromSql(string connID, string sql, string value)
+        { 
+            Guid cid;
+            if(!connID.IsGuid(out cid))
+            {
+                return "";
+            }
+            DBConnection dbConn = new DBConnection();
+            var dbconn = dbConn.Get(cid);
+            if (dbconn == null)
+            {
+                return "";
+            }
+            DataTable dt = dbConn.GetDataTable(dbconn, sql.ReplaceSelectSql());
+            if (dt.Rows.Count == 0)
+            {
+                return "";
+            }
+            List<ListItem> items = new List<ListItem>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (dt.Columns.Count == 0)
+                {
+                    continue;
+                }
+                string value1 = dr[0].ToString();
+                string title = value1;
+                if (dt.Columns.Count > 1)
+                {
+                    title = dr[1].ToString();
+                }
+
+                items.Add(new ListItem(title, value1) { Selected = value == value1 });
+            }
+            return Utility.Tools.GetOptionsString(items.ToArray());
+        }
+
+        /// <summary>
+        /// 根据sql得到下拉列表项
+        /// </summary>
+        /// <param name="dbconn"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public string GetCheckboxFromSql(string connID, string sql, string name, string value, string attr="")
+        {
+            Guid cid;
+            if (!connID.IsGuid(out cid))
+            {
+                return "";
+            }
+            DBConnection dbConn = new DBConnection();
+            var dbconn = dbConn.Get(cid);
+            if (dbconn == null)
+            {
+                return "";
+            }
+            DataTable dt = dbConn.GetDataTable(dbconn, sql.ReplaceSelectSql());
+            if (dt.Rows.Count == 0)
+            {
+                return "";
+            }
+            List<ListItem> items = new List<ListItem>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (dt.Columns.Count == 0)
+                {
+                    continue;
+                }
+                string value1 = dr[0].ToString();
+                string title = value1;
+                if (dt.Columns.Count > 1)
+                {
+                    title = dr[1].ToString();
+                }
+
+                items.Add(new ListItem(title, value1));
+            }
+            return Utility.Tools.GetCheckBoxString(items.ToArray(), name, (value ?? "").Split(','), attr);
         }
     }
 }

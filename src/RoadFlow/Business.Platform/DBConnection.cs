@@ -499,22 +499,103 @@ namespace Business.Platform
         /// </summary>
         /// <param name="linkID"></param>
         /// <returns></returns>
-        public System.Data.IDbDataAdapter GetDataAdapter(Data.Model.DBConnection dbconn, string cmdText, IDbConnection conn)
+        public System.Data.IDbDataAdapter GetDataAdapter(IDbConnection conn, string connType, string cmdText, IDataParameter[] parArray)
+        {
+            IDbDataAdapter dataAdapter = null;
+            switch (connType)
+            {
+                case "SqlServer":
+                    using (SqlCommand cmd = new SqlCommand(cmdText, (SqlConnection)conn))
+                    {
+                        if (parArray != null && parArray.Length > 0)
+                        {
+                            cmd.Parameters.AddRange(parArray);
+                        }
+                        dataAdapter = new SqlDataAdapter(cmd);
+                    }
+                    break;
+            }
+            return dataAdapter;
+        }
+
+        /// <summary>
+        /// 测试一个sql是否合法
+        /// </summary>
+        /// <param name="dbconn"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public bool TestSql(Data.Model.DBConnection dbconn, string sql)
+        {
+            if (dbconn == null)
+            {
+                return false;
+            }
+            switch (dbconn.Type)
+            {
+                case "SqlServer":
+                    using (SqlConnection conn = new SqlConnection(dbconn.ConnectionString))
+                    {
+                        try
+                        {
+                            conn.Open();
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                        using (SqlCommand cmd = new SqlCommand(sql.ReplaceSelectSql(), (SqlConnection)conn))
+                        {
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                return true;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    break;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 根据连接实体得到数据表
+        /// </summary>
+        /// <param name="linkID"></param>
+        /// <returns></returns>
+        public System.Data.DataTable GetDataTable(Data.Model.DBConnection dbconn, string sql)
         {
             if (dbconn == null || dbconn.Type.IsNullOrEmpty() || dbconn.ConnectionString.IsNullOrEmpty())
             {
                 return null;
             }
-            IDbDataAdapter dataAdapter = null;
+            DataTable dt = new DataTable();
             switch (dbconn.Type)
             {
                 case "SqlServer":
-                    dataAdapter = new SqlDataAdapter(cmdText, (SqlConnection)conn);
+                    using (SqlConnection conn = new SqlConnection(dbconn.ConnectionString))
+                    {
+                        try
+                        {
+                            conn.Open();
+                            using (SqlDataAdapter dap = new SqlDataAdapter(sql, conn))
+                            {
+                                dap.Fill(dt);
+                            }
+                        }
+                        catch (SqlException ex)
+                        {
+                            Platform.Log.Add(ex);
+                        }
+                    }
                     break;
 
             }
 
-            return dataAdapter;
+            return dt;
         }
 
         /// <summary>

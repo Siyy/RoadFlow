@@ -3,7 +3,6 @@
 ; RoadUI.Validate = function ()
 {
     var instance = this;
-
     this.bind = function ($elements)
     {
         if (!$elements || $elements.size() == 0)
@@ -48,7 +47,7 @@
 
         });
     };
-    // form1 要验证的form,对象或id  promptType提示方式 0:window.alert 1:输入框后面提示
+    // form1 要验证的form,对象或id  promptType提示方式 0:window.alert 1:输入框后面提示 2:输入框后面提示后显示图标，不显示文字
     this.validateForm = function (form1, promptType)
     {
         var $f;
@@ -279,6 +278,7 @@
                 }
                 break;
             case 1:
+            case 2:
                 var $span = $element.nextAll(".validate,.validate1,.validate2");
                 if ($span.size() > 0)
                 {
@@ -289,15 +289,30 @@
                     $span = $('<span class="validate"></span>');
                     $element.parent().append($span);
                 }
-                $span.text(isSuccess ? "" : errMessage);
-                if (showInfo)
+                if (promptType == 1)
                 {
-                    //如果验证成功则不显示任何信息，如果要显示则将 validate改为validate1
-                    $span.removeClass().addClass(isSuccess ? "validate" : "validate2");
+                    $span.text(isSuccess ? "" : errMessage);
+                    if (showInfo)
+                    {
+                        //如果验证成功则不显示任何信息，如果要显示则将 validate改为validate1
+                        $span.removeClass().addClass(isSuccess ? "validate" : promptType == 1 ? "validate2" : "validate3");
+                    }
+                    else
+                    {
+                        $span.removeClass().addClass("validate");
+                    }
                 }
                 else
                 {
-                    $span.removeClass().addClass("validate");
+                    if (!isSuccess)
+                    {
+                        $span.text("").attr("title", errMessage);;
+                        $span.removeClass("").addClass("validate3");
+                    }
+                    else
+                    {
+                        $span.removeClass("").addClass("validate").remove();
+                    }
                 }
                 break;
         }

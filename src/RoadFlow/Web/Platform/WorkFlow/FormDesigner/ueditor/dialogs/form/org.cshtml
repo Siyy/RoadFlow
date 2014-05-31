@@ -91,20 +91,11 @@
         html += 'more="' + more + '" ';
         if (org_rang)
         {
-            var rootid = "";
-            if ("0" == org_rang)//发起者部门
+            html += 'org_rang="' + org_rang + '" ';
+            if (org_rang == "2")
             {
-
+                html += 'org_rang1="' + org_rang1 + '" ';
             }
-            else if ("1" == org_rang)//处理者部门
-            {
-
-            }
-            else if ("2" == org_rang)
-            {
-                rootid = org_rang1;
-            }
-            html += 'rootid="' + rootid + '" ';
         }
         
         html += 'org_type="' + org_type + '" ';

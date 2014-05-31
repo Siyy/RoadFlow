@@ -36,7 +36,7 @@ namespace Utility
             get
             {
                 var cookie = System.Web.HttpContext.Current.Request.Cookies["theme_platform"];
-                return cookie != null && !cookie.Value.IsNullOrEmpty() ? cookie.Value : "BlueLight";
+                return cookie != null && !cookie.Value.IsNullOrEmpty() ? cookie.Value : "Blue";
             }
         }
     }

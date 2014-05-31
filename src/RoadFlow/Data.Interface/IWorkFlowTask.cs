@@ -73,7 +73,10 @@ namespace Data.Interface
         /// <summary>
         /// 更新打开时间
         /// </summary>
-        void UpdateOpenTime(Guid id, DateTime openTime);
+        /// <param name="id"></param>
+        /// <param name="openTime"></param>
+        /// <param name="isStatus">是否将状态更新为1</param>
+        void UpdateOpenTime(Guid id, DateTime openTime, bool isStatus = false);
 
         /// <summary>
         /// 得到一个流程实例的发起者
@@ -179,5 +182,12 @@ namespace Data.Interface
         /// <param name="flowID"></param>
         /// <returns></returns>
         bool HasNoCompletedTasks(Guid flowID, Guid stepID, Guid groupID, Guid userID);
+
+        /// <summary>
+        /// 得到一个任务的状态
+        /// </summary>
+        /// <param name="taskID"></param>
+        /// <returns></returns>
+        int GetTaskStatus(Guid taskID);
     }
 }

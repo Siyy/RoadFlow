@@ -32,9 +32,10 @@
         <thead>
             <tr>
                 <th style="width:30%;"><input type="checkbox" style="vertical-align:middle;" onclick="checkall(this);" />显示列</th>
-                <th style="width:30%;">显示名称</th>
+                <th style="width:25%;">显示名称</th>
                 <th style="width:30%;">编辑模式</th>
-                <th style="width:7%;">合计</th>
+                <th style="width:5%;">合计</th>
+                <th style="width:10%;">显示顺序</th>
             </tr>
         </thead>
         <tbody>
@@ -59,7 +60,15 @@
         {
             $text = $(text);
             var id = $text.attr("id");
-            initJSON = parent.formsubtabs[id];
+            for (var i = 0; i < parent.formsubtabs.length; i++)
+            {
+                if (parent.formsubtabs[i].id == id)
+                {
+                    initJSON = parent.formsubtabs[i];
+                    break;
+                }
+            }
+            
             if (initJSON)
             {
                 secondtable = initJSON.secondtable;
@@ -103,6 +112,7 @@
             var issum = false;
             var showname = "";
             var showtype = "";
+            var index = "";
             var editmode = {};
             if (initJSON && initJSON.colnums)
             {
@@ -115,6 +125,7 @@
                         issum = "1" == colnumjson.issum;
                         showname = colnumjson.showname;
                         editmode = colnumjson.editmode;
+                        index = colnumjson.index || "";
                         if (editmode && editmode.title) showtype = editmode.title;
                         break;
                     }
@@ -122,10 +133,11 @@
             }
             
             var tr = '<tr>';
-            tr += '<td style="background-color:#ffffff; height:28px;"><input type="checkbox" name="field" value="' + filed + '" id="field_' + index + '" '+(isshow?'checked="checked"':'')+' style="vertical-align:middle;" /><label style="vertical-align:middle;" for="field_' + index + '">' + filed + '</label></td>';
+            tr += '<td style="background-color:#ffffff; height:28px;"><input type="checkbox" name="field" value="' + filed + '" id="field_' + filed + '" ' + (isshow ? 'checked="checked"' : '') + ' style="vertical-align:middle;" /><label style="vertical-align:middle;" for="field_' + filed + '">' + filed + '</label></td>';
             tr += '<td style="background-color:#ffffff;"><input type="text" class="mytext" name="name_' + filed + '" value="" />' + '</td>';
-            tr += '<td style="background-color:#ffffff;"><input type="hidden" value="" id="set_' + filed + '_hidden"/><input type="text" class="mytext" readonly="readonly" style="width:100px;" name="set_' + filed + '" id="set_' + filed + '" value="'+showtype+'"/><input type="button" class="mybutton" value="设置" onclick="filedEditSet(\'' + filed + '\');"/>' + '</td>';
+            tr += '<td style="background-color:#ffffff;"><input type="hidden" value="" id="set_' + filed + '_hidden"/><input type="text" class="mytext" readonly="readonly" style="width:100px;mraing-right:0;" name="set_' + filed + '" id="set_' + filed + '" value="'+showtype+'"/><input type="button" class="mybutton" style="border-left:none 0;margin:0;" value="设置" onclick="filedEditSet(\'' + filed + '\');"/>' + '</td>';
             tr += '<td style="background-color:#ffffff;"><input type="checkbox" name="field_count" value="' + filed + '" id="field_count_' + index + '" ' + (issum ? 'checked="checked"' : '') + ' style="vertical-align:middle;" /></td>';
+            tr += '<td style="background-color:#ffffff;"><input type="text" class="mytext" id="field_index_' + filed + '" style="width:40px;" value="' + index + '"/></td>';
             tr += '</tr>';
             var $tr = $(tr);
             if (showname)
@@ -176,13 +188,28 @@
             colnum.showname = $("input[name='name_" + field + "']", $(this)).val();
             colnum.editmode = jstr.length > 0 ? JSON.parse(jstr) : {};
             colnum.issum = $("input[type='checkbox'][name='field_count']", $(this)).prop("checked") ? "1" : "0";
+            colnum.index = $("input[id='field_index_" + field + "']", $(this)).val();
             json.colnums.push(colnum);
             
         });
-        var id ="subtable_" + secondtable + "_" + primarytablefiled + "_" + secondtableprimarykey + "_" + secondtablerelationfield;
+        var id = secondtable + "_" + primarytablefiled + "_" + secondtableprimarykey + "_" + secondtablerelationfield;
         var html = '<input type="text" isflow="1" readonly="readonly" type1="flow_subtable" id="' + id + '" style="width:99%;height:50px;" value="从表" ';
         html += '/>';
-        parent.formsubtabs[id] = json;
+        json.id = id;
+        var isadd = true;
+        for (var i = 0; i < parent.formsubtabs.length; i++)
+        {
+            if (parent.formsubtabs[i].id == id)
+            {
+                parent.formsubtabs[i] = json;
+                isadd = false;
+                break;
+            }
+        }
+        if (isadd)
+        {
+            parent.formsubtabs.push(json);
+        }
         
         editor.execCommand("formsubtable", html);
         dialog.close();

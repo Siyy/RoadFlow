@@ -30,6 +30,7 @@
         <th>值类型:</th>
         <td><select class="myselect" id="valuetype" >@Html.Raw(workFlowFrom.GetValueTypeOptions(""))</select></td>
     </tr>
+    <!--
     <tr>
         <th>字符范围:</th>
         <td><input type="text" id="charrange" class="mytext" style="width:272px" /></td>
@@ -37,7 +38,7 @@
     <tr>
         <th>非法字符:</th>
         <td><input type="text" id="charillegal" class="mytext" style="width:272px" /></td>
-    </tr>
+    </tr>-->
 </table>
 <script type="text/javascript">
     var text = editor.selection.getRange().getClosedNode();
@@ -54,8 +55,8 @@
             if ($text.attr('width1')) $("#width").val($text.attr('width1'));
             $("input[name='inputtype'][value='" + $text.attr('type') + "']").prop('checked', true);
             $("#maxlength").val($text.attr('maxlength'));
-            $("#charrange").val($text.attr('charrange'));
-            $("#charillegal").val($text.attr('charillegal'));
+            //$("#charrange").val($text.attr('charrange'));
+            //$("#charillegal").val($text.attr('charillegal'));
             $("#valuetype").val($text.attr('valuetype'));
         }
     });
@@ -68,8 +69,8 @@
         var maxlength = $("#maxlength").val();
         var inputtype = $(":checked[name='inputtype']").val();
         var valuetype = $("#valuetype").val();
-        var charrange = $("#charrange").val();
-        var charillegal = $("#charillegal").val();
+        var charrange = "";// $("#charrange").val();
+        var charillegal = "";// $("#charillegal").val();
 
         var html = '<input type="' + (inputtype || 'text') + '" id="' + id + '" type1="flow_text" name="' + id + '" value="文本框" ';
         if (width)

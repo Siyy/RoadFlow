@@ -16,7 +16,7 @@
 
             $_member.prop("readonly", true);
             var $hide = $('<input type="hidden" id="' + id + '" name="' + name + '" value="' + (value || "") + '" />');
-            var $but = $('<input type="button" ' + (disabled ? 'disabled="disabled"' : '') + ' title="' + title + '" class="mybutton" style="border-left:none;" value="选择" />');
+            var $but = $('<input type="button" ' + (disabled ? 'disabled="disabled"' : '') + ' title="' + title + '" class="mybutton" style="border-left:none; margin:0;" value="选择" />');
             $_member.attr("id", id + "_text");
             $_member.attr("name", name + "_text");
             $_member.removeClass().addClass("mytext");

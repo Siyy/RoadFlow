@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Collections.Generic;
+using Microsoft.VisualBasic;
 
 /// <summary>
 ///ExtString 的摘要说明
@@ -148,6 +149,15 @@ public static class MyExtensions
     public static bool IsGuid(this string str, out Guid test)
     {
         return Guid.TryParse(str, out test);
+    }
+    /// <summary>
+    /// 判断是否为Guid.Empty
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
+    public static bool IsEmptyGuid(this Guid guid)
+    {
+        return guid == Guid.Empty;
     }
 
     public static bool IsUrl(this string str)
@@ -374,6 +384,26 @@ public static class MyExtensions
     {
         str = str.Replace("'", "").Replace("--", " ").Replace(";", "");
         return str;
+    }
+    /// <summary>
+    /// 过滤查询sql
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static string ReplaceSelectSql(this string str)
+    {
+        if (str.IsNullOrEmpty()) return "";
+        str = str.Replace1("DELETE", "").Replace1("UPDATE", "").Replace1("INSERT", "");
+        return str;
+    }
+    /// <summary>
+    /// 过滤字符串(不区分大小写)
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static string Replace1(this string str, string oldString, string newString)
+    {
+        return str.IsNullOrEmpty() ? "" : Strings.Replace(str, oldString, newString, 1, -1, CompareMethod.Text);
     }
     /// <summary>
     /// 获取汉字拼音的第一个字母

@@ -1,0 +1,26 @@
+﻿@{
+    if (!Check.CheckLogin())
+    {
+        Response.Write("未登录!");
+        Response.End();
+    }
+    string id = Request["id"];
+    Guid gid;
+    if(!id.IsGuid(out gid))
+    {
+        Response.Write("");
+        Response.End();
+    }
+
+    var wff = new Business.Platform.WorkFlowForm().Get(gid);
+    if(wff==null)
+    {
+        Response.Write("");
+        Response.End();
+    }
+    else
+    {
+        Response.Write(wff.SubTableJson);
+        Response.End();
+    }
+}

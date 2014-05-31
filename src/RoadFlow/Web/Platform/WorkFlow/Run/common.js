@@ -1,5 +1,4 @@
-﻿
-$(function ()
+﻿$(function ()
 {
     $(window).bind('resize', function ()
     {
@@ -8,6 +7,7 @@ $(function ()
     });
     $(window).resize();
 });
+
 function execute(script)
 {
     if (!script || $.trim(script).length == 0)
@@ -84,6 +84,11 @@ function flowCompleted()
     formSubmit(options);
 }
 
+function flowRedirect()
+{
+    top.mainDialog.open({ url: "/Platform/WorkFlow/Run/FlowRedirect?" + query, openerid: iframeid, width: 480, height: 200, title: "选择接收人员" });
+}
+
 function formSubmit(options)
 {
     if (!options || !options.type || !options.steps)
@@ -97,27 +102,31 @@ function formSubmit(options)
         return false;
     }
     var f = document.forms[0];
-    if (new RoadUI.Validate().validateForm(f))
+    var validateAlertType = $("#Form_ValidateAlertType").val() || 2;
+    if (new RoadUI.Validate().validateForm(f, parseInt(validateAlertType)))
     {
-        showProcessing("' + options.type + '");
+        showProcessing(options.type);
         window.setTimeout('', 100);
         $("#params").val(JSON.stringify(options));
         f.action = '/Platform/WorkFlow/Run/Execute?' + query;
         f.submit();
     }
-
 }
 
 function showProcessing(type)
 {
-    var title = "";
+    var title = "正在处理";
     switch (type)
     {
-        case "save": title = "正在保存"; break;
-        case "submit": title = "正在发送"; break;
-        case "back": title = "正在退回"; break;
+        case "save": title = "正在保存..."; break;
+        case "submit": title = "正在发送..."; break;
+        case "back": title = "正在退回..."; break;
+        case "redirect": title = "正在转交..."; break;
     }
-    top.mainDialog.open({ title: title, width: 260, height: 120, url: '/Platform/WorkFlow/Run/Process?op=' + type, openerid: iframeid, resize: false, showclose: true });
+    top.mainDialog.open({
+        title: title, width: 260, height: 120, url: '/Platform/WorkFlow/Run/Process?op=' + type,
+        openerid: iframeid, resize: false, showclose: true, showico: true
+    });
 }
 
 function sign()

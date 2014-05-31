@@ -182,7 +182,11 @@ namespace Data.Model.WorkFlowExecute
             /// <summary>
             /// 完成
             /// </summary>
-            Completed
+            Completed,
+            /// <summary>
+            /// 转交
+            /// </summary>
+            Redirect
         }
     }
 

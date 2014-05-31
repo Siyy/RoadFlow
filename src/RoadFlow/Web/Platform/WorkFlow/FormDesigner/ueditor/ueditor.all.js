@@ -21,6 +21,13 @@
     var dom = UE.dom = {};
 
     /*自定义插件开始*/
+    UE.commands['selectattribute'] = {
+        execCommand: function (cmdName, json)
+        {
+            var me = this;
+            
+        }
+    };
     UE.commands['formattribute'] = {
         execCommand: function (cmdName, json, isNew)
         {
@@ -35,6 +42,7 @@
                 formattributeJSON.dbtabletitle = json.dbtabletitle;
                 formattributeJSON.apptype = json.apptype;
                 formattributeJSON.autotitle = json.autotitle;
+                formattributeJSON.validatealerttype = json.validatealerttype;
             }
             if (isNew)
             {
@@ -159,6 +167,13 @@
                     formattributeJSON = json;
                 }
             });
+            $.ajax({
+                url: "/Platform/WorkFlow/FormDesigner/Getsubtable?id=" + id, dataType: "JSON", async: false, cache: false,
+                success: function (json)
+                {
+                    formsubtabs = json;
+                }
+            });
         }
     };
     UE.commands['formnew'] = {
@@ -192,13 +207,15 @@
             {
                 formid = formattributeJSON.id;
             }
-       
+
             $.ajax({
                 url: "/Platform/WorkFlow/FormDesigner/Save", type: "POST",
                 data: {
-                    id: formid, html: html,
+                    id: formid,
+                    html: html,
                     name: formattributeJSON.name,
-                    att: JSON.stringify(formattributeJSON)
+                    att: JSON.stringify(formattributeJSON),
+                    subtable: JSON.stringify(formsubtabs)
                 }, async: false, cache: false, success: function (txt)
                 {
                     alert(txt);
@@ -233,7 +250,8 @@
                 for (var i = 0; i < $controls.size() ; i++)
                 {
                     var $control = $controls.eq(i);
-                    var controlType = $control.attr('type1').split('_')[1];
+                    var type1Arr = $control.attr('type1').split('_');
+                    var controlType = type1Arr.length > 1 ? type1Arr[1] : "";
                     switch (controlType)
                     {
                         case 'text':
@@ -271,6 +289,9 @@
                             break;
                         case 'html':
                             UE.compule.getHtmlHtml($control)
+                            break;
+                        case "subtable":
+                            UE.compule.getSubTableHtml($control)
                             break;
                     }
                 } 
@@ -458,7 +479,21 @@
                 $control.attr("workgroup", org_type.indexOf(",3,") >= 0 ? "1" : "0");
                 $control.attr("unit", org_type.indexOf(",4,") >= 0 ? "1" : "0");
             }
-            $control.removeAttr("defaultvalue").removeAttr("width1").removeAttr("org_type").removeAttr("org_rang1").removeAttr("org_rang");
+            var org_rang = $control.attr("org_rang");
+            var rootid = '';
+            switch (org_rang)
+            {
+                case "0": //发起者部门
+                    rootid = '@BWorkFlowTask.GetFirstSnderDeptID(FlowID.ToGuid(), GroupID.ToGuid())';
+                    break;
+                case "1": //处理者部门
+                    rootid = '@Business.Platform.Users.CurrentDeptID';
+                    break;
+                case "2": //自定义
+                    rootid = $control.attr("org_rang1");
+                    break;
+            }
+            $control.attr("rootid", rootid).removeAttr("defaultvalue").removeAttr("width1").removeAttr("org_type").removeAttr("org_rang1").removeAttr("org_rang");
         },
         getDictHtml: function ($control)
         {
@@ -511,9 +546,375 @@
             textarea += '</textarea>';
             $control.after(textarea);
             $control.remove();
+        },
+        getSubTableHtml_Text: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var input = '<input type="text" class="mytext" issubflow="1" type1="subflow_text" ';
+            input += 'name="' + id + '_' + i + '_' + colnumJSON.name + '" ';
+            input += 'colname="' + colnumJSON.name + '" ';
+            if (editmode.text_width)
+            {
+                input += 'style="width:' + editmode.text_width + '" ';
+            }
+            if (editmode.text_maxlength)
+            {
+                input += 'maxlength="' + parseInt(editmode.text_maxlength) + '" ';
+            }
+            input += 'value="' + UE.compule.getDefaultValue(editmode.text_defaultvalue) + '" ';
+            if (iscount)
+            {
+                input += 'iscount="1" onblur="formrun.subtableCount(\'' + id + '\',\'' + colnumJSON.name + '\',\'countspan_' + id + '_' + colnumJSON.name + '\');" ';
+            }
+            if (editmode.text_valuetype)
+            {
+                input += 'valuetype="' + editmode.text_valuetype + '" ';
+            }
+            input += '/>';
+            return input;
+        },
+        getSubTableHtml_Textarea: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var textarea = '<textarea class="mytextarea" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_textarea" ';
+            var width = editmode.textarea_width;
+            var height = editmode.textarea_height;
+            textarea += 'colname="' + colnumJSON.name + '" ';
+            if (width && height)
+            {
+                textarea += 'style="width:' + width + ';height:' + height + '" ';
+            }
+            else if (width || height)
+            {
+                if (width)
+                {
+                    textarea += 'style="width:' + width + '" ';
+                }
+                if (height)
+                {
+                    textarea += 'style="height:' + height + '" ';
+                }
+            }
+
+            if (editmode.text_valuetype)
+            {
+                input += 'valuetype="' + editmode.text_valuetype + '" ';
+            }
+
+            if (editmode.textarea_maxlength)
+            {
+                textarea += 'maxlength="' + parseInt(editmode.textarea_maxlength) + '" ';
+            }
+            textarea += '>';
+            textarea += UE.compule.getDefaultValue(editmode.textarea_defaultvalue);
+            textarea += '</textarea>';
+            return textarea;
+        },
+        getSubTableHtml_OptionsFromString: function (str, type, name, colname, iscount)//type:0 option 1 checkbox 2 radio name:checkbox radio时的名称
+        {
+            var select = '';
+            var strarray = str.split(';');
+            for (var i = 0; i < strarray.length; i++)
+            {
+                var strarray1 = strarray[i].split(',');
+                if (strarray1.length == 0)
+                {
+                    continue;
+                }
+                var val = strarray1[0];
+                var txt = val;
+                if (strarray1.length > 1)
+                {
+                    txt = strarray1[1];
+                }
+                type = type || 0;
+                switch(type)
+                {
+                    case 0:
+                        select += '<option value="' + val.toString().replaceAll('"', '') + '">' + txt + '</option>';
+                        break;
+                    case 1:
+                        select += '<input type="checkbox" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
+                        select += '<label style="vertical-align:middle;">' + txt + '</label>';
+                        break;
+                    case 2:
+                        select += '<input type="radio" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
+                        select += '<label style="vertical-align:middle;">' + txt + '</label>';
+                        break;
+                }
+            }
+            return select;
+        },
+        getSubTableHtml_Select: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var select = '<select class="myselect" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_select" ';
+            select += 'colname="' + colnumJSON.name + '" ';
+            if (editmode.select_width)
+            {
+                select += 'style="width:' + editmode.select_width + '" ';
+            }
+            select += '>';
+            var ds = editmode.select_ds;
+            switch (ds)
+            {
+                case "select_dsdict":
+                    var rootid = editmode.select_ds_dict;
+                    select += '<option value=""></option>';
+                    select += '@Html.Raw(BDictionary.GetOptionsByID("' + rootid + '".ToGuid(), Business.Platform.Dictionary.OptionValueField.ID, ""))';
+                    break;
+                case "select_dssql":
+                    var sql = editmode.select_ds_sql;
+                    select += '<option value=""></option>';
+                    select += '@Html.Raw(new Business.Platform.WorkFlowForm().GetOptionsFromSql(DBConnID, "' + sql.replaceAll('"', '') + '", ""))';
+                    break;
+                case "select_dsstring":
+                    var str = editmode.select_ds_string;
+                    select += '<option value=""></option>';
+                    select += UE.compule.getSubTableHtml_OptionsFromString(str, 0, "");
+                    break;
+            }
+            select += '</select>';
+            return select;
+        },
+        getSubTableHtml_Checkbox: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var checkbox = '';
+            var ds = editmode.checkbox_ds;
+            var name = id + '_' + i + '_' + colnumJSON.name;
+            switch (ds)
+            {
+                case "checkbox_dsdict":
+                    var rootid = editmode.checkbox_ds_dict;
+                    checkbox = '<span>@Html.Raw(BDictionary.GetCheckboxsByID("' + rootid + '".ToGuid(), "' + name + '", Business.Platform.Dictionary.OptionValueField.ID, "", "issubflow=\'1\' type1=\'subflow_checkbox\' colname=\'' + colnumJSON.name + '\'"))</span>';
+                    break;
+                case "checkbox_dssql":
+                    var sql = editmode.checkbox_ds_sql;
+                    checkbox = '@Html.Raw(new Business.Platform.WorkFlowForm().GetCheckboxFromSql(DBConnID, "' + sql.replaceAll('"', '') + '", "' + name + '", "", "issubflow=\'1\' type1=\'subflow_checkbox\'" colname=\'' + colnumJSON.name + '\'"))';
+                    break;
+                case "checkbox_dsstring":
+                    var str = editmode.checkbox_ds_string;
+                    checkbox += UE.compule.getSubTableHtml_OptionsFromString(str, 1, name, colnumJSON.name);
+                    break;
+            }
+            
+            return checkbox;
+        },
+        getSubTableHtml_DateTime: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var datetime = '<input type="text" class="mycalendar" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_datetime" value="' + UE.compule.getDefaultValue(editmode.datetime_defaultvalue) + '" ';
+            datetime += 'colname="' + colnumJSON.name + '" ';
+            if (editmode.datetime_min)
+            {
+                datetime += 'mindate="' + editmode.datetime_min + '"';
+            }
+            if (editmode.datetime_max)
+            {
+                datetime += 'maxdate="' + editmode.datetime_max + '"';
+            }
+            if (editmode.datetime_width)
+            {
+                datetime += 'style="width:' + editmode.datetime_width + '" ';
+            }
+            datetime += '/>';
+            return datetime;
+        },
+        getSubTableHtml_Org: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var org = '<input type="text" class="mymember" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_org" value="' + UE.compule.getDefaultValue(editmode.org_defaultvalue) + '" ';
+            org += 'colname="' + colnumJSON.name + '" ';
+            var org_type = editmode.org_type;
+            if (org_type)
+            {
+                org += ' dept="' + (org_type.indexOf(",0,") >= 0 ? "1" : "0") + '"';
+                org += ' station="' + (org_type.indexOf(",1,") >= 0 ? "1" : "0") + '"';
+                org += ' user="' + (org_type.indexOf(",2,") >= 0 ? "1" : "0") + '"';
+                org += ' workgroup="' + (org_type.indexOf(",3,") >= 0 ? "1" : "0") + '"';
+                org += ' unit="' + (org_type.indexOf(",4,") >= 0 ? "1" : "0") + '"';
+            }
+            if (editmode.org_width)
+            {
+                org += 'style="width:' + editmode.org_width + '" ';
+            }
+            org += ' more="' + editmode.org_more + '"';
+            var rootid = '';
+            switch (editmode.org_rang)
+            {
+                case "0": //发起者部门
+                    rootid = '@BWorkFlowTask.GetFirstSnderDeptID(FlowID.ToGuid(), GroupID.ToGuid())';
+                    break;
+                case "1": //处理者部门
+                    rootid = '@Business.Platform.Users.CurrentDeptID';
+                    break;
+                case "2": //自定义
+                    rootid = editmode.org_rang1;
+                    break;
+            }
+            if (rootid)
+            {
+                org += ' rootid="' + rootid + '"';
+            }
+            org += '/>';
+            return org;
+        },
+        getSubTableHtml_Dict: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var dict = '<input type="text" class="mydict" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_dict" ';
+            dict += 'colname="' + colnumJSON.name + '" ';
+            if (editmode.dict_width)
+            {
+                dict += 'style="width:' + editmode.dict_width + '" ';
+            }
+            if (editmode.dict_rang)
+            {
+                dict += 'rootid="' + editmode.dict_rang + '" ';
+            }
+            dict += 'more="' + editmode.dict_more + '" ';
+            dict += '/>';
+            return dict;
+        },
+        getSubTableHtml_Files: function (colnumJSON, id, i, iscount)
+        {
+            var editmode = colnumJSON.editmode;
+            var files = '<input type="text" class="myfile" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_file" ';
+            files += 'colname="' + colnumJSON.name + '" ';
+            if (editmode.files_width)
+            {
+                files += 'style="width:' + editmode.files_width + '" ';
+            }
+            if (editmode.files_filetype)
+            {
+                files += 'filetype="' + editmode.files_filetype + '" ';
+            }
+            files += '/>';
+            return files;
+        },
+        getSubTableHtml: function ($control)
+        {
+            var id = $control.attr("id");
+            var subtableJSON = {};
+            
+            for (var i = 0; i < formsubtabs.length; i++)
+            {
+                if (formsubtabs[i].id == id)
+                {
+                    subtableJSON = formsubtabs[i];
+                    break;
+                }
+            }
+            if (!subtableJSON.id || !subtableJSON.colnums || subtableJSON.colnums.length == 0)
+            {
+                return;
+            }
+            var html = '<table class="flowformsubtable" style="width:99%;margin:0 auto;" cellPadding="0" cellSpacing="1" issubflowtable="1" id="subtable_' + id + '">';
+            html += '<thead>';
+            html += '<tr>';
+            
+            var edittds = '';
+            var counttds = [];//合计列
+            var hasCountColnum = false;//是否有合计列
+            var guid = RoadUI.Core.newid(false);
+            for (var i = 0; i < subtableJSON.colnums.length; i++)
+            {
+                var colnumJSON = subtableJSON.colnums[i];
+                if ("1" != colnumJSON.isshow)
+                {
+                    continue;
+                }
+                html += '<td>';
+                html += colnumJSON.showname || colnumJSON.name;
+                html += '</td>';
+                
+                var editelement = '';
+                var editmode = colnumJSON.editmode;
+                var editmode1 = editmode.editmode || "text";
+                var iscount = "1" == colnumJSON.issum;
+                edittds += '<td colname="' + colnumJSON.name + '" iscount="' + colnumJSON.issum + '">';
+                switch (editmode1)
+                {
+                    case "text":
+                        editelement = UE.compule.getSubTableHtml_Text(colnumJSON, id, guid, iscount);
+                        break;
+                    case "textarea":
+                        editelement = UE.compule.getSubTableHtml_Textarea(colnumJSON, id, guid, iscount);
+                        break;
+                    case "select":
+                        editelement = UE.compule.getSubTableHtml_Select(colnumJSON, id, guid, iscount);
+                        break;
+                    case "checkbox":
+                        editelement = UE.compule.getSubTableHtml_Checkbox(colnumJSON, id, guid, iscount);
+                        break;
+                    case "datetime":
+                        editelement = UE.compule.getSubTableHtml_DateTime(colnumJSON, id, guid, iscount);
+                        break;
+                    case "org":
+                        editelement = UE.compule.getSubTableHtml_Org(colnumJSON, id, guid, iscount);
+                        break;
+                    case "dict":
+                        editelement = UE.compule.getSubTableHtml_Dict(colnumJSON, id, guid, iscount);
+                        break;
+                    case "files":
+                        editelement = UE.compule.getSubTableHtml_Files(colnumJSON, id, guid, iscount);
+                        break;
+                }
+                edittds += editelement;
+                edittds += '</td>';
+
+                if (!hasCountColnum && "1" == colnumJSON.issum)
+                {
+                    hasCountColnum = true;
+                }
+                
+                if (iscount)
+                {
+                    var coltitle = colnumJSON.showname || colnumJSON.name;
+                    counttds.push({ "id": id, "name": colnumJSON.name, "title": coltitle });
+                }
+                
+            }
+            html += '<td>'
+            html += '<input type="hidden" name="flowsubtable_id" value="' + id + '" />';
+            html += '<input type="hidden" name="flowsubtable_' + id + '_secondtable" value="' + subtableJSON.secondtable + '" />';
+            html += '<input type="hidden" name="flowsubtable_' + id + '_primarytablefiled" value="' + subtableJSON.primarytablefiled + '" />';
+            html += '<input type="hidden" name="flowsubtable_' + id + '_secondtableprimarykey" value="' + subtableJSON.secondtableprimarykey + '" />';
+            html += '<input type="hidden" name="flowsubtable_' + id + '_secondtablerelationfield" value="' + subtableJSON.secondtablerelationfield + '" />';
+            html += '</td>'
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+            html += '<tr type1="listtr">';
+            html += edittds;
+            html += '<td>'
+            html += '<input type="hidden" name="hidden_guid_' + id + '" value="' + guid + '" />';
+            html += '<input type="hidden" name="flowsubid" value="' + id + '" />';
+            html += '<input type="button" class="mybutton" style="margin-right:4px;" value="增加" onclick="formrun.subtableNewRow(this);"/>';
+            html += '<input type="button" class="mybutton" value="删除" onclick="formrun.subtableDeleteRow(this);"/>';
+            html += '</td>'
+            html += '</tr>';
+
+            if (hasCountColnum)//添加合计行
+            {
+                html += '<tr type1="counttr">';
+                html += '<td colspan="' + (subtableJSON.colnums.length + 1).toString() + '" align="right" style="padding-right:20px; text-align:right;">';
+                for (var j = 0; j < counttds.length; j++)
+                {
+                    html += '<span style="margin-right:10px;">' + counttds[j].title +
+                        '合计：<label id="countspan_' + counttds[j].id + '_' + counttds[j].name + '">0</label></span>';
+                }
+                html += '</td>';
+                html += '</tr>';
+            }
+
+            html += '</tbody>';
+            html += '</table>';
+
+            $control.after(html);
+            $control.remove();
         }
-
-
     };
 /*自定义插件完*/
 
@@ -7204,7 +7605,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;}\n' +
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
-                    'body{margin:8px;font-family:sans-serif;font-size:16px;}' +
+                    'body{margin:8px;font-family:sans-serif;font-size:12px;}' +
                     //设置段落间距
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
@@ -15637,7 +16038,7 @@ UE.plugins['list'] = function () {
                 lineWrapping:true
             });
             var dom = codeEditor.getWrapperElement();
-            dom.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;font-family:consolas,"Courier new",monospace;font-size:13px;';
+            dom.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;font-family:consolas,"Courier new",monospace;font-size:12px;';
             codeEditor.getScrollerElement().style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;';
             codeEditor.refresh();
             return {
@@ -18416,7 +18817,7 @@ UE.plugins['video'] = function (){
                     html.push('</tr>')
                 }
                 //禁止指定table-width
-                return '<table class="formtable">' + html.join('') + '</table>'
+                return '<table class="flowformtable" cellPadding="0" cellSpacing="1">' + html.join('') + '</table>'
             }
 
             if (!opt) {
@@ -21348,6 +21749,7 @@ UE.plugins['contextmenu'] = function () {
             lang = me.getLang( "contextMenu" ),
             menu,
             items = me.options.contextMenu || [
+                
                 {label:lang['selectall'], cmdName:'selectall'},
                 {
                     label:lang.cleardoc,
@@ -21698,6 +22100,13 @@ UE.plugins['contextmenu'] = function () {
                     query:function () {
                         return 0;
                     }
+                },
+                {
+                    //label: '选中对象属性', cmdName: 'selectattribute',
+                    //exec: function ()
+                    //{
+                        
+                    //}
                 }
             ];
     if ( !items.length ) {
