@@ -19,7 +19,7 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
+#[Bb]in
 [Dd]ebug*/
 *.lib
 *.sbr
@@ -30,12 +30,14 @@ _ReSharper*/
 
 *.scc
 *.psd
-src/RoadFlow/packages/*
-!src/RoadFlow/packages/*.config
+*/*/packages/*
+!*/*/*/*.config
 src/RoadFlow/Web/Content/Upload/*
 src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/tmp/*
 src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/upload*
 src/RoadFlow/Web/Platform/WorkFlow/Sign/*
 !src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/Uploader.cs
+*/*/*/[Bb]in/*
+!*/*/*/*/*.refresh
 tree副本.gif
 *.vssscc
