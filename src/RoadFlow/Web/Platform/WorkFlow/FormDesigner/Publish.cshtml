@@ -52,7 +52,7 @@
     serverScript.Append("<link href=\"~/Platform/WorkFlow/FormDesigner/Forms/flowform.css\" rel=\"stylesheet\" type=\"text/css\" />\r\n");
     serverScript.Append("<script src=\"~/Platform/WorkFlow/FormDesigner/Forms/common.js\" type=\"text/javascript\" ></script>\r\n");
     
-    if(attrJSON.ContainsKey("hasEditor") && "1"==attrJSON["hasEditor"].ToString())
+    if (((System.Collections.IDictionary)attrJSON).Contains("hasEditor") && "1" == attrJSON["hasEditor"].ToString())
     {
         serverScript.Append("<script src=\"~/Scripts/ueditor/ueditor.config.js\" type=\"text/javascript\" ></script>\r\n");
         serverScript.Append("<script src=\"~/Scripts/ueditor/ueditor.all.min.js\" type=\"text/javascript\" ></script>\r\n");

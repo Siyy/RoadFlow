@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Drawing;
+using System.Collections;
 
 namespace Business.Platform
 {
@@ -628,7 +629,7 @@ namespace Business.Platform
                         ToID = line["to"].ToString().ToGuid(),
                         CustomMethod = line["customMethod"].ToString(),
                         SqlWhere = line["sql"].ToString(),
-                        NoAccordMsg = line.ContainsKey("noaccordMsg") ? line["noaccordMsg"].ToString() : ""
+                        NoAccordMsg = ((IDictionary)line).Contains("noaccordMsg") ? line["noaccordMsg"].ToString() : ""
                     });
                 }
             }
@@ -1249,7 +1250,7 @@ namespace Business.Platform
                 return value;
             }
             var key = string.Concat(table, "_", field);
-            if (!jsonData.ContainsKey(key))
+            if (!((IDictionary)jsonData).Contains(key))
             {
                 return value;
             }
