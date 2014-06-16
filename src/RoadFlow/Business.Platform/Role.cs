@@ -59,9 +59,9 @@ namespace Business.Platform
         /// <param name="value"></param>
         /// <param name="hideID">不显示的ID</param>
         /// <returns></returns>
-        public string GetRoleOptions(string value="", string hideID="")
+        public string GetRoleOptions(string value = "", string hideID = "", IEnumerable<Data.Model.Role> roleList = null)
         {
-            var roles = GetAll();
+            var roles = roleList == null ? GetAll() : roleList;
             StringBuilder options = new StringBuilder();
             foreach (var role in roles)
             {
@@ -74,5 +74,7 @@ namespace Business.Platform
             }
             return options.ToString();
         }
+
+      
     }
 }

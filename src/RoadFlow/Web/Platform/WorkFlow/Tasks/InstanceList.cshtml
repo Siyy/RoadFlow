@@ -37,17 +37,26 @@
     string pager;
     
     List<SelectListItem> statusItems=new List<SelectListItem>();
-    statusItems.Add(new SelectListItem() { Text = "未完成", Value = "0", Selected = "0" == status });
-    statusItems.Add(new SelectListItem() { Text = "已完成", Value = "1", Selected = "1" == status });
+    statusItems.Add(new SelectListItem() { Text = "==全部==", Value = "0", Selected = "0" == status });
+    statusItems.Add(new SelectListItem() { Text = "未完成", Value = "1", Selected = "1" == status });
+    statusItems.Add(new SelectListItem() { Text = "已完成", Value = "2", Selected = "2" == status });
 
-    string flowOptions = bworkFlow.GetOptions(flowid);
+    
     
     //可管理的流程ID数组
-    Guid[] manageFlows = new Guid[] { };
+    var flows = bworkFlow.GetInstanceManageFlowIDList(Business.Platform.Users.CurrentUserID);
+    List<Guid> flowids = new List<Guid>();
+    foreach(var flow in flows)
+    {
+        flowids.Add(flow.Key);
+    }
+    Guid[] manageFlows = flowids.ToArray();
+
+    string flowOptions = bworkFlow.GetOptions(flows, flowid);
 
     var taskList = bworkFlowTask.GetInstances(manageFlows, new Guid[] { },
         sender.IsNullOrEmpty() ? new Guid[] { } : new Guid[] { sender.Replace(Business.Platform.Users.PREFIX, "").ToGuid() },
-        out pager, query, title, flowid, date1, date2, "1" == status);
+        out pager, query, title, flowid, date1, date2, status.ToInt());
 }
 <form action="" method="post" >
 <div class="querybar">
@@ -58,7 +67,7 @@
                 所属流程：<select class="myselect" style="width:130px;" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(flowOptions)</select>
                 发送人：<input type="text" style="width:80px;"  class="mymember" id="SenderID" unit="0" dept="0" station="0" user="1" group="0" more="0" name="SenderID" value="@sender"  />
                 发送时间：<input type="text" class="mycalendar" value="@date1" style="width:90px;" name="Date1" /> 至 <input type="text" style="width:90px;" value="@date2" class="mycalendar" name="Date2" />
-                状态：@Html.DropDownList("Status", statusItems, new {@class="myselect"})
+                状态：@Html.DropDownList("Status", statusItems, new {@class="myselect", style="width:100px;"})
                 <input type="submit" name="Search" value="查询" class="mybutton" />
             </td>
         </tr>
@@ -94,7 +103,11 @@
             <td>@bworkFlowTask.GetStatusTitle(task.Status)@Html.Raw(timeout)</td>
             <td>
                 <a style="margin-right:3px; background:url(/Images/ico/Properties.png) no-repeat left center; padding-left:18px;" href="javascript:void(0);" onclick="manage('@task.FlowID','@task.GroupID');">管理</a>
+                @{
+                    if(task.Status.In(0,1)){
                 <a style="margin-right:3px; background:url(/Images/ico/trash.gif) no-repeat left center; padding-left:18px;" href="javascript:void(0);" onclick="delete1('@task.FlowID','@task.GroupID');">删除</a>
+                }
+                }
             </td>
         </tr>
     }

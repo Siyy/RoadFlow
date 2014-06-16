@@ -131,7 +131,7 @@ function showProcessing(type)
 
 function sign()
 {
-    top.mainDialog.open({ title: "输入签章密码", width: 360, height: 130, url: '/Platform/WorkFlow/Run/Sign?appid=' + appid, openerid: iframeid, resize: false });
+    top.mainDialog.open({ title: "请输入签章密码", width: 360, height: 130, url: '/Platform/WorkFlow/Run/Sign?appid=' + appid, openerid: iframeid, resize: false });
 }
 
 function showProcess()

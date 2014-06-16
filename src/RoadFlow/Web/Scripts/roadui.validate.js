@@ -64,7 +64,6 @@
             return;
         }
         var flag = true;
-
         $("[validate]", $f).each(function ()
         {
             var flag1 = instance.validateElement($(this), promptType);
@@ -345,11 +344,11 @@
     };
     this.isPositiveFloat = function (val)
     {
-        return this.isFloat(val) && parseFloat(val) >= 0;
+        return (this.isFloat(val) || this.isInt(val)) && parseFloat(val) >= 0;
     };
     this.isNegativeFloat = function (val)
     {
-        return this.isFloat(val) && parseFloat(val) < 0;
+        return (this.isFloat(val) || this.isInt(val)) && parseFloat(val) < 0;
     };
     this.isChinese = function (val)//是否为中文
     {

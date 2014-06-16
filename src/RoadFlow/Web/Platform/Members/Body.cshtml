@@ -9,6 +9,8 @@
     string name = string.Empty;
     string type = string.Empty;
     string status = string.Empty;
+    string chargeLeader = string.Empty;
+    string leader = string.Empty;
     string note = string.Empty;
     Guid orgID;
     string oldXML = string.Empty;
@@ -20,6 +22,8 @@
             name = org.Name;
             type = org.Type.ToString();
             status = org.Status.ToString();
+            chargeLeader = org.ChargeLeader;
+            leader = org.Leader;
             note = org.Note;
             oldXML = org.Serialize();
         }
@@ -34,11 +38,15 @@
             name = Request.Form["Name"];
             type = Request.Form["Type"];
             status = Request.Form["Status"];
+            chargeLeader = Request.Form["ChargeLeader"];
+            leader = Request.Form["Leader"];
             note = Request.Form["note"];
 
             org.Name = name.Trim();
             org.Type = type.AsInt(1);
             org.Status = status.AsInt(0);
+            org.ChargeLeader = chargeLeader;
+            org.Leader = leader;
             org.Note = note.IsNullOrEmpty() ? null : note.Trim();
 
             borganize.Update(org);
@@ -111,6 +119,16 @@
             <th style="width:80px;">状态：</th>
             <td>@Html.Raw(statusRadios)</td>
         </tr>
+        @if("1"!=Request.QueryString["type"]){
+        <tr>
+            <th style="width:80px;">分管领导：</th>
+            <td><input type="text" class="mymember" value="@chargeLeader" unit="0" dept="0" station="0" user="1" group="0" id="ChargeLeader" name="ChargeLeader" /></td>
+        </tr>
+        <tr>
+            <th style="width:80px;">主管：</th>
+            <td><input type="text" class="mymember" value="@leader" unit="0" dept="0" station="0" user="1" group="0" id="Leader" name="Leader" /></td>
+        </tr>
+        }
         <tr>
             <th style="width:80px;">备注：</th>
             <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;">@note</textarea></td>

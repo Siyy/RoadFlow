@@ -40,10 +40,10 @@
     //流程标题
     string titleField = Request.Form["Form_TitleField"];
     string title = Request.Form[titleField];
-    if (title.IsNullOrEmpty())
-    {
-        title = "未命名任务";
-    }
+    //if (title.IsNullOrEmpty())
+    //{
+    //    title = "未命名任务";
+    //}
 
     //保存业务数据
     instanceid = bworkFlow.SaveFromData(instanceid);
@@ -159,13 +159,13 @@
                     if (objType != boolType && "1" != obj.ToString())
                     {
                         removeIDList.Add(step.Key);
-                        //nosubmitMsg.Append(obj.ToString());
+                        nosubmitMsg.Append(obj.ToString());
                         nosubmitMsg.Append("\\n");
                     }
                     else if (objType == boolType && !(bool)obj)
                     {
                         removeIDList.Add(step.Key);
-                        //nosubmitMsg.Append(line.NoAccordMsg);
+                        nosubmitMsg.Append(line.NoAccordMsg);
                         nosubmitMsg.Append("\\n");
                     }
                 }
@@ -183,7 +183,7 @@
                             wfInstalled.DataBases.First().PrimaryKey, instanceid, line.SqlWhere))
                        {
                            removeIDList.Add(step.Key);
-                           //nosubmitMsg.Append(string.Concat("条件未满足"));
+                           //nosubmitMsg.Append(string.Concat("提交条件未满足"));
                            nosubmitMsg.Append("\\n");
                        }
                     } 
@@ -195,10 +195,11 @@
             execute.Steps.Remove(rid);
         }
 
-
         if (execute.Steps.Count==0)
         {
-            Response.Write("<script type=\"text/javascript\">alert('后续所有步骤流转条件均不符合,任务未提交!');top.mainDialog.close();</script>");
+            string alertMsg = nosubmitMsg.ToString();
+            alertMsg = alertMsg.IsNullOrEmpty() ? "条件不符合,任务未提交!" : alertMsg;
+            Response.Write("<script type=\"text/javascript\">alert('" + alertMsg + "');top.mainDialog.close();</script>");
             Response.End();
         }
     }
@@ -239,8 +240,8 @@
 
     if (reslut.IsSuccess)
     {
-        //判断是打开新任务还是关闭窗口
-        var nextTasks = reslut.NextTasks.Where(p => p.ReceiveID == Business.Platform.Users.CurrentUserID && p.Status==0);
+        //判断是打开任务还是关闭窗口
+        var nextTasks = reslut.NextTasks.Where(p => p.Status.In(0, 1) && p.ReceiveID == Business.Platform.Users.CurrentUserID);
         var nextTask = nextTasks.Count() > 0 ? nextTasks.First() : null;
         if (nextTask != null)
         {
@@ -249,7 +250,7 @@
                 Request.QueryString["appid"], Request.QueryString["tabid"]
                 );
             <script type="text/javascript">
-                window.parent.location = '@url';
+                window.parent.location = '@Html.Raw(url)';
             </script>
         }
         else

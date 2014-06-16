@@ -17,13 +17,20 @@
     <div id="div_sql" style="width:96%; margin:8px auto 0 auto; display:block;">
         <div>SQL条件：</div>
         <div style="margin-top:8px;">
-            <textarea id="div_sql_value" style="width:98%; height:100px;" rows="1" cols="1" class="mytextarea"></textarea>
+            <textarea id="div_sql_value" style="width:98%; height:100px; font-family:Verdana;" rows="1" cols="1" class="mytextarea"></textarea>
         </div>
-        <div style="margin-top:8px; line-height:21px;">
-            <div>1.条件对应的表为流程对应的主表</div>
-            <div>2.条件对应的字段为流程主表字段</div>
-            <div>3.示例：a=1 and b='1'</div>
-        </div>
+        <table border="0" style="width:99%;" align="center">
+            <tr>
+                <td>
+                    <div style="margin-top:8px; line-height:21px;">
+                        <div>1.条件对应的表为流程对应的主表</div>
+                        <div>2.条件对应的字段为流程主表字段</div>
+                        <div>3.示例：a=1 and b='1'</div>
+                    </div>
+                </td>
+                <td style="text-align:right; padding:15px 4px 0 0; vertical-align:top;"><input type="button" class="mybutton" value="测试SQL条件" onclick="test();" /></td>
+            </tr>
+        </table>
     </div>
     <div id="div_custom" style="width:96%; margin:8px auto 0 auto; display:none;">
         <div>
@@ -45,8 +52,7 @@
         </div>
     </div>
 
-    <div style="width:100%; margin:10px auto 10px auto; text-align:center;">
-        <input type="button" class="mybutton" value=" 测 试 " onclick="test();" />
+    <div style="width:100%; margin:30px auto 10px auto; text-align:center;">
         <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
         <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
     </div>

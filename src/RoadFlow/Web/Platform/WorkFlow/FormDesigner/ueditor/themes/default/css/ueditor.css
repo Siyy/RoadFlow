@@ -1910,13 +1910,29 @@ div.edui-box {
 }
 .edui-default .edui-for-formselect .edui-dialog-content {
     width: 430px;
-    height: 280px;
+    height: 310px;
 }
 /*formfiles-dialog*/
 .edui-default  .edui-for-formfiles .edui-icon {
     background: url(../images/formico/files.gif) no-repeat 2px 3px!important;
 }
 .edui-default .edui-for-formfiles .edui-dialog-content {
+    width: 400px;
+    height: 280px;
+}
+/*formflowname-dialog*/
+.edui-default  .edui-for-formflowname .edui-icon {
+    background: url(../images/formico/flowname.png) no-repeat 2px 3px!important;
+}
+.edui-default .edui-for-formflowname .edui-dialog-content {
+    width: 400px;
+    height: 280px;
+}
+/*formflowstepname-dialog*/
+.edui-default  .edui-for-formflowstepname .edui-icon {
+    background: url(../images/formico/stepname.png) no-repeat 2px 3px!important;
+}
+.edui-default .edui-for-formflowstepname .edui-dialog-content {
     width: 400px;
     height: 280px;
 }

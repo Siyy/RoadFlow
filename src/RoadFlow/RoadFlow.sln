@@ -30,9 +30,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCache.IO", "MyCache.IO\My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCache.InProc", "MyCache.InProc\MyCache.InProc.csproj", "{85CE9C4B-0E05-4951-83C0-BBB65F43DF28}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Web(1)", "http://localhost:4502", "{718F3D35-47C9-405F-B852-51FF6F07D76D}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Web", "Web", "{718F3D35-47C9-405F-B852-51FF6F07D76D}"
 	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
+		SccProjectName = ""
+		SccAuxPath = ""
+		SccLocalPath = ""
+		SccProvider = ""
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		ProjectReferences = "{4853EEE1-204A-4501-A2A6-7D14CA7DCD0E}|Business.Platform.dll;{1E605362-7767-45F9-9BC1-F8E495FA3F4E}|MyCache.Factory.dll;{85CE9C4B-0E05-4951-83C0-BBB65F43DF28}|MyCache.InProc.dll;{C3F609A8-6A7B-4BFF-9E21-02B785AD4F20}|MyCache.Interface.dll;{41C4C5A0-0CF3-4E8F-9339-1F557C6D5A0F}|MyCache.IO.dll;{C34A6499-929A-4F0E-B1BA-2A6A9734888E}|Data.Factory.dll;{7F7EC855-EE2F-4EF5-861B-DA945961C1A2}|Data.Interface.dll;{75FB2C86-F7D3-4E94-82E9-46DD9787B39D}|Data.Model.dll;{EFCD6A7C-C598-4BBD-BDC6-3016AAABD26C}|Data.MSSQL.dll;{CE3B0ADB-736E-4A7B-BEDE-801C9104F95E}|Utility.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/Web"
@@ -49,7 +52,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Web(1)", "http://localhost:
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "Web\"
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject

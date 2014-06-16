@@ -51,7 +51,7 @@ namespace Business.Platform
             onUser.ClientInfo = string.Concat("操作系统：", Utility.Tools.GetOSName(), "  浏览器：", Utility.Tools.GetBrowse());
             onUser.IP = Utility.Tools.GetIPAddress();
             onUser.LastPage = "";
-            onUser.LoginTime = Utility.Tools.DateTime;
+            onUser.LoginTime = Utility.DateTimeNew.Now;
             onUser.UniqueID = uniqueID;
             onUser.UserName = user.Name;
             if (isadd)

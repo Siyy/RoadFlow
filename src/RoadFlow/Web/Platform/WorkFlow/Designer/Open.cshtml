@@ -13,7 +13,9 @@
     }
 
     var typesOptions = bwf.GetAllTypesOptions(type);
-    IEnumerable<Data.Model.WorkFlow> flows = bwf.GetAll().Where(p => p.Status != 4);
+    IEnumerable<Data.Model.WorkFlow> flows = bwf.GetAll().Where(p => p.Status != 4
+        && p.Manager.Contains(Business.Platform.Users.PREFIX + Business.Platform.Users.CurrentUserID.ToString(),
+        StringComparison.CurrentCultureIgnoreCase));
     if(!name.IsNullOrEmpty())
     {
         flows = flows.Where(p => p.Name.IndexOf(name) >= 0);

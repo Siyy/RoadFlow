@@ -42,6 +42,8 @@ a.red:hover {color:red; text-decoration:underline;}
 .mainTheme_bluelight1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_bluelight1.gif) no-repeat;}
 .mainTheme_green{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_green.gif) no-repeat;}
 .mainTheme_green1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_green1.gif) no-repeat;}
+.mainTheme_gray{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_gray.gif) no-repeat;}
+.mainTheme_gray1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_gray1.gif) no-repeat;}
 
 /*首页样式*/
 .homediv{width:100%; border:1px solid #99bbe8; }
@@ -116,7 +118,7 @@ a.pager:hover{padding:1px 5px; margin:2px; color:#000000; background:#CEE0F7; bo
 .uploadify-queue {margin-bottom: 1em;}
 .uploadify-queue-item {background-color: #F5F5F5; max-width: 100%; padding: 3px;}
 .uploadify-error {background-color: #FDE5DD !important;}
-.uploadify-queue-item .cancel a {background: url('/javascript/uploadify/uploadify-cancel.png') 0 0 no-repeat;float: right;height:16px;text-indent: -9999px;width: 16px;}
+.uploadify-queue-item .cancel a {float: right;height:16px;text-indent: -9999px;width: 16px;}
 .uploadify-queue-item.completed {background-color: #E5E5E5;}
 .uploadify-progress {background-color: #E5E5E5;margin-top: 3px;width: 100%;}
 .uploadify-progress-bar {background-color: #0099FF;height: 3px;width: 1px;}

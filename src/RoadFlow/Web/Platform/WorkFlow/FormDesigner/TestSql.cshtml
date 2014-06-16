@@ -1,0 +1,23 @@
+﻿@{
+    string sql = Request["sql"];
+    string dbconn = Request["dbconn"];
+    
+    if(sql.IsNullOrEmpty() || !dbconn.IsGuid())
+    {
+        Response.Write("sql语句为空或未设置数据连接");
+        Response.End();
+    }
+
+    Business.Platform.DBConnection bdbconn = new Business.Platform.DBConnection();
+    var dbconn1 = bdbconn.Get(dbconn.ToGuid());
+    if(bdbconn.TestSql(dbconn1, sql))
+    {
+        Response.Write("sql语句测试正确");
+        Response.End();
+    }
+    else
+    {
+        Response.Write("sql语句测试错误");
+        Response.End();
+    }
+}

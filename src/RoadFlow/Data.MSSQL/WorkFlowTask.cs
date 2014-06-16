@@ -286,14 +286,26 @@ namespace Data.MSSQL
         /// <param name="flowid"></param>
         /// <param name="date1"></param>
         /// <param name="date2"></param>
-        /// <param name="isCompleted">是否完成</param>
+        /// <param name="status">是否完成 0:全部 1:未完成 2:已完成</param>
         /// <returns></returns>
-        public List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", bool isCompleted=false)
+        public List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", int status = 0)
         {
             List<SqlParameter> parList = new List<SqlParameter>();
             StringBuilder sql = new StringBuilder(@"SELECT a.*,ROW_NUMBER() OVER(ORDER BY a.SenderTime DESC) AS PagerAutoRowNumber FROM WorkFlowTask a
                 WHERE a.ID=(SELECT TOP 1 ID FROM WorkFlowTask WHERE FlowID=a.FlowID AND GroupID=a.GroupID ORDER BY Sort DESC)");
 
+            if (status != 0)
+            {
+                if (status == 1)
+                {
+                    sql.Append(" AND a.Status IN(0,1,5)");
+                }
+                else if (status == 2)
+                {
+                    sql.Append(" AND a.Status IN(2,3,4)");
+                }
+            }
+            
             if (flowID != null && flowID.Length > 0)
             {
                 sql.Append(string.Format(" AND a.FlowID IN({0})", Utility.Tools.GetSqlInString(flowID)));
@@ -439,15 +451,15 @@ namespace Data.MSSQL
         /// <returns></returns>
         public int Completed(Guid taskID, string comment = "", bool isSign = false, int status = 2, string note="")
         {
-            string sql = "UPDATE WorkFlowTask SET Comment=@Comment,CompletedTime1=@CompletedTime1,IsSign=@IsSign,Status=@Status,Note=@Note WHERE ID=@ID";
+            string sql = "UPDATE WorkFlowTask SET Comment=@Comment,CompletedTime1=@CompletedTime1,IsSign=@IsSign,Status=@Status" + (note.IsNullOrEmpty() ? "" : ",Note=@Note") + " WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				comment.IsNullOrEmpty() ? new SqlParameter("@Comment", SqlDbType.VarChar){ Value = DBNull.Value } : new SqlParameter("@Comment", SqlDbType.VarChar){ Value = comment },
-                new SqlParameter("@CompletedTime1", SqlDbType.DateTime){ Value = Utility.Tools.DateTime },
+                new SqlParameter("@CompletedTime1", SqlDbType.DateTime){ Value = Utility.DateTimeNew.Now },
                 new SqlParameter("@IsSign", SqlDbType.Int){ Value = isSign?1:0 },
                 new SqlParameter("@Status", SqlDbType.Int){ Value = status },
                 note.IsNullOrEmpty()?new SqlParameter("@Note", SqlDbType.NVarChar){ Value = DBNull.Value }:new SqlParameter("@Note", SqlDbType.NVarChar){ Value = note },
                 new SqlParameter("@ID", SqlDbType.UniqueIdentifier){ Value = taskID }
-			};
+			};         
             return dbHelper.Execute(sql, parameters);
         }
 
@@ -619,7 +631,7 @@ namespace Data.MSSQL
         /// <returns></returns>
         public bool HasNoCompletedTasks(Guid flowID, Guid stepID, Guid groupID, Guid userID)
         {
-            string sql = "SELECT TOP 1 ID FROM WorkFlowTask WHERE FlowID=@FlowID AND StepID=@StepID AND GroupID=@GroupID AND ReceiveID=@ReceiveID AND Status IN(0,1,5)";
+            string sql = "SELECT TOP 1 ID FROM WorkFlowTask WHERE FlowID=@FlowID AND StepID=@StepID AND GroupID=@GroupID AND ReceiveID=@ReceiveID AND Status IN(0,1)";
             SqlParameter[] parameters = new SqlParameter[]{
                 new SqlParameter("@FlowID", SqlDbType.UniqueIdentifier){ Value = flowID },
                 new SqlParameter("@StepID", SqlDbType.UniqueIdentifier){ Value = stepID },

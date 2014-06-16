@@ -38,11 +38,11 @@
     <tr>
         <th>非法字符:</th>
         <td><input type="text" id="charillegal" class="mytext" style="width:272px" /></td>
-    </tr>-->
+    </tr>
+    -->
 </table>
 <script type="text/javascript">
-    var text = editor.selection.getRange().getClosedNode();
-    //var text = range.collapsed ? editor.queryCommandValue("formtext") : editor.selection.getStart();
+    var text = getElement(editor, "flow_text", "formtextDialog");
     var attJSON = parent.formattributeJSON;
     var textid = text ? text.id : "";
     $(function ()
@@ -72,7 +72,7 @@
         var charrange = "";// $("#charrange").val();
         var charillegal = "";// $("#charillegal").val();
 
-        var html = '<input type="' + (inputtype || 'text') + '" id="' + id + '" type1="flow_text" name="' + id + '" value="文本框" ';
+        var html = '<input ondblclick="if(editor.ui._dialogs.formtextDialog.iframeUrl.indexOf(\'?\')==-1){editor.ui._dialogs.formtextDialog.iframeUrl=editor.ui._dialogs.formtextDialog.iframeUrl+\'?edit=1\';}editor.ui._dialogs.formtextDialog.open();" title="双击可设置属性" type="' + (inputtype || 'text') + '" id="' + id + '" type1="flow_text" name="' + id + '" value="文本框" ';
         if (width)
         {
             html += 'style="width:' + width + '" ';
@@ -97,6 +97,10 @@
         }
 
         html += '/>';
+        if (text)
+        {
+            $(text).remove();
+        }
         editor.execCommand("formtext", html);
         dialog.close();
     }

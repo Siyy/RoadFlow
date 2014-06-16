@@ -236,12 +236,35 @@ namespace Business.Platform
                 json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
                 json.AppendFormat("\"title\":\"{0}\",", dr["Title"]);
                 json.AppendFormat("\"ico\":\"{0}\",", "");
-                json.AppendFormat("\"link\":\"{0}\",", getAddress(rootDr));
+                json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
                 json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
                 json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);
                 json.AppendFormat("\"height\":\"{0}\",", dr["Height"]);
                 json.AppendFormat("\"hasChilds\":\"{0}\",", childs.Length > 0 ? "1" : "0");
                 json.AppendFormat("\"childs\":[");
+
+                DataRow[] apps1 = appDt.Select(string.Format("ParentID='{0}'", dr["ID"].ToString()));
+                for (int j = 0; j < apps1.Length; j++)
+                {
+                    DataRow dr1 = apps1[j];
+                    var childs1 = appDt.Select("ParentID='" + dr1["ID"].ToString() + "'");
+                    json.Append("{");
+                    json.AppendFormat("\"id\":\"{0}\",", dr1["ID"]);
+                    json.AppendFormat("\"title\":\"{0}\",", dr1["Title"]);
+                    json.AppendFormat("\"ico\":\"{0}\",", "");
+                    json.AppendFormat("\"link\":\"{0}\",", getAddress(dr1));
+                    json.AppendFormat("\"model\":\"{0}\",", dr1["OpenMode"]);
+                    json.AppendFormat("\"width\":\"{0}\",", dr1["Width"]);
+                    json.AppendFormat("\"height\":\"{0}\",", dr1["Height"]);
+                    json.AppendFormat("\"hasChilds\":\"{0}\",", childs1.Length > 0 ? "1" : "0");
+                    json.AppendFormat("\"childs\":[");
+                    json.Append("]");
+                    json.Append("}");
+                    if (j < apps1.Length - 1)
+                    {
+                        json.Append(",");
+                    }
+                }
 
                 json.Append("]");
                 json.Append("}");

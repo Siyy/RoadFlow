@@ -135,9 +135,9 @@ namespace Data.Model
         public int? IsSign { get; set; }
 
         /// <summary>
-        /// 状态 0 待处理 1打开 2完成 3退回 4他人已处理 5等待他人处理
+        /// 状态 0 待处理 1打开 2完成 3退回 4他人已处理 5他人已退回
         /// </summary>
-        [DisplayName("状态 0 待处理 1打开 2完成 3退回 4他人已处理 5等待他人处理")]
+        [DisplayName("状态 0 待处理 1打开 2完成 3退回 4他人已处理 5他人已退回")]
         public int Status { get; set; }
 
         /// <summary>

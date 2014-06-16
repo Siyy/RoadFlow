@@ -9,7 +9,7 @@ namespace Utility
 {
     public class Tools
     {
-        [Obsolete("改为DateTime类")]
+        [Obsolete("请用Utility.DateTimeNew.Now", true)]
         public static DateTime DateTime
         {
             get
@@ -17,7 +17,6 @@ namespace Utility
                 return DateTimeNew.Now;
             }
         }
-        
 
         public static System.IO.MemoryStream GetValidateImg(out string code)
         {

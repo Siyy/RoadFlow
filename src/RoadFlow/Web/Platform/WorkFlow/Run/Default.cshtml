@@ -53,8 +53,11 @@
     
     //更新打开时间
     Guid taskgid;
-    if(taskid.IsGuid(out taskgid))
+    
+    //如果是执行，并且任务ID为GUID,则更新打开时间和状态，检查当前任务是否可以执行。
+    if("0" == display && taskid.IsGuid(out taskgid))
     {
+       
         btask.UpdateOpenTime(taskgid, Utility.DateTimeNew.Now, true);
         
         var task=btask.Get(taskgid);
@@ -84,11 +87,11 @@
     
     int signType = currentStep.SignatureType;
 }
-<body>
-<form id="mainform" name="mainform" method="post" target="submiter">
+<body onload="$('#mainform').show();">
+<form id="mainform" name="mainform" method="post" target="submiter" style="display:none;">
 @if ("0" == display)//display为0表示执行，1表示查看
 {
-    <div class="toolbar" style="margin-top:0; border-top:none 0;">
+    <div class="toolbar" style="margin-top:0; border-top:none 0; position:fixed; top:0; left:0; right:0; margin-left:auto; z-index:99999999; width:100%; margin-right:auto; height:26px;">
         <div>
         @foreach (var button in currentStep.Buttons)
         {
@@ -108,7 +111,7 @@
                 function @funName {@Html.Raw(button1.Script)}
             </script>
             }
-            else if (string.Compare(button.ID, "other_splitline", true) == 0)//显示其它特定按钮如分隔线...
+            else if (string.Compare(button.ID, "other_splitline", true) == 0)//显示其它特定按钮如分隔线|
             { 
             <span class="toolbarsplit">&nbsp;</span>
             }
@@ -116,18 +119,18 @@
         </div>
        
     </div>
+    
     <input type="hidden" name="params" id="params" value="" />
         if (isDebug && debugType == 1)
         {
-    <iframe name="submiter" style="width:98%; border:1px solid #ccc; height:100px; margin:0;" ></iframe>
+    <br /><br />
+    <iframe name="submiter" style="width:99%; height:100px; border:1px solid #666666; margin-left:4px; overflow:auto;"></iframe>
         }
         else
         {
-    <iframe name="submiter" style="width:98%; height:100px; margin:0; display:none;"></iframe>    
+    <iframe name="submiter" style="width:99%; height:100px; margin:0; display:none;"></iframe>    
         }
 }
-    <!--iframe id="flowMain" frameborder="0" style="width:100%; height:100%; margin:0;" scrolling="auto" src=""></iframe-->
-    
     <!--显示流程名称和当前步骤-->
     <div style="margin:0px;">
         @*@{
@@ -144,7 +147,14 @@
     @{
         if (!src.IsNullOrEmpty())
         {
-            @RenderPage(src)
+            try
+            {
+                @RenderPage(src)
+            }
+            catch(Exception err)
+            {
+                @err.Message
+            }
         }
     }
     </div>
@@ -161,8 +171,8 @@
         {
         <input type="hidden" value="" id="issign" name="issign" />
         <input type="button" class="mybutton" id="signbutton" onclick="sign();" value="&nbsp;&nbsp;签&nbsp;&nbsp;章&nbsp;&nbsp;"/>
-            string signFile = string.Concat(Server.MapPath("/Platform/WorkFlow/Sign/"), Business.Platform.Users.CurrentUserID, ".gif");
-            string signSrc = string.Concat("/Platform/WorkFlow/Sign/", Business.Platform.Users.CurrentUserID, ".gif");
+            string signFile = string.Concat(Server.MapPath("/Platform/WorkFlow/Sign/Signs/"), Business.Platform.Users.CurrentUserID, ".gif");
+            string signSrc = string.Concat("/Platform/WorkFlow/Sign/Signs/", Business.Platform.Users.CurrentUserID, ".gif");
             if (!System.IO.File.Exists(signFile))
             {
                 System.Drawing.Bitmap img = new Business.Platform.WorkFlow().CreateSignImage(Business.Platform.Users.CurrentUserName);

@@ -37,8 +37,7 @@
     </tr>
 </table>
 <script type="text/javascript">
-    var text = editor.selection.getRange().getClosedNode();
-    //var text = range.collapsed ? editor.queryCommandValue("formorg") : editor.selection.getStart();
+    var text = getElement(editor, "flow_org", "formorgDialog");
     var attJSON = parent.formattributeJSON;
     var textid = text ? text.id : "";
     $(function ()
@@ -81,7 +80,7 @@
             org_type += $(this).val() + ",";
         });
 
-        var html = '<input type="text" type1="flow_org" id="' + id + '" name="' + id + '" value="组织机构选择" ';
+        var html = '<input ondblclick="if(editor.ui._dialogs.formorgDialog.iframeUrl.indexOf(\'?\')==-1){editor.ui._dialogs.formorgDialog.iframeUrl=editor.ui._dialogs.formorgDialog.iframeUrl+\'?edit=1\';}editor.ui._dialogs.formorgDialog.open();" title="双击可设置属性" type="text" type1="flow_org" id="' + id + '" name="' + id + '" value="组织机构选择" ';
         if (width)
         {
             html += 'style="width:' + width + '" ';
@@ -100,6 +99,10 @@
         
         html += 'org_type="' + org_type + '" ';
         html += '/>';
+        if (text)
+        {
+            $(text).remove();
+        }
         editor.execCommand("formorg", html);
         dialog.close();
     }

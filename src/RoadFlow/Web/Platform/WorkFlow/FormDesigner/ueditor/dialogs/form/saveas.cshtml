@@ -22,10 +22,10 @@
             {
                 wff.ID = Guid.NewGuid();
                 wff.Name = name.Trim();
-                wff.CreateTime = Utility.Tools.DateTime;
+                wff.CreateTime = Utility.DateTimeNew.Now;
                 wff.LastModifyTime = wff.CreateTime;
                 wff.CreateUserID = Business.Platform.Users.CurrentUserID;
-                wff.CreateUserName = Business.Platform.Users.CurrentUsreName;
+                wff.CreateUserName = Business.Platform.Users.CurrentUserName;
                 wff.Status = 0;
 
                 var json = LitJson.JsonMapper.ToObject(wff.Attribute);

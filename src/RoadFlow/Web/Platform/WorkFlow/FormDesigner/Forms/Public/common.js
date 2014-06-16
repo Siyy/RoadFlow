@@ -45,7 +45,7 @@
        
         if ("1" == $("#Form_HasUEditor").val())
         {
-            $(".edui-default[id^='" + dbtable + "']").each(function ()
+            $(".edui-default[id^='" + dbtable + "'],[type1='flow_html']").each(function ()
             {
                 var id = $(this).attr("id");
                 var filed = id.split('.')[1];
@@ -65,6 +65,7 @@
                         }
                     }
                 }
+                
                 if (1 == filedcheck)
                 {
 
@@ -109,7 +110,7 @@
 
             var fieldstatus = "1" != displayModel ? eval("jsonStatus." + dbtable + "_" + fieldName) : "";
             var validatetype = formrun.getValidateType($control.attr("valuetype"));
-            var initValue = initValue = eval("jsonData." + dbtable + "_" + fieldName);
+            var initValue = eval("jsonData." + dbtable + "_" + fieldName);
 
             //验证类型
             var validate = formrun.initFlowControl(type1, $control, initValue, validatetype, fieldstatus);
@@ -440,16 +441,24 @@
                 {
                     if (filedshow == 0)
                     {
-                        if (("," + initValue + ",").indexOf("," + $control.val() + ",") >= 0)
+                        if (("," + initValue + ",").indexOf("," + $control.val() + ",") != -1)
                         {
                             $control.prop("checked", true);
                         }
                     }
                     else if (filedshow == 1)
                     {
-                        if (("," + initValue + ",").indexOf("," + $control.val() + ",") >= 0)
+                        if (("," + initValue + ",").indexOf("," + $control.val() + ",") != -1)
                         {
                             $control.remove();
+                            var $label = $("label[for='" + $control.attr("id") + "']");
+                            //var $nextlabel = $label.next();
+                            //if ($nextlabel.size() > 0 &&
+                            //    ("flow_checkbox" == $nextlabel.attr("type1") || "subflow_checkbox" == $nextlabel.attr("type1"))
+                            //    && ("," + initValue + ",").indexOf("," + $nextlabel.val() + ",") != -1)
+                            //{
+                            $label.after("&nbsp;,&nbsp;");
+                            //}
                         }
                         else
                         {

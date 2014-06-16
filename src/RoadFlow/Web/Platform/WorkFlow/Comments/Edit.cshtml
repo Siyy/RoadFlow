@@ -8,6 +8,8 @@
     string member = string.Empty;
     string comment = string.Empty;
     string sort = string.Empty;
+
+    bool isOneSelf = "1" == Request.QueryString["isoneself"];
     
     Guid commentID;
     if (id.IsGuid(out commentID))
@@ -21,7 +23,7 @@
     Validation.RequireField("Comment");
     if(IsPost && Validation.IsValid())
     {
-        member = Request.Form["Member"];
+        member = isOneSelf ? Business.Platform.Users.PREFIX + Business.Platform.Users.CurrentUserID.ToString() : Request.Form["Member"];
         comment = Request.Form["Comment"];
         sort = Request.Form["Sort"];
 
@@ -31,7 +33,7 @@
             isAdd = true;
             workFlowComment = new Data.Model.WorkFlowComment();
             workFlowComment.ID = Guid.NewGuid();
-            workFlowComment.Type = 0;
+            workFlowComment.Type = isOneSelf ? 1 : 0;
         }
 
         workFlowComment.MemberID = member.IsNullOrEmpty() ? "" : member.Trim();
@@ -42,12 +44,12 @@
         if(isAdd)
         {
             bworkFlowComment.Add(workFlowComment);
-            Business.Platform.Log.Add("添加了通用流程意见", workFlowComment.Serialize(), Business.Platform.Log.Types.流程相关);
+            Business.Platform.Log.Add("添加了流程意见", workFlowComment.Serialize(), Business.Platform.Log.Types.流程相关);
         }
         else
         {
             bworkFlowComment.Update(workFlowComment);
-            Business.Platform.Log.Add("修改了通用流程意见", "修改前：" + oldXML + "修改后：" + workFlowComment.Serialize(), Business.Platform.Log.Types.流程相关);
+            Business.Platform.Log.Add("修改了流程意见", "修改前：" + oldXML + "修改后：" + workFlowComment.Serialize(), Business.Platform.Log.Types.流程相关);
         }
         bworkFlowComment.RefreshCache();
         <script type="text/javascript">
@@ -68,6 +70,8 @@
             <textarea class="mytext" name="Comment" id="Comment" validate="empty" style="width:75%; height:60px;">@comment</textarea>
         </td>
     </tr>
+    @if(!isOneSelf)
+    {
     <tr>
         <th style="width: 80px;">
             使用成员：
@@ -76,6 +80,7 @@
             <input type="text" name="Member" id="Member" class="mymember" value="@member" style="width:60%" /> //为空表示给所有成员
         </td>
     </tr>
+    }
     <tr>
         <th style="width: 80px;">
             序号：

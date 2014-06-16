@@ -101,7 +101,7 @@ namespace Business.Platform
                 log.UserID = user.ID;
                 log.UserName = user.Name;
             }
-            log.WriteTime = Utility.Tools.DateTime;
+            log.WriteTime = Utility.DateTimeNew.Now;
             Add(log);
         }
 

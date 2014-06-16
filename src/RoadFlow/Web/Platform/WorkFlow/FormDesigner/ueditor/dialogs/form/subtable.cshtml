@@ -44,10 +44,10 @@
     </table>
 </div>
 <script type="text/javascript">
+    var text = getElement(editor, "flow_subtable", "formsubtableDialog");
     var attJSON = parent.formattributeJSON;
     var dbconn = attJSON.dbconn || "";
     var dbtable = attJSON.dbtable || "";
-    var text = editor.selection.getRange().getClosedNode();
     var textid = text ? text.id : "";
     var initJSON = {};
     $(function ()
@@ -193,7 +193,7 @@
             
         });
         var id = secondtable + "_" + primarytablefiled + "_" + secondtableprimarykey + "_" + secondtablerelationfield;
-        var html = '<input type="text" isflow="1" readonly="readonly" type1="flow_subtable" id="' + id + '" style="width:99%;height:50px;" value="从表" ';
+        var html = '<input ondblclick="if(editor.ui._dialogs.formsubtableDialog.iframeUrl.indexOf(\'?\')==-1){editor.ui._dialogs.formsubtableDialog.iframeUrl=editor.ui._dialogs.formsubtableDialog.iframeUrl+\'?edit=1\';}editor.ui._dialogs.formsubtableDialog.open();" title="双击可设置属性" type="text" isflow="1" readonly="readonly" type1="flow_subtable" id="' + id + '" style="width:99%;height:50px;" value="从表" ';
         html += '/>';
         json.id = id;
         var isadd = true;
@@ -210,7 +210,10 @@
         {
             parent.formsubtabs.push(json);
         }
-        
+        if (text)
+        {
+            $(text).remove();
+        }
         editor.execCommand("formsubtable", html);
         dialog.close();
     }

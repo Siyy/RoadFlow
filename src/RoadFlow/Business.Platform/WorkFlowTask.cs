@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Business.Platform
 {
-    public class WorkFlowTask
+    public class WorkFlowTask : IEqualityComparer<Data.Model.WorkFlowTask>
     {
         private WorkFlow bWorkFlow = new WorkFlow();
         private Data.Interface.IWorkFlowTask dataWorkFlowTask;
@@ -58,6 +58,22 @@ namespace Business.Platform
 		{
 			return dataWorkFlowTask.GetCount();
 		}
+
+        /// <summary>
+        /// 去除重复的接收人，在退回任务时去重，避免一个人收到多条任务。
+        /// </summary>
+        /// <param name="task1"></param>
+        /// <param name="task2"></param>
+        /// <returns></returns>
+        public bool Equals(Data.Model.WorkFlowTask task1, Data.Model.WorkFlowTask task2)
+        {
+            return task1.ReceiveID == task2.ReceiveID;
+        }
+
+        public int GetHashCode(Data.Model.WorkFlowTask task)
+        {
+            return task.ToString().GetHashCode();
+        }
 
         /// <summary>
         /// 更新打开时间
@@ -308,13 +324,6 @@ namespace Business.Platform
                     result.Messages = "当前任务已处理";
                     return;
                 }
-                else if (currentTask.Status == 5)
-                {
-                    result.DebugMessages = "当前任务正在等待他人处理";
-                    result.IsSuccess = false;
-                    result.Messages = "当前任务正在等待他人处理";
-                    return;
-                }
 
                 var currentSteps = wfInstalled.Steps.Where(p => p.ID == executeModel.StepID);
                 var currentStep = currentSteps.Count() > 0 ? currentSteps.First() : null;
@@ -336,11 +345,7 @@ namespace Business.Platform
                             var noCompleted = taskList.Where(p => p.Status != 2);
                             if (noCompleted.Count() - 1 > 0)
                             {
-                                status = 5;
-                            }
-                            else
-                            {
-                                UpdateNextTaskStatus(currentTask.ID, 0);
+                                status = -1;
                             }
                         }
                         Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign);
@@ -351,7 +356,10 @@ namespace Business.Platform
                         {
                             if (task.ID != currentTask.ID)
                             {
-                                Completed(task.ID, "", false, 4);
+                                if (task.Status.In(0, 1))
+                                {
+                                    Completed(task.ID, "", false, 4);
+                                }
                             }
                             else
                             {
@@ -367,7 +375,7 @@ namespace Business.Platform
                             var noCompleted = taskList2.Where(p => p.Status != 2);
                             if ((((decimal)(taskList2.Count - (noCompleted.Count() - 1)) / (decimal)taskList2.Count) * 100).Round() < percentage)
                             {
-                                status = 5;
+                                status = -1;
                             }
                             else
                             {
@@ -378,7 +386,6 @@ namespace Business.Platform
                                         Completed(task.ID, "", false, 4);
                                     }
                                 }
-                                UpdateNextTaskStatus(currentTask.ID, 0);
                             }
                         }
                         Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign);
@@ -386,6 +393,18 @@ namespace Business.Platform
                     case 3://独立处理
                         Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign);
                         break;
+                }
+
+                //修改日期：2014-05-22
+                //将此处处理类型判断改为：如果条件不满足则不创建后续任务，直到最后一个条件满足时才创建后续任务。等待中的任务 状态为：5 已不用
+                if (status == -1)
+                {
+                    result.DebugMessages += "已发送,其他人未处理,不创建后续任务";
+                    result.IsSuccess = true;
+                    result.Messages += "已发送,等待他人处理!"; 
+                    result.NextTasks = nextTasks;
+                    scope.Complete();
+                    return;
                 }
 
                 foreach (var step in executeModel.Steps)
@@ -430,10 +449,8 @@ namespace Business.Platform
                         task.StepID = step.Key;
                         task.StepName = nextSteps.First().Name;
                         task.Sort = currentTask.Sort + 1;
-                        if (!executeModel.Title.IsNullOrEmpty())
-                        {
-                            task.Title = executeModel.Title;
-                        }
+                        task.Title = executeModel.Title.IsNullOrEmpty() ? currentTask.Title : executeModel.Title;
+                        
                         Add(task);
                         nextTasks.Add(task);
                     }
@@ -477,10 +494,18 @@ namespace Business.Platform
             else
             {
                 nextTasks.Add(currentTask);
-                if (!executeModel.Title.IsNullOrEmpty())
+                if (isFirst)
                 {
-                    currentTask.Title = executeModel.Title;
+                    currentTask.Title = executeModel.Title.IsNullOrEmpty() ? "未命名任务" : executeModel.Title;
                     Update(currentTask);
+                }
+                else
+                {
+                    if (!executeModel.Title.IsNullOrEmpty())
+                    {
+                        currentTask.Title = executeModel.Title;
+                        Update(currentTask);
+                    }
                 }
             }
 
@@ -504,13 +529,6 @@ namespace Business.Platform
                 result.DebugMessages = "当前任务已处理";
                 result.IsSuccess = false;
                 result.Messages = "当前任务已处理";
-                return;
-            }
-            else if (currentTask.Status == 5)
-            {
-                result.DebugMessages = "当前任务正在等待他人处理";
-                result.IsSuccess = false;
-                result.Messages = "当前任务正在等待他人处理";
                 return;
             }
 
@@ -538,39 +556,94 @@ namespace Business.Platform
                 result.Messages = "没有选择要退回的步骤";
                 return;
             }
-
-            List<Data.Model.WorkFlowTask> backTasks = new List<Data.Model.WorkFlowTask>();
-            switch (currentStep.Behavior.BackModel)
-            { 
-                case 0://不能退回
-                    result.DebugMessages = "当前步骤设置为不能退回";
-                    result.IsSuccess = false;
-                    result.Messages = "当前步骤设置为不能退回";
-                    return;
-                case 1://单个退回
-                    var taskList = GetTaskList(currentTask.ID);
-                    if (taskList.Find(p => p.Status > 1) != null)
-                    {
-                        result.DebugMessages = "当前步骤他人已处理,不能退回";
-                        result.IsSuccess = false;
-                        result.Messages = "当前步骤他人已处理,不能退回";
-                    }
-                    backTasks.Add(currentTask);
-                    break;
-                case 2://全部退回
-                    var taskList1 = GetTaskList(currentTask.ID);
-                    if (taskList1.Find(p => p.Status > 1) != null)
-                    {
-                        result.DebugMessages = "当前步骤他人已处理,不能退回";
-                        result.IsSuccess = false;
-                        result.Messages = "当前步骤他人已处理,不能退回";
-                    }
-                    backTasks.AddRange(taskList1);
-                    break;
-            }
-
             using (System.Transactions.TransactionScope scope = new System.Transactions.TransactionScope())
             {
+                List<Data.Model.WorkFlowTask> backTasks = new List<Data.Model.WorkFlowTask>();
+                int status = 0;
+                switch (currentStep.Behavior.BackModel)
+                {
+                    case 0://不能退回
+                        result.DebugMessages = "当前步骤设置为不能退回";
+                        result.IsSuccess = false;
+                        result.Messages = "当前步骤设置为不能退回";
+                        return;
+                    #region 根据策略退回
+                    case 1:
+                        switch (currentStep.Behavior.HanlderModel)
+                        {
+                            case 0://所有人必须同意,如果一人不同意则全部退回
+                                var taskList1 = GetTaskList(currentTask.ID);
+                                foreach (var task in taskList1)
+                                {
+                                    if (task.ID != currentTask.ID)
+                                    {
+                                        if (task.Status.In(0, 1))
+                                        {
+                                            Completed(task.ID, "", false, 5);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Completed(task.ID, executeModel.Comment, executeModel.IsSign, 3);
+                                    }
+                                }
+                                break;
+                            case 1://一人同意即可
+                                var taskList = GetTaskList(currentTask.ID);
+                                if (taskList.Count > 1)
+                                {
+                                    var noCompleted = taskList.Where(p => p.Status != 3);
+                                    if (noCompleted.Count() - 1 > 0)
+                                    {
+                                        status = -1;
+                                    }
+                                }
+                                Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign, 3);
+                                break;
+                            case 2://依据人数比例
+                                var taskList2 = GetTaskList(currentTask.ID);
+                                if (taskList2.Count > 1)
+                                {
+                                    decimal percentage = currentStep.Behavior.Percentage;//比例
+                                    var noCompleted = taskList2.Where(p => p.Status != 3);
+                                    if ((((decimal)(taskList2.Count - (noCompleted.Count() - 1)) / (decimal)taskList2.Count) * 100).Round() < percentage)
+                                    {
+                                        status = -1;
+                                    }
+                                    else
+                                    {
+                                        foreach (var task in taskList2)
+                                        {
+                                            if (task.ID != currentTask.ID && task.Status.In(0, 1))
+                                            {
+                                                Completed(task.ID, "", false, 5);
+                                            }
+                                        }
+                                    }
+                                }
+                                Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign, 3);
+                                break;
+                            case 3://独立处理
+                                Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign, 3);
+                                break;
+                        }
+                        backTasks.Add(currentTask);
+                        break;
+                    #endregion
+                }
+
+                if (status == -1)
+                {
+                    result.DebugMessages += "已退回,其他人未处理";
+                    result.IsSuccess = true;
+                    result.Messages += "已退回,等待他人处理!";
+                    result.NextTasks = nextTasks;
+                    scope.Complete();
+                    return;
+                }
+
+                List<Data.Model.WorkFlowTask> tasks = new List<Data.Model.WorkFlowTask>();
+
                 foreach (var backTask in backTasks)
                 {
                     if (backTask.Status.In(2, 3))//已完成的任务不能退回
@@ -585,37 +658,40 @@ namespace Business.Platform
                     {
                         Completed(backTask.ID, "", false, 3, "他人已退回");
                     }
-                    var tasks = GetTaskList(backTask.PrevID);
-                    foreach (var task in tasks)
+                    tasks.AddRange(GetTaskList(executeModel.FlowID, executeModel.Steps.First().Key, executeModel.GroupID));
+                }
+
+                foreach (var task in tasks.Distinct(this))
+                {
+                    if (task != null)
                     {
-                        if (task != null)
+                        Data.Model.WorkFlowTask newTask = task;
+                        newTask.ID = Guid.NewGuid();
+                        newTask.PrevID = currentTask.ID;
+                        newTask.Note = "退回任务";
+                        newTask.ReceiveTime = Utility.DateTimeNew.Now;
+                        newTask.SenderID = currentTask.ReceiveID;
+                        newTask.SenderName = currentTask.ReceiveName;
+                        newTask.SenderTime = Utility.DateTimeNew.Now;
+                        newTask.Sort = currentTask.Sort + 1;
+                        newTask.Status = 0;
+                        newTask.Comment = "";
+                        newTask.OpenTime = null;
+                        //newTask.PrevStepID = currentTask.StepID;
+                        if (currentStep.WorkTime > 0)
                         {
-                            //Completed(task.ID, "", false, 0, "");
-                            Data.Model.WorkFlowTask newTask = task;
-                            newTask.ID = Guid.NewGuid();
-                            newTask.PrevID = currentTask.ID;
-                            newTask.Note = "退回任务";
-                            newTask.ReceiveTime = Utility.DateTimeNew.Now;
-                            newTask.SenderID = currentTask.ReceiveID;
-                            newTask.SenderName = currentTask.ReceiveName;
-                            newTask.SenderTime = Utility.DateTimeNew.Now;
-                            newTask.Sort = currentTask.Sort + 1;
-                            newTask.Status = 0;
-                            newTask.Comment = "";
-                            if (currentStep.WorkTime > 0)
-                            {
-                                newTask.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)currentStep.WorkTime);
-                            }
-                            else
-                            {
-                                newTask.CompletedTime = null;
-                            }
-                            newTask.CompletedTime1 = null;
-                            Add(newTask);
-                            nextTasks.Add(newTask);
+                            newTask.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)currentStep.WorkTime);
                         }
+                        else
+                        {
+                            newTask.CompletedTime = null;
+                        }
+                        newTask.CompletedTime1 = null;
+                        Add(newTask);
+                        nextTasks.Add(newTask);
                     }
                 }
+
                 scope.Complete();
             }
 
@@ -640,7 +716,6 @@ namespace Business.Platform
                 result.IsSuccess = false;
                 result.Messages = "完成流程参数错误";
                 return;
-                
             }
             var task = Get(executeModel.TaskID);
             if (task == null)
@@ -652,12 +727,13 @@ namespace Business.Platform
             }
             Completed(task.ID, executeModel.Comment, executeModel.IsSign);
 
-            if(wfInstalled.TitleField!=null && wfInstalled.TitleField.LinkID!=Guid.Empty && !wfInstalled.TitleField.Table.IsNullOrEmpty()
-                && !wfInstalled.TitleField.Field.IsNullOrEmpty() && wfInstalled.DataBases.Count()>0)
+            //更新业务表标识字段的值为1
+            if (wfInstalled.TitleField != null && wfInstalled.TitleField.LinkID != Guid.Empty && !wfInstalled.TitleField.Table.IsNullOrEmpty()
+                && !wfInstalled.TitleField.Field.IsNullOrEmpty() && wfInstalled.DataBases.Count() > 0)
             {
                 var firstDB = wfInstalled.DataBases.First();
                 new DBConnection().UpdateFieldValue(
-                    wfInstalled.TitleField.LinkID, 
+                    wfInstalled.TitleField.LinkID,
                     wfInstalled.TitleField.Table,
                     wfInstalled.TitleField.Field,
                     "1",
@@ -809,11 +885,11 @@ namespace Business.Platform
         /// <param name="flowid"></param>
         /// <param name="date1"></param>
         /// <param name="date2"></param>
-        /// <param name="isCompleted">是否完成</param>
+        /// <param name="isCompleted">是否完成 0:全部 1:未完成 2:已完成</param>
         /// <returns></returns>
-        public List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", bool isCompleted = false)
+        public List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", int status = 0)
         {
-            return dataWorkFlowTask.GetInstances(flowID, senderID, receiveID, out pager, query, title, flowid, date1, date2);
+            return dataWorkFlowTask.GetInstances(flowID, senderID, receiveID, out pager, query, title, flowid, date1, date2, status);
         }
 
         /// <summary>
@@ -1029,16 +1105,10 @@ namespace Business.Platform
                     title = "已退回";
                     break;
                 case 4:
-                    title = "他人已处理";
+                    title = "他人已完成";
                     break;
                 case 5:
-                    title = "等待中";
-                    break;
-                case 6:
-                    title = "已指派";
-                    break;
-                case 7:
-                    title = "已委托";
+                    title = "他人已退回";
                     break;
                 default:
                     title = "其它";

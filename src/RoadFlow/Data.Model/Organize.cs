@@ -62,6 +62,18 @@ namespace Data.Model
         public int ChildsLength { get; set; }
 
         /// <summary>
+        /// 分管领导
+        /// </summary>
+        [DisplayName("ChargeLeader")]
+        public string ChargeLeader { get; set; }
+
+        /// <summary>
+        /// 部门或岗位主管
+        /// </summary>
+        [DisplayName("Leader")]
+        public string Leader { get; set; }
+
+        /// <summary>
         /// Note
         /// </summary>
         [DisplayName("Note")]

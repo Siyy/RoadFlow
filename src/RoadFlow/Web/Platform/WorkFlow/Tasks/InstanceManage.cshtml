@@ -37,7 +37,9 @@
             <td>
             @if (task.Status.In(0,1))
             { 
+                <!--
                 <a style="margin-right:3px; background:url(/Images/ico/arrow_medium_left.png) no-repeat left center; padding-left:16px;" href="javascript:void(0);" onclick="back('@task.ID');">退回</a>
+                -->
                 <a style="background:url(/Images/ico/arrow_medium_lower_left.png) no-repeat left center; padding-left:16px;" href="javascript:void(0);" onclick="designate('@task.ID');">指派</a>
             }
             </td>

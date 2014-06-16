@@ -41,18 +41,19 @@
         
         if(!Request.Form["Save"].IsNullOrEmpty() && role!=null && Validation.IsValid())
         {
-            name = Request.Form["Name"];
-            useMember = Request.Form["UseMember"];
-            note = Request.Form["Note"];
-
-            role.Name = name.Trim();
-            role.Note = note.IsNullOrEmpty() ? null : note.Trim();
-            role.UseMember = useMember.IsNullOrEmpty() ? null : useMember;
-            brole.Update(role);
-            if(!useMember.IsNullOrEmpty())
+            Business.Platform.UsersRole busersRole = new Business.Platform.UsersRole();
+            using(System.Transactions.TransactionScope scope=new System.Transactions.TransactionScope())
             {
-                Business.Platform.UsersRole busersRole = new Business.Platform.UsersRole();
-                using(System.Transactions.TransactionScope scope=new System.Transactions.TransactionScope())
+                name = Request.Form["Name"];
+                useMember = Request.Form["UseMember"];
+                note = Request.Form["Note"];
+
+                role.Name = name.Trim();
+                role.Note = note.IsNullOrEmpty() ? null : note.Trim();
+                role.UseMember = useMember.IsNullOrEmpty() ? null : useMember;
+                brole.Update(role);
+                busersRole.DeleteByRoleID(role.ID);
+                if(!useMember.IsNullOrEmpty())
                 {
                     busersRole.DeleteByRoleID(role.ID);
                     foreach(var member in useMember.Split(','))
@@ -69,13 +70,12 @@
                         ur.RoleID = role.ID;
                         busersRole.Add(ur);
                     }
-                    scope.Complete();
                 }
+                scope.Complete();
             }
             <script type="text/javascript">
                 parent.frames[0].location = "Tree?appid=@Request.QueryString["appid"]&roleid=@roleID";
             </script>
-            
         }
         
         if(!Request.Form["Delete"].IsNullOrEmpty())

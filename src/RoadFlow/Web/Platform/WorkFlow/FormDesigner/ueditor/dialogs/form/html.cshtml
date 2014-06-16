@@ -21,8 +21,8 @@
     
 </table>
 <script type="text/javascript">
-    var text = editor.selection.getRange().getClosedNode();
-    //var text = range.collapsed ? editor.queryCommandValue("formtextarea") : editor.selection.getStart();
+    var text = getElement(editor, "flow_html", "formhtmlDialog");
+
     var attJSON = parent.formattributeJSON;
     var textid = text ? text.id : "";
     $(function ()
@@ -50,7 +50,7 @@
         var height = $("#height").val();
         //var valuetype = $("#valuetype").val();
 
-        var html = '<input type="text" isflow="1" type1="flow_html" id="' + id + '" name="' + id + '" value="HTML编辑器" ';
+        var html = '<input ondblclick="if(editor.ui._dialogs.formhtmlDialog.iframeUrl.indexOf(\'?\')==-1){editor.ui._dialogs.formhtmlDialog.iframeUrl=editor.ui._dialogs.formhtmlDialog.iframeUrl+\'?edit=1\';}editor.ui._dialogs.formhtmlDialog.open();" title="双击可设置属性" type="text" isflow="1" type1="flow_html" id="' + id + '" name="' + id + '" value="HTML编辑器" ';
         if (width && height)
         {
             html += 'style="width:' + width + ';height:' + height + '" ';
@@ -76,6 +76,10 @@
         }
         
         html += '/>';
+        if (text)
+        {
+            $(text).remove();
+        }
         editor.execCommand("formhtml", html);
         dialog.close();
     }

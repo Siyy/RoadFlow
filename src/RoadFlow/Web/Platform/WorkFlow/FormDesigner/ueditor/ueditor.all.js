@@ -32,7 +32,6 @@
         execCommand: function (cmdName, json, isNew)
         {
             var me = this;
-            //formattributeJSON = json;
             if (json)
             {
                 formattributeJSON.name = json.name;
@@ -55,7 +54,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -63,7 +61,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -71,7 +68,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -79,7 +75,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -87,7 +82,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -95,7 +89,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -103,7 +96,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -111,7 +103,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -119,7 +110,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -127,7 +117,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -135,7 +124,20 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
+            me.execCommand('insertHtml', html);
+        }
+    };
+    UE.commands['formflowname'] = {
+        execCommand: function (cmdName, html)
+        {
+            var me = this;
+            me.execCommand('insertHtml', html);
+        }
+    };
+    UE.commands['formflowstepname'] = {
+        execCommand: function (cmdName, html)
+        {
+            var me = this;
             me.execCommand('insertHtml', html);
         }
     };
@@ -143,7 +145,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
             me.execCommand('insertHtml', html);
         }
     };
@@ -180,8 +181,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
-            //me.execCommand('insertHtml', html);
         }
     };
     UE.commands['formsave'] = {
@@ -227,8 +226,6 @@
         execCommand: function (cmdName, html)
         {
             var me = this;
-            //range = me.selection.getRange()
-            //alert('save');
         }
     };
     UE.commands['formcompile'] = {
@@ -282,16 +279,22 @@
                             UE.compule.getDateTimeHtml($control);
                             break;
                         case 'files':
-                            UE.compule.getFilesHtml($control)
+                            UE.compule.getFilesHtml($control);
                             break;
                         case 'hidden':
-                            UE.compule.getHiddenHtml($control)
+                            UE.compule.getHiddenHtml($control);
                             break;
                         case 'html':
-                            UE.compule.getHtmlHtml($control)
+                            UE.compule.getHtmlHtml($control);
                             break;
                         case "subtable":
-                            UE.compule.getSubTableHtml($control)
+                            UE.compule.getSubTableHtml($control);
+                            break;
+                        case "flowname":
+                            UE.compule.getFlowNameHtml($control);
+                            break;
+                        case "flowstepname":
+                            UE.compule.getFlowStepNameHtml($control);
                             break;
                     }
                 } 
@@ -352,10 +355,10 @@
         },
         getTextHtml: function ($control)
         {
-            $control.attr("isflow", "1").attr("value", "").attr("class", "mytext");
+            $control.attr("isflow", "1").attr("value", "").attr("class", "mytext").attr("title", "");
             var defaultValue = $control.attr("defaultvalue");
             $control.attr("value", UE.compule.getDefaultValue(defaultValue));
-            $control.removeAttr("defaultvalue").removeAttr("width1");
+            $control.removeAttr("defaultvalue").removeAttr("ondblclick").removeAttr("width1");
         },
         getTextareaHtml: function ($control)
         {
@@ -423,6 +426,21 @@
                 $control.after(radios);
                 $control.remove();
             }
+            else if ("2" == datasource)//SQL
+            {
+                var sql = $control.attr("sql");
+                var radios = '';
+                if ("radio" == type)
+                {
+                    radios += '<span>@Html.Raw(new Business.Platform.WorkFlowForm().GetRadioFromSql(DBConnID, "' + sql.replaceAll('"', '\"') + '", "' + id + '", "", "isflow=\'1\' type1=\'flow_radio\'"))</span>';
+                }
+                else if ("checkbox" == type)
+                {
+                    radios += '<span>@Html.Raw(new Business.Platform.WorkFlowForm().GetCheckboxFromSql(DBConnID, "' + sql.replaceAll('"', '\"') + '", "' + id + '", "", "isflow=\'1\' type1=\'flow_checkbox\'"))</span>';
+                }
+                $control.after(radios);
+                $control.remove();
+            }
         },
         getSelectHtml: function ($control)
         {
@@ -464,10 +482,20 @@
                 $control.after(radios);
                 $control.remove();
             }
+            else if ("2" == datasource)//SQL
+            {
+                var sql = $control.attr("sql");
+                var radios = '<select class="myselect" id="' + id + '" name="' + id + '" ' + (width1 ? 'style="width:' + width1 + '"' : '') + ' isflow="1" type1="flow_select">';
+                radios += '<option value=""></option>';
+                radios += '@Html.Raw(new Business.Platform.WorkFlowForm().GetOptionsFromSql(DBConnID, "' + sql.replaceAll('"', '\"') + '", ""))';
+                radios += '</select>';
+                $control.after(radios);
+                $control.remove();
+            }
         },
         getOrgHtml: function ($control)
         {
-            $control.attr("isflow", "1").attr("value", "").attr("class", "mymember");
+            $control.attr("isflow", "1").attr("value", "").attr("class", "mymember").attr("title", "");;
             var defaultValue = $control.attr("defaultvalue");
             $control.attr("value", UE.compule.getDefaultValue(defaultValue));
             var org_type = $control.attr("org_type");
@@ -493,24 +521,24 @@
                     rootid = $control.attr("org_rang1");
                     break;
             }
-            $control.attr("rootid", rootid).removeAttr("defaultvalue").removeAttr("width1").removeAttr("org_type").removeAttr("org_rang1").removeAttr("org_rang");
+            $control.attr("rootid", rootid).removeAttr("defaultvalue").removeAttr("width1").removeAttr("ondblclick").removeAttr("org_type").removeAttr("org_rang1").removeAttr("org_rang");
         },
         getDictHtml: function ($control)
         {
-            $control.attr("isflow", "1").attr("value", "").attr("class", "mydict");
-            $control.removeAttr("width1");
+            $control.attr("isflow", "1").attr("value", "").attr("class", "mydict").attr("title","");
+            $control.removeAttr("width1").removeAttr("ondblclick");
         },
         getDateTimeHtml: function ($control)
         {
-            $control.attr("isflow", "1").attr("value", "").attr("class", "mycalendar");
+            $control.attr("isflow", "1").attr("value", "").attr("class", "mycalendar").attr("title", "");
             var defaultValue = $control.attr("defaultvalue");
             $control.attr("value", UE.compule.getDefaultValue(defaultValue));
-            $control.removeAttr("width1");
+            $control.removeAttr("width1").removeAttr("ondblclick");
         },
         getFilesHtml: function ($control)
         {
-            $control.attr("isflow", "1").attr("value", "").attr("class", "myfile");
-            $control.removeAttr("width1");
+            $control.attr("isflow", "1").attr("value", "").attr("class", "myfile").attr("title", "");
+            $control.removeAttr("width1").removeAttr("ondblclick");
         },
         getHiddenHtml: function ($control)
         {
@@ -541,10 +569,34 @@
             //}
             textarea += '>';
             
-            textarea += '@Html.Raw(BWorkFlow.GetFromFieldData(jsonData, "' + table + '","' + field + '"))';
+            textarea += '@Html.Raw(BWorkFlow.GetFromFieldData(initData, "' + table + '","' + field + '"))';
             
             textarea += '</textarea>';
             $control.after(textarea);
+            $control.remove();
+        },
+        getFlowNameHtml: function ($control)
+        {
+            var fontsize = $control.attr("fontsize") || "12px";
+            var fontcolor = $control.attr("fontcolor") || "#000000";
+            var html = '<span ';
+            html += 'style="font-size:' + fontsize + '; color:' + fontcolor + ';"';
+            html += '>';
+            html += '@Html.Raw(BWorkFlow.GetFlowName(FlowID.ToGuid()))';
+            html += '</span>';
+            $control.after(html);
+            $control.remove();
+        },
+        getFlowStepNameHtml: function ($control)
+        {
+            var fontsize = $control.attr("fontsize") || "12px";
+            var fontcolor = $control.attr("fontcolor") || "#000000";
+            var html = '<span ';
+            html += 'style="font-size:' + fontsize + '; color:' + fontcolor + ';"';
+            html += '>';
+            html += '@Html.Raw(BWorkFlow.GetStepName(StepID.ToGuid(), FlowID.ToGuid(), true))';
+            html += '</span>';
+            $control.after(html);
             $control.remove();
         },
         getSubTableHtml_Text: function (colnumJSON, id, i, iscount)
@@ -666,7 +718,7 @@
                 case "select_dssql":
                     var sql = editmode.select_ds_sql;
                     select += '<option value=""></option>';
-                    select += '@Html.Raw(new Business.Platform.WorkFlowForm().GetOptionsFromSql(DBConnID, "' + sql.replaceAll('"', '') + '", ""))';
+                    select += '@Html.Raw(new Business.Platform.WorkFlowForm().GetOptionsFromSql(DBConnID, "' + sql.replaceAll('"', '\"') + '", ""))';
                     break;
                 case "select_dsstring":
                     var str = editmode.select_ds_string;
@@ -691,7 +743,7 @@
                     break;
                 case "checkbox_dssql":
                     var sql = editmode.checkbox_ds_sql;
-                    checkbox = '@Html.Raw(new Business.Platform.WorkFlowForm().GetCheckboxFromSql(DBConnID, "' + sql.replaceAll('"', '') + '", "' + name + '", "", "issubflow=\'1\' type1=\'subflow_checkbox\'" colname=\'' + colnumJSON.name + '\'"))';
+                    checkbox = '@Html.Raw(new Business.Platform.WorkFlowForm().GetCheckboxFromSql(DBConnID, "' + sql.replaceAll('"', '\"') + '", "' + name + '", "", "issubflow=\'1\' type1=\'subflow_checkbox\'" colname=\'' + colnumJSON.name + '\'"))';
                     break;
                 case "checkbox_dsstring":
                     var str = editmode.checkbox_ds_string;
@@ -8203,17 +8255,20 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
 //                return;
 //            }
 
-
+           
             var hackForMouseUp = false;
             var mouseX, mouseY;
-            if (browser.ie && browser.version < 9 && evt && evt.type == 'mouseup') {
+            if (browser.ie && browser.version < 9 && evt && evt.type == 'mouseup')
+            {
                 var range = this.selection.getRange();
-                if (!range.collapsed) {
+                if (!range.collapsed)
+                {
                     hackForMouseUp = true;
                     mouseX = evt.clientX;
                     mouseY = evt.clientY;
                 }
             }
+           
             clearTimeout(_selectionChangeTimer);
             _selectionChangeTimer = setTimeout(function () {
                 if (!me.selection || !me.selection.getNative()) {
@@ -26407,7 +26462,9 @@ baidu.editor.ui = {};
         'formsubtable': '~/dialogs/form/subtable.cshtml',
         'formopen': '~/dialogs/form/open.cshtml',
         'formnew': '~/dialogs/form/attribute.cshtml?new=1',
-        'formsaveas': '~/dialogs/form/saveas.cshtml'
+        'formsaveas': '~/dialogs/form/saveas.cshtml',
+        'formflowname': '~/dialogs/form/flowname.cshtml',
+        'formflowstepname': '~/dialogs/form/flowstepname.cshtml'
     };
     //为工具栏添加按钮，以下都是统一的按钮触发命令，所以写在一起
     var btnCmds = ['undo', 'redo', 'formatmatch',
@@ -26537,7 +26594,7 @@ baidu.editor.ui = {};
         ok:['attachment', 'anchor', 'link', 'insertimage', 'map', 'gmap', 'insertframe', 'wordimage',
             'insertvideo', 'insertframe', 'edittip', 'edittable', 'edittd', 'scrawl', 'template', 'music', 'background', 'charts',
             'formattribute', 'formtext', 'formtextarea', 'formhtml', 'formradio', 'formcheckbox', 'formorg', 'formdictionary', 'formdatetime',
-            'formhidden', 'formselect', 'formfiles', 'formsubtable', 'formnew'
+            'formhidden', 'formselect', 'formfiles', 'formsubtable', 'formnew', 'formflowname', 'formflowstepname'
         ]
     };
 

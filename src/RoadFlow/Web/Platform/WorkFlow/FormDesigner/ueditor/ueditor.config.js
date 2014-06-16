@@ -36,8 +36,8 @@
         //,compressSide:0                           //等比压缩的基准，确定maxImageSideLength参数的参照对象。0为按照最长边，1为按照宽度，2为按照高度
         //,maxImageSideLength:900                   //上传图片最大允许的边长，超过会自动等比缩放,不缩放就设置一个比较大的值，更多设置在image.html中
         //,savePath: [ 'upload1', 'upload2', 'upload3' ]    //图片保存在服务器端的目录， 默认为空， 此时在上传图片时会向服务器请求保存图片的目录列表，
-                                                            // 如果用户不希望发送请求， 则可以在这里设置与服务器端能够对应上的目录名称列表
-                                                            //比如： savePath: [ 'upload1', 'upload2' ]
+        // 如果用户不希望发送请求， 则可以在这里设置与服务器端能够对应上的目录名称列表
+        //比如： savePath: [ 'upload1', 'upload2' ]
 
         //涂鸦图片配置区
         ,scrawlUrl:URL+"net/scrawlUp.ashx"           //涂鸦上传地址
@@ -92,6 +92,7 @@
     "formnew", "formopen", "formattribute", "|",
     "formtext", "formtextarea", "formradio", "formcheckbox", "formhidden", "formselect", "formhtml", "formorg",
     "formdictionary", "formdatetime", "formfiles", "formsubtable", "|",
+    "formflowname","formflowstepname","|",
     "formsave", "formsaveas", "formcompile"
 ]]
         //当鼠标放在工具栏上时显示的tooltip提示,留空支持自动多语言配置，否则以配置值为准
@@ -99,7 +100,8 @@
             'anchor': '', 'undo': '', 'formattribute': '表单属性', 'formtext': '流程文本框', 'formtextarea': '流程文本域', 'formhtml': '流程HTML编辑器',
             'formradio': '流程单选按钮', 'formcheckbox': '流程复选框', 'formorg': '流程组织机构选择', 'formdictionary': '流程数据字典选择'
             , 'formdatetime': '流程日期时间选择', 'formhidden': '流程隐藏域', 'formselect': '流程下拉列表框', 'formfiles': '流程附件管理', 'formsubtable': '流程从表',
-            'formnew': '新建表单', 'formopen': '打开表单', 'formsave': '保存表单', 'formsaveas': '另存表单', 'formcompile': '发布表单'
+            'formnew': '新建表单', 'formopen': '打开表单', 'formsave': '保存表单', 'formsaveas': '另存表单', 'formcompile': '发布表单',
+            'formflowname': '流程名称', 'formflowstepname': '流程当前步骤名称'
         }
         //webAppKey
         //百度应用的APIkey，每个站长必须首先去百度官网注册一个key后方能正常使用app功能
@@ -136,7 +138,7 @@
 
         //,autoClearinitialContent:true //是否自动清除编辑器初始内容，注意：如果focus属性设置为true,这个也为真，那么编辑器一上来就会触发导致初始化的内容看不到了
 
-        , iframeCssUrl: '/Platform/themes/WorkFlow/FormDesigner/Forms/Public/flowform.css' //给编辑器内部引入一个css文件
+        , iframeCssUrl: '/Platform/WorkFlow/FormDesigner/Forms/Public/flowform.css' //给编辑器内部引入一个css文件
 
         //,textarea:'editorValue' // 提交表单时，服务器获取编辑器提交内容的所用的参数，多实例时可以给容器name属性，会将name给定的值最为每个实例的键值，不用每次实例化的时候都设置这个值
 

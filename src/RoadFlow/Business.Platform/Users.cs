@@ -350,5 +350,71 @@ namespace Business.Platform
         {
             return id.IsNullOrEmpty() ? "" : id.Replace(PREFIX, "");
         }
+
+        /// <summary>
+        /// 得到一个人员的主管
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public string GetLeader(Guid userID)
+        {
+            var mainStation = GetMainStation(userID);
+            if (mainStation == null)
+            {
+                return "";
+            }
+            Business.Platform.Organize borg = new Organize();
+            var station = borg.Get(mainStation);
+            if (station == null)
+            {
+                return "";
+            }
+            if (!station.Leader.IsNullOrEmpty())
+            {
+                return station.Leader;
+            }
+            var parents = borg.GetAllParent(station.Number);
+            foreach (var parent in parents)
+            {
+                if (!parent.Leader.IsNullOrEmpty())
+                {
+                    return parent.Leader;
+                }
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// 得到一个人员的分管领导
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public string GetChargeLeader(Guid userID)
+        {
+            var mainStation = GetMainStation(userID);
+            if (mainStation == null)
+            {
+                return "";
+            }
+            Business.Platform.Organize borg = new Organize();
+            var station = borg.Get(mainStation);
+            if (station == null)
+            {
+                return "";
+            }
+            if (!station.ChargeLeader.IsNullOrEmpty())
+            {
+                return station.ChargeLeader;
+            }
+            var parents = borg.GetAllParent(station.Number);
+            foreach (var parent in parents)
+            {
+                if (!parent.ChargeLeader.IsNullOrEmpty())
+                {
+                    return parent.ChargeLeader;
+                }
+            }
+            return "";
+        }
     }
 }

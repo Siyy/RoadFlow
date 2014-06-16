@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Drawing;
+using System.Collections;
 
 namespace Business.Platform
 {
@@ -255,7 +256,7 @@ namespace Business.Platform
             {
                 wf.ID = Guid.NewGuid();
                 wf.Name = newName.Trim();
-                wf.CreateDate = Utility.Tools.DateTime;
+                wf.CreateDate = Utility.DateTimeNew.Now;
                 wf.CreateUserID = Platform.Users.CurrentUserID;
                 wf.InstallDate = null;
                 wf.InstallUserID = null;
@@ -831,6 +832,17 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 得到流程名称
+        /// </summary>
+        /// <param name="flowID"></param>
+        /// <returns></returns>
+        public string GetFlowName(Guid flowID)
+        {
+            var flow = GetWorkFlowRunModel(flowID);
+            return flow != null ? flow.Name : "";
+        }
+
+        /// <summary>
         /// 查询所有ID和名称
         /// </summary>
         public Dictionary<Guid,string> GetAllIDAndName()
@@ -852,6 +864,39 @@ namespace Business.Platform
                     dict.Key.ToString() == value ? "selected=\"selected\"" : "", dict.Value);
             }
             return options.ToString();
+        }
+
+        /// <summary>
+        /// 得到一个人员可管理实例的所有流程选择项
+        /// </summary>
+        /// <returns></returns>
+        public string GetOptions(Dictionary<Guid,string> flows, string value = "")
+        {
+            var dicts = flows;
+            StringBuilder options = new StringBuilder();
+            foreach (var dict in dicts)
+            {
+                options.AppendFormat("<option value=\"{0}\" {1}>{2}</option>", dict.Key,
+                    dict.Key.ToString() == value ? "selected=\"selected\"" : "", dict.Value);
+            }
+            return options.ToString();
+        }
+
+        /// <summary>
+        /// 得到一个人员可管理实例的流程ID和名称列表
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public Dictionary<Guid,string> GetInstanceManageFlowIDList(Guid userID)
+        {
+            var flows = this.GetAll().Where(p => p.InstanceManager.Contains(Business.Platform.Users.PREFIX + userID.ToString(),
+            StringComparison.CurrentCultureIgnoreCase));
+            Dictionary<Guid, string> flowids = new Dictionary<Guid, string>();
+            foreach (var flow in flows)
+            {
+                flowids.Add(flow.ID, flow.Name);
+            }
+            return flowids;
         }
 
         /// <summary>

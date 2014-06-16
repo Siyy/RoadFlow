@@ -302,7 +302,7 @@ namespace Data.Model.WorkFlowInstalledSub.StepSet
         /// </summary>
         public int RunSelect { get; set; }
         /// <summary>
-        /// 处理者类型 0所有成员 1部门 2岗位 3工作组 4人员 5发起者 6前一步骤处理者 7某一步骤处理者 8字段值
+        /// 处理者类型 0所有成员 1部门 2岗位 3工作组 4人员 5发起者 6前一步骤处理者 7某一步骤处理者 8字段值 9发起者主管 10发起者分管领导 11当前处理者主管 12当前处理者分管领导
         /// </summary>
         public int HandlerType { get; set; }
         /// <summary>

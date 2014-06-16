@@ -23,8 +23,8 @@ namespace Data.MSSQL
         public int Add(Data.Model.Organize model)
         {
             string sql = @"INSERT INTO Organize
-				(ID,Name,Number,Type,Status,ParentID,Sort,Depth,ChildsLength,Note) 
-				VALUES(@ID,@Name,@Number,@Type,@Status,@ParentID,@Sort,@Depth,@ChildsLength,@Note)";
+				(ID,Name,Number,Type,Status,ParentID,Sort,Depth,ChildsLength,ChargeLeader,Leader,Note) 
+				VALUES(@ID,@Name,@Number,@Type,@Status,@ParentID,@Sort,@Depth,@ChildsLength,@ChargeLeader,@Leader,@Note)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Name", SqlDbType.VarChar, 2000){ Value = model.Name },
@@ -35,6 +35,8 @@ namespace Data.MSSQL
 				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
 				new SqlParameter("@Depth", SqlDbType.Int, -1){ Value = model.Depth },
 				new SqlParameter("@ChildsLength", SqlDbType.Int, -1){ Value = model.ChildsLength },
+				model.ChargeLeader == null ? new SqlParameter("@ChargeLeader", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@ChargeLeader", SqlDbType.VarChar, 200) { Value = model.ChargeLeader },
+				model.Leader == null ? new SqlParameter("@Leader", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@Leader", SqlDbType.VarChar, 200) { Value = model.Leader },
 				model.Note == null ? new SqlParameter("@Note", SqlDbType.NVarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Note", SqlDbType.NVarChar, -1) { Value = model.Note }
 			};
             return dbHelper.Execute(sql, parameters);
@@ -46,7 +48,7 @@ namespace Data.MSSQL
         public int Update(Data.Model.Organize model)
         {
             string sql = @"UPDATE Organize SET 
-				Name=@Name,Number=@Number,Type=@Type,Status=@Status,ParentID=@ParentID,Sort=@Sort,Depth=@Depth,ChildsLength=@ChildsLength,Note=@Note
+				Name=@Name,Number=@Number,Type=@Type,Status=@Status,ParentID=@ParentID,Sort=@Sort,Depth=@Depth,ChildsLength=@ChildsLength,ChargeLeader=@ChargeLeader,Leader=@Leader,Note=@Note
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Name", SqlDbType.VarChar, 2000){ Value = model.Name },
@@ -57,6 +59,8 @@ namespace Data.MSSQL
 				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
 				new SqlParameter("@Depth", SqlDbType.Int, -1){ Value = model.Depth },
 				new SqlParameter("@ChildsLength", SqlDbType.Int, -1){ Value = model.ChildsLength },
+				model.ChargeLeader == null ? new SqlParameter("@ChargeLeader", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@ChargeLeader", SqlDbType.VarChar, 200) { Value = model.ChargeLeader },
+				model.Leader == null ? new SqlParameter("@Leader", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@Leader", SqlDbType.VarChar, 200) { Value = model.Leader },
 				model.Note == null ? new SqlParameter("@Note", SqlDbType.NVarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Note", SqlDbType.NVarChar, -1) { Value = model.Note },
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID }
 			};
@@ -93,7 +97,11 @@ namespace Data.MSSQL
                 model.Depth = dataReader.GetInt32(7);
                 model.ChildsLength = dataReader.GetInt32(8);
                 if (!dataReader.IsDBNull(9))
-                    model.Note = dataReader.GetString(9);
+                    model.ChargeLeader = dataReader.GetString(9);
+                if (!dataReader.IsDBNull(10))
+                    model.Leader = dataReader.GetString(10);
+                if (!dataReader.IsDBNull(11))
+                    model.Note = dataReader.GetString(11);
                 List.Add(model);
             }
             return List;

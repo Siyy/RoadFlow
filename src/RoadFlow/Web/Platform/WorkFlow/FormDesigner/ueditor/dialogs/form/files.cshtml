@@ -23,9 +23,7 @@
     </tr>
 </table>
 <script type="text/javascript">
-    //var range = editor.selection.getRange();
-    //var text = range.collapsed ? editor.queryCommandValue("formfiles") : editor.selection.getStart();
-    var text = editor.selection.getRange().getClosedNode();
+    var text = getElement(editor, "flow_files", "formfilesDialog");
     var attJSON = parent.formattributeJSON;
     var textid = text ? text.id : "";
     $(function ()
@@ -45,8 +43,7 @@
         var width = $("#width").val();
         var filetype = $("#filetype").val();
         
-
-        var html = '<input type="text" type1="flow_files" id="' + id + '" name="' + id + '" value="附件管理" ';
+        var html = '<input ondblclick="if(editor.ui._dialogs.formfilesDialog.iframeUrl.indexOf(\'?\')==-1){editor.ui._dialogs.formfilesDialog.iframeUrl=editor.ui._dialogs.formfilesDialog.iframeUrl+\'?edit=1\';}editor.ui._dialogs.formfilesDialog.open();" title="双击可设置属性" type="text" type1="flow_files" id="' + id + '" name="' + id + '" value="附件管理" ';
         if (width)
         {
             html += 'style="width:' + width + '" ';
@@ -55,6 +52,10 @@
        
         html += 'filetype="' + filetype + '" ';
         html += '/>';
+        if (text)
+        {
+            $(text).remove();
+        }
         editor.execCommand("formfiles", html);
         dialog.close();
     }

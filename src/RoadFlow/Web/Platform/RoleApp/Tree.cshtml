@@ -19,7 +19,7 @@
     $(function ()
     {
         loadTree($('#role').val());
-        parent.frames[1].location = 'EditRole?id='+$("#role").val()+'&appid=@Request.QueryString["appid"]';
+        parent.frames[1].location = 'EditRole?id=' + $("#role").val() + '&appid=' + AppID;
     });
     function loadTree(id)
     {
@@ -27,6 +27,7 @@
         if (id.length > 0)
         {
             roadTree = new RoadUI.Tree({ id: "menu", path: "Tree1?roleid=" + id, refreshpath: "TreeRefresh", onclick: openUrl });
+            parent.frames[1].location = 'EditRole?id=' + id + '&appid=' + AppID;
         }
     }
     function reLoad(id)

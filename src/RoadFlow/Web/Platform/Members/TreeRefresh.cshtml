@@ -71,6 +71,10 @@
     var userRelations = new Business.Platform.UsersRelation().GetAllByOrganizeID(orgID);
     var users = new Business.Platform.Users().GetAllByOrganizeID(orgID);
     int count1 = users.Count;
+    if (count1 > 0 && count>0)
+    {
+        json.Append(",");
+    }
     int j = 0;
     foreach (var user in users)
     {

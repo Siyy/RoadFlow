@@ -131,6 +131,10 @@
                         <option value="6">前一步骤处理者</option>
                         <option value="7">某一步骤处理者</option>
                         <option value="8">字段值</option>
+                        <option value="9">发起者主管</option>
+                        <option value="10">发起者分管领导</option>
+                        <option value="11">当前处理者主管</option>
+                        <option value="12">当前处理者分管领导</option>
                     </select>
                 </td>
                 <th >选择范围：</th>
@@ -152,9 +156,8 @@
                 <th >退回策略：</th>
                 <td>
                     <select class="myselect" style="width:210px;" id="behavior_BackModel">
-                        <option value="1">单个退回</option>
+                        <option value="1">根据处理策略退回</option>
                         <option value="0">不能退回</option>
-                        <option value="2">全部退回</option>
                     </select>
                 </td>
             </tr>
@@ -162,10 +165,10 @@
                 <th >处理策略：</th>
                 <td>
                     <select class="myselect" style="width:210px;" id="behavior_HanlderModel">
-                        <option value="3">独立处理</option>
-                        <option value="0">所有人必须处理</option>
+                        <option value="0">所有人必须同意</option>
                         <option value="1">一人同意即可</option>
                         <option value="2">依据人数比例</option>
+                        <option value="3">独立处理</option>
                     </select>
                 </td>
                 <th >退回类型：</th>
@@ -643,8 +646,8 @@
              //    var $spans=$(this).children('span');
              //    step.forms.push({ id: $(this).attr("val"), name:$spans.eq(0).text(), type:$spans.eq(1).text(), srot:i });
              //});
-             var form_type=$('#form_types').val();
-             var form_forms=$("#form_forms").val();
+             var form_type=$('#form_types').val()||"";
+             var form_forms=$("#form_forms").val()||"";
              if(form_forms.length > 0 && form_type.length > 0)
              {
                  step.forms.push({ id: form_forms, name:"", type:form_type, srot:0 });

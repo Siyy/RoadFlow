@@ -149,8 +149,10 @@ namespace Business.Platform
         {
             ListItem[] items = new ListItem[]{ 
                 new ListItem("数据字典","0"){ Selected="0"==value},
-                new ListItem("自定义","1"){ Selected="1"==value}
+                new ListItem("自定义","1"){ Selected="1"==value},
+                new ListItem("SQL语句","2"){ Selected="2"==value}
             };
+
             return Utility.Tools.GetRadioString(items, name, att);
         }
 
@@ -277,7 +279,50 @@ namespace Business.Platform
         }
 
         /// <summary>
-        /// 根据sql得到下拉列表项
+        /// 根据sql得到单选按钮组
+        /// </summary>
+        /// <param name="dbconn"></param>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public string GetRadioFromSql(string connID, string sql, string name, string value, string attr = "")
+        {
+            Guid cid;
+            if (!connID.IsGuid(out cid))
+            {
+                return "";
+            }
+            DBConnection dbConn = new DBConnection();
+            var dbconn = dbConn.Get(cid);
+            if (dbconn == null)
+            {
+                return "";
+            }
+            DataTable dt = dbConn.GetDataTable(dbconn, sql.ReplaceSelectSql());
+            if (dt.Rows.Count == 0)
+            {
+                return "";
+            }
+            List<ListItem> items = new List<ListItem>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (dt.Columns.Count == 0)
+                {
+                    continue;
+                }
+                string value1 = dr[0].ToString();
+                string title = value1;
+                if (dt.Columns.Count > 1)
+                {
+                    title = dr[1].ToString();
+                }
+
+                items.Add(new ListItem(title, value1) { Selected = value == value1 });
+            }
+            return Utility.Tools.GetRadioString(items.ToArray(), name, attr);
+        }
+
+        /// <summary>
+        /// 根据sql得到复选框
         /// </summary>
         /// <param name="dbconn"></param>
         /// <param name="sql"></param>

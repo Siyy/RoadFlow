@@ -66,9 +66,9 @@ namespace Data.Interface
         /// <param name="flowid"></param>
         /// <param name="date1"></param>
         /// <param name="date2"></param>
-        /// <param name="isCompleted">是否完成</param>
+        /// <param name="status">是否完成 0:全部 1:未完成 2:已完成</param>
         /// <returns></returns>
-        List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", bool isCompleted = false);
+        List<Data.Model.WorkFlowTask> GetInstances(Guid[] flowID, Guid[] senderID, Guid[] receiveID, out string pager, string query = "", string title = "", string flowid = "", string date1 = "", string date2 = "", int status = 0);
 
         /// <summary>
         /// 更新打开时间

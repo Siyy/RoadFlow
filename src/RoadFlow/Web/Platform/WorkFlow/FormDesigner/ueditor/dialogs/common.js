@@ -70,3 +70,51 @@ function getFieldsOps(connid, table, field)
     }
     return options;
 }
+
+//测试sql合法性
+function testSql(sql)
+{
+    if ($.trim(sql).length == 0)
+    {
+        alert("sql语句为空");
+        return;
+    }
+    var json = parent.formattributeJSON;
+    if (!json || !json.dbconn)
+    {
+        alert("未设置数据连接");
+        return;
+    }
+    $.ajax({
+        url: "/Platform/WorkFlow/FormDesigner/TestSql", async: false, cache: false, data: {sql:sql, dbconn:json.dbconn}, success: function (txt)
+        {
+            alert(txt);
+        }
+    });
+}
+
+function getElement(editor, type1, dialogName)
+{
+    var edit = RoadUI.Core.query("edit");
+    var dialog = editor.ui._dialogs[dialogName];
+    if (dialog.iframeUrl.indexOf("?") != -1)
+    {
+        dialog.iframeUrl = dialog.iframeUrl.split('?')[0];
+    }
+    
+    if ("1" != edit)
+    {
+        return undefined;
+    }
+    var text = editor.selection.getRange().getClosedNode();
+    if (!text)
+    {
+        var text = editor.selection.getStart();
+        if ("INPUT" != text.tagName)
+        {
+            text1 = $("[type1='" + type1 + "']", $(text));
+            text = text1.size() > 0 ? text1.get(0) : undefined;
+        }
+    }
+    return text;
+}

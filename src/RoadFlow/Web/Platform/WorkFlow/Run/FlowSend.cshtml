@@ -8,6 +8,7 @@
 
     Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
     Business.Platform.WorkFlowTask btask = new Business.Platform.WorkFlowTask();
+    Business.Platform.Users busers = new Business.Platform.Users();
     Data.Model.WorkFlowInstalled wfInstalled = bworkFlow.GetWorkFlowRunModel(flowid);
     if (wfInstalled == null)
     {
@@ -29,7 +30,7 @@
     @if (!currentStep.Note.IsNullOrEmpty())
     { 
         <tr>
-            <td style="padding:2px 0 0 0; color:red;">@Html.Raw(currentStep.Note)</td>
+            <td style="padding:2px 0 0 0; color:#cc0000;">@Html.Raw(currentStep.Note)</td>
         </tr>
     }
     @foreach (var step in nextSteps)
@@ -95,6 +96,34 @@
                     {
                         defaultMember = new Business.Platform.DBConnection().GetFieldValue(linkString, wfInstalled.DataBases.First().PrimaryKey, instanceid);
                     }
+                    break;
+                case 9://发起者主管
+                    Guid firstSenderID = btask.GetFirstSnderID(wfInstalled.ID, groupid.ToGuid());
+                    if (firstSenderID.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)//如果是第一步则发起者为当前人员
+                    {
+                        firstSenderID = Business.Platform.Users.CurrentUserID;
+                    }
+                    if (!firstSenderID.IsEmptyGuid())
+                    {
+                        defaultMember = busers.GetLeader(firstSenderID);
+                    }
+                    break;
+                case 10://发起者分管领导
+                    Guid firstSenderID1 = btask.GetFirstSnderID(wfInstalled.ID, groupid.ToGuid());
+                    if (firstSenderID1.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)//如果是第一步则发起者为当前人员
+                    {
+                        firstSenderID1 = Business.Platform.Users.CurrentUserID;
+                    }
+                    if (!firstSenderID1.IsEmptyGuid())
+                    {
+                        defaultMember = busers.GetChargeLeader(firstSenderID1);
+                    }
+                    break;
+                case 11://当前处理者主管
+                    defaultMember = busers.GetLeader(Business.Platform.Users.CurrentUserID);
+                    break;
+                case 12://当前处理者分管领导
+                    defaultMember = busers.GetChargeLeader(Business.Platform.Users.CurrentUserID);
                     break;
             }
         }

@@ -81,7 +81,10 @@
             <td>@task.ReceiveTime</td>
             <td>@bworkFlowTask.GetStatusTitle(task.Status)</td>
             <td>@task.Note</td>
-            <td><a class="viewlink" href="javascript:void(0);" onclick="detail('@task.FlowID','@task.GroupID');">查看</a></td>
+            <td>
+                <a class="viewlink" href="javascript:void(0);" onclick="detail('@task.FlowID','@task.GroupID');">查看</a>
+
+            </td>
         </tr>
     }
     </tbody>
@@ -96,7 +99,7 @@
     function detail(flowid, groupid)
     {
         top.mainDialog.open({ url: '/Platform/WorkFlow/Tasks/Detail?flowid1=' + flowid + "&groupid=" + groupid + '@Html.Raw(query)',
-            width: 980, height: 450, title: "查看流程处理过程"
+            width: 980, height: 530, title: "查看流程处理过程"
         });
     }
 </script>

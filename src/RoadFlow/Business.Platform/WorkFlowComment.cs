@@ -163,7 +163,7 @@ namespace Business.Platform
             var list = GetAllList();
             var list1 = list.Where(p => p.Item5.Count == 0 || p.Item5.Exists(q => q == userID)).OrderByDescending(p => p.Item3).ThenBy(p => p.Item4);
             List<string> commentsList = new List<string>();
-            foreach (var li in list1)
+            foreach (var li in list1.OrderBy(p=>p.Item3).ThenBy(p=>p.Item4))
             {
                 commentsList.Add(li.Item2);
             }

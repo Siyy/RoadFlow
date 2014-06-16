@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/_SiteLayout.cshtml";
 
-    string query1 = string.Format("&appid={0}&tabid={1}", Request.QueryString["appid"], Request.QueryString["tabid"]);
+    string query1 = string.Format("&appid={0}&tabid={1}&isoneself={2}", Request.QueryString["appid"], Request.QueryString["tabid"], Request.QueryString["isoneself"]);
     Business.Platform.WorkFlowComment bworkFlowComment = new Business.Platform.WorkFlowComment();
     Business.Platform.Organize borganize = new Business.Platform.Organize();
     IEnumerable<Data.Model.WorkFlowComment> workFlowCommentList;
@@ -28,11 +28,15 @@
             bworkFlowComment.RefreshCache();
 
         }
-        workFlowCommentList = bworkFlowComment.GetManagerAll();
+        
     }
-    else
+    
+    workFlowCommentList = bworkFlowComment.GetAll();
+
+    bool isOneSelf = "1" == Request.QueryString["isoneself"];
+    if(isOneSelf)
     {
-        workFlowCommentList = bworkFlowComment.GetManagerAll();
+        workFlowCommentList = workFlowCommentList.Where(p => p.MemberID == Business.Platform.Users.PREFIX + Business.Platform.Users.CurrentUserID.ToString());
     }
 }
 
@@ -48,17 +52,23 @@
         <tr>
             <th><input type="checkbox" onclick="checkAll(this.checked);" style="vertical-align:middle;" />序号</th>
             <th>内容</th>
+            @if(!isOneSelf){
             <th>所属成员</th>
+            <th>添加类型</th>
+            }
             <th>编辑</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var comment in workFlowCommentList.OrderBy(p=>p.Sort))
+    @foreach (var comment in workFlowCommentList.OrderBy(p=>p.Type).ThenBy(p=>p.Sort))
     { 
         <tr>
             <td><input type="checkbox" value="@comment.ID" name="checkbox_app" />@comment.Sort</td>
             <td>@comment.Comment</td>
+            @if(!isOneSelf){
             <td>@borganize.GetNames(comment.MemberID)</td>
+            <td>@(comment.Type==0?"管理员":"个人")</td>
+            }
             <td><a class="editlink" href="javascript:edit('@comment.ID');">编辑</a></td>
         </tr>
     }
@@ -88,7 +98,7 @@
             alert("您没有选择要删除的项!");
             return false;
         }
-        if (!confirm('您真的要删除所选按钮吗?'))
+        if (!confirm('您真的要删除所选意见吗?'))
         {
             return false;
         }
