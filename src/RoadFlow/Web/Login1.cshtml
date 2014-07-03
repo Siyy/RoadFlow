@@ -65,7 +65,7 @@
                 {
                     string ip=onUser.IP;
                     Session.Remove(isVcodeSessionKey);
-                    forcescript = "if(confirm('您的帐号已经在" + ip + "登录,您要强行登录吗?')){$('#Account').val('" + account + "');$('#Password').val('"+password+"');$('#Force').val('1');$('#form1').submit();}";
+                    forcescript = "if(confirm('当前帐号已经在" + ip + "登录,您要强行登录吗?')){$('#Account').val('" + account + "');$('#Password').val('"+password+"');$('#Force').val('1');$('#form1').submit();}";
                 }
                 else
                 {

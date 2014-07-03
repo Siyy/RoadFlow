@@ -23,8 +23,8 @@ namespace Data.MSSQL
         public int Add(Data.Model.RoleApp model)
         {
             string sql = @"INSERT INTO RoleApp
-				(ID,ParentID,RoleID,AppID,Title,Params,Sort) 
-				VALUES(@ID,@ParentID,@RoleID,@AppID,@Title,@Params,@Sort)";
+				(ID,ParentID,RoleID,AppID,Title,Params,Sort,Ico,Type) 
+				VALUES(@ID,@ParentID,@RoleID,@AppID,@Title,@Params,@Sort,@Ico,@Type)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@ParentID", SqlDbType.UniqueIdentifier, -1){ Value = model.ParentID },
@@ -32,7 +32,9 @@ namespace Data.MSSQL
 				model.AppID == null ? new SqlParameter("@AppID", SqlDbType.UniqueIdentifier, -1) { Value = DBNull.Value } : new SqlParameter("@AppID", SqlDbType.UniqueIdentifier, -1) { Value = model.AppID },
 				new SqlParameter("@Title", SqlDbType.NVarChar, 400){ Value = model.Title },
 				model.Params == null ? new SqlParameter("@Params", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Params", SqlDbType.VarChar, -1) { Value = model.Params },
-				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort }
+				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
+				model.Ico == null ? new SqlParameter("@Ico", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@Ico", SqlDbType.VarChar, 200) { Value = model.Ico },
+				new SqlParameter("@Type", SqlDbType.Int, -1){ Value = model.Type }
 			};
             return dbHelper.Execute(sql, parameters);
         }
@@ -43,7 +45,7 @@ namespace Data.MSSQL
         public int Update(Data.Model.RoleApp model)
         {
             string sql = @"UPDATE RoleApp SET 
-				ParentID=@ParentID,RoleID=@RoleID,AppID=@AppID,Title=@Title,Params=@Params,Sort=@Sort
+				ParentID=@ParentID,RoleID=@RoleID,AppID=@AppID,Title=@Title,Params=@Params,Sort=@Sort,Ico=@Ico,Type=@Type
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ParentID", SqlDbType.UniqueIdentifier, -1){ Value = model.ParentID },
@@ -52,6 +54,8 @@ namespace Data.MSSQL
 				new SqlParameter("@Title", SqlDbType.NVarChar, 400){ Value = model.Title },
 				model.Params == null ? new SqlParameter("@Params", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Params", SqlDbType.VarChar, -1) { Value = model.Params },
 				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
+				model.Ico == null ? new SqlParameter("@Ico", SqlDbType.VarChar, 200) { Value = DBNull.Value } : new SqlParameter("@Ico", SqlDbType.VarChar, 200) { Value = model.Ico },
+				new SqlParameter("@Type", SqlDbType.Int, -1){ Value = model.Type },
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID }
 			};
             return dbHelper.Execute(sql, parameters);
@@ -86,6 +90,9 @@ namespace Data.MSSQL
                 if (!dataReader.IsDBNull(5))
                     model.Params = dataReader.GetString(5);
                 model.Sort = dataReader.GetInt32(6);
+                if (!dataReader.IsDBNull(7))
+                    model.Ico = dataReader.GetString(7);
+                model.Type = dataReader.GetInt32(8);
                 List.Add(model);
             }
             return List;

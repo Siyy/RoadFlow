@@ -36,12 +36,6 @@ namespace Data.Interface
         long GetCount();
 
         /// <summary>
-        /// 得到所有分类
-        /// </summary>
-        /// <returns></returns>
-        List<string> GetAllTypes();
-
-        /// <summary>
         /// 得到一页数据
         /// </summary>
         /// <param name="pager"></param>

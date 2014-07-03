@@ -31,19 +31,26 @@
                 });
             }
 
-            $but.bind("click", function ()
+            if ($_member.prop("disabled"))
             {
-                var $obj = $(this).prev().prev();
-                var val = $obj.val();
-                var $obj1 = $(this).prev();
-                var ismore = $obj1.attr("more") || "";
-                var isparent = $obj1.attr("parent") || "";
-                var root = $obj1.attr("rootid") || "";
-                var ischild = $obj1.attr("child") || "";
+                $but.prop("disabled", true);
+            }
+            else
+            {
+                $but.bind("click", function ()
+                {
+                    var $obj = $(this).prev().prev();
+                    var val = $obj.val();
+                    var $obj1 = $(this).prev();
+                    var ismore = $obj1.attr("more") || "";
+                    var isparent = $obj1.attr("parent") || "";
+                    var root = $obj1.attr("rootid") || "";
+                    var ischild = $obj1.attr("child") || "";
 
-                var params = "eid=" + id + "&ismore=" + ismore + "&isparent=" + isparent + "&root=" + root + "&ischild=" + ischild + "&values=" + val;
-                new RoadUI.Window().open({ id: "dict_" + id, url: "/Content/Controls/Dict/Default?" + params, width: 500, height: 470, resize: false, title: "选择数据字典", openerid: RoadUI.Core.query("tabid")||"" });
-            });
+                    var params = "eid=" + id + "&ismore=" + ismore + "&isparent=" + isparent + "&root=" + root + "&ischild=" + ischild + "&values=" + val;
+                    new RoadUI.Window().open({ id: "dict_" + id, url: "/Content/Controls/Dict/Default?" + params, width: 500, height: 470, resize: false, title: "选择数据字典", openerid: RoadUI.Core.query("tabid") || "" });
+                });
+            }
 
             $_member.after($but).before($hide);
         });

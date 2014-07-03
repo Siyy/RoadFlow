@@ -14,33 +14,39 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// Name
+        /// 表单名称
         /// </summary>
-        [DisplayName("Name")]
+        [DisplayName("表单名称")]
         public string Name { get; set; }
 
         /// <summary>
-        /// CreateUserID
+        /// 表单分类
         /// </summary>
-        [DisplayName("CreateUserID")]
+        [DisplayName("表单分类")]
+        public Guid Type { get; set; }
+
+        /// <summary>
+        /// 创建人ID
+        /// </summary>
+        [DisplayName("创建人ID")]
         public Guid CreateUserID { get; set; }
 
         /// <summary>
-        /// CreateUserName
+        /// 创建人姓名
         /// </summary>
-        [DisplayName("CreateUserName")]
+        [DisplayName("创建人姓名")]
         public string CreateUserName { get; set; }
 
         /// <summary>
-        /// CreateTime
+        /// 创建时间
         /// </summary>
-        [DisplayName("CreateTime")]
+        [DisplayName("创建时间")]
         public DateTime CreateTime { get; set; }
 
         /// <summary>
-        /// LastModifyTime
+        /// 最后修改时间
         /// </summary>
-        [DisplayName("LastModifyTime")]
+        [DisplayName("最后修改时间")]
         public DateTime LastModifyTime { get; set; }
 
         /// <summary>

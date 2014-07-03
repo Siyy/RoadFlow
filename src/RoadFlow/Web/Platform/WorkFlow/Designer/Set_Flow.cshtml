@@ -3,7 +3,7 @@
 
     Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
     Business.Platform.DBConnection bdbConn = new Business.Platform.DBConnection();
-    string base_TypesOptions = bworkFlow.GetAllTypesOptions();
+    string base_TypesOptions = bworkFlow.GetTypeOptions();
     string link_DBConnOptions = bdbConn.GetAllOptions();
     bool isAdd = "1" == Request.QueryString["isadd"];
 
@@ -31,10 +31,10 @@
             <td><input type="text" id="base_Name" name="base_Name" class="mytext" style="width:75%"  /></td>
         </tr>
         <tr>
-            <th>流程类型：</th>
-            <td><input type="text" id="base_Type" name="base_Type"  class="mytext" style="width:150px;"  />
-            <select id="base_TypeSelect" name="base_TypeSelect" class="myselect" 
-            style="width:120px;" onchange="$('#base_Type').val(this.value);"><option value=""></option>@Html.Raw(base_TypesOptions)</select></td>
+            <th>流程分类：</th>
+            <td>
+            <select id="base_Type" name="base_Type" class="myselect" 
+            style=""><option value=""></option>@Html.Raw(base_TypesOptions)</select></td>
         </tr>
         <tr>
             <th>管理者：</th>

@@ -4,7 +4,7 @@
     string editID = Request.QueryString["id"];
     string title = string.Empty;
     string address = string.Empty;
-    string type = string.Empty;
+    string type = Request.QueryString["typeid"];
     string openModel = string.Empty;
     string width = string.Empty;
     string height = string.Empty;
@@ -20,7 +20,7 @@
         {
             title = appLibrary.Title;
             address = appLibrary.Address;
-            type = appLibrary.Type;
+            type = appLibrary.Type.ToString();
             openModel = appLibrary.OpenMode.ToString();
             width = appLibrary.Width.ToString();
             height = appLibrary.Height.ToString();
@@ -42,7 +42,7 @@
         height = Request.Form["Height"];
         params1 = Request.Form["Params"];
         note = Request.Form["Note"];
-        if(title.IsNullOrEmpty() || address.IsNullOrEmpty() || type.IsNullOrEmpty())
+        if(title.IsNullOrEmpty() || address.IsNullOrEmpty() || !type.IsGuid())
         {
             <script type="text/javascript">
                 alert("数据验证错误!");
@@ -65,7 +65,7 @@
             appLibrary.OpenMode = openModel.ToInt();
             appLibrary.Params = params1;
             appLibrary.Title = title;
-            appLibrary.Type = type.Trim();
+            appLibrary.Type = type.ToGuid();
             appLibrary.Width = width.ToIntOrNull();
             string url = "/Platform/AppLibrary/List" + Request.Url.Query;
             if (isAdd)
@@ -73,8 +73,9 @@
                 bappLibrary.Add(appLibrary);
                 Business.Platform.Log.Add("添加了应用程序库", appLibrary.Serialize(), Business.Platform.Log.Types.角色应用);
                 <script type="text/javascript">
-                    new RoadUI.Window().reloadOpener('@url');
+                    new RoadUI.Window().reloadOpener();
                     alert("添加成功!");
+                    new RoadUI.Window().close();
                 </script>
             }
             else
@@ -83,8 +84,9 @@
                 Business.Platform.Log.Add("修改了应用程序库", string.Format("修改前:{0}修改后:{1}", oldXML, appLibrary.Serialize()),
                     Business.Platform.Log.Types.角色应用);
                 <script type="text/javascript">
-                    new RoadUI.Window().reloadOpener('@url');
+                    new RoadUI.Window().reloadOpener();
                     alert("修改成功!");
+                    new RoadUI.Window().close();
                 </script>
             }
             bappLibrary.ClearCache();
@@ -118,11 +120,10 @@
     </tr>
     <tr>
         <th>
-            应用类型：
+            应用分类：
         </th>
         <td>
-            <input type="text" name="Type" id="Type" class="mytext" value="@type" validate="empty" style="width: 120px;" />
-            <select name="TypeSelect" id="TypeSelect" class="myselect" runat="server" onchange="typeChange(this.value);">
+            <select name="type" id="type" class="myselect" runat="server" validate="empty">
             <option value=""></option>
             @Html.Raw(typeOptions)
             </select>
@@ -175,17 +176,6 @@
         {
             $("#OpenModel").change();
         });
-        function typeChange(value)
-        {
-            $("#TypeSelect option").each(function ()
-            {
-                if ($(this).val() == value)
-                {
-                    $("#Type").val(!$(this).val() ? "" : $(this).text());
-                    return false;
-                }
-            });
-        }
         function openModelChange(value)
         {
             if ("0" == value)

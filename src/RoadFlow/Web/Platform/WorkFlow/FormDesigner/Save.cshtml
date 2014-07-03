@@ -9,6 +9,7 @@
     string name = Request["name"];
     string att = Request["att"];
     string id = Request["id"];
+    string type = Request["type"];
     string subtable = Request["subtable"];
     if(name.IsNullOrEmpty())
     {
@@ -31,6 +32,7 @@
     {
         wff = new Data.Model.WorkFlowForm();
         wff.ID = formID;
+        wff.Type = type.ToGuid();
         wff.CreateUserID = Business.Platform.Users.CurrentUserID;
         wff.CreateUserName = Business.Platform.Users.CurrentUserName;
         wff.CreateTime = Utility.DateTimeNew.Now;

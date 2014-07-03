@@ -27,6 +27,7 @@
 
     Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
     Business.Platform.WorkFlowTask btask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlowDelegation bworkFlowDelegation = new Business.Platform.WorkFlowDelegation();
     Business.Platform.Organize borganize = new Business.Platform.Organize();
     Business.Platform.Users busers = new Business.Platform.Users();
     
@@ -45,11 +46,7 @@
     //    title = "未命名任务";
     //}
 
-    //保存业务数据
-    instanceid = bworkFlow.SaveFromData(instanceid);
-
     Data.Model.WorkFlowExecute.Execute execute = new Data.Model.WorkFlowExecute.Execute();
-
     execute.Comment = comment.IsNullOrEmpty() ? "" : comment.Trim();
     switch(opation)
     {
@@ -69,6 +66,7 @@
             execute.ExecuteType = Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect;
             break;
     }
+    
     execute.FlowID = flowid.ToGuid();
     execute.GroupID = groupid.ToGuid();
     execute.InstanceID = instanceid;
@@ -119,6 +117,14 @@
     eventParams.StepID = execute.StepID;
     eventParams.TaskID = execute.TaskID;
     eventParams.InstanceID = execute.InstanceID;
+
+    //保存业务数据
+    instanceid = bworkFlow.SaveFromData(instanceid, eventParams);
+    if(execute.InstanceID.IsNullOrEmpty())
+    {
+        execute.InstanceID = instanceid;
+        eventParams.InstanceID = instanceid;
+    }
     
     
     Response.Write("执行参数：" + params1 + "<br/>");
@@ -204,6 +210,19 @@
         }
     }
     
+    //处理委托
+    foreach(var executeStep in execute.Steps)
+    {
+        for (int i = 0; i < executeStep.Value.Count; i++)
+        {
+            Guid newUserID = bworkFlowDelegation.GetFlowDelegationByUserID(execute.FlowID,  executeStep.Value[i].ID);
+            if (newUserID != Guid.Empty && newUserID != executeStep.Value[i].ID)
+            {
+                executeStep.Value[i] = busers.Get(newUserID);
+            }
+        }
+    }
+    
     var reslut = btask.Execute(execute);
     Response.Write(string.Format("处理流程步骤结果：{0}<br/>", reslut.IsSuccess ? "成功" : "失败"));
     Response.Write(string.Format("调试信息：{0}", reslut.DebugMessages));
@@ -232,6 +251,34 @@
             Response.Write(string.Format("执行步骤退回后事件：({0}) 返回值：{1}<br/>", step.Event.BackAfter.Trim(), obj.ToString()));
         }
     }
+    
+    //归档
+    if(execute.ExecuteType == Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit)
+    {
+        var currentsteps = wfInstalled.Steps.Where(p=>p.ID==execute.StepID);
+        if (currentsteps.Count() > 0 && currentsteps.First().Archives == 1)
+        {
+            string flowName, stepName;
+            stepName = bworkFlow.GetStepName(execute.StepID, execute.FlowID, out flowName, true);
+            string archivesContents = Request.Form["form_body_div_textarea"];
+            string archivesComments = Request.Form["form_commentlist_div_textarea"];
+            Data.Model.WorkFlowArchives wfr = new Data.Model.WorkFlowArchives();
+            wfr.Comments = archivesComments;
+            wfr.Contents = archivesContents;
+            wfr.FlowID = execute.FlowID;
+            wfr.FlowName = flowName;
+            wfr.GroupID = execute.GroupID;
+            wfr.ID = Guid.NewGuid();
+            wfr.InstanceID = execute.InstanceID;
+            wfr.StepID = execute.StepID;
+            wfr.StepName = stepName;
+            wfr.Title = title;
+            wfr.TaskID = execute.TaskID;
+            wfr.WriteTime = Utility.DateTimeNew.Now;
+            new Business.Platform.WorkFlowArchives().Add(wfr);
+        }
+    }
+    
     
     <script type="text/javascript">
         alert('@msg');

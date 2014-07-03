@@ -34,5 +34,10 @@ namespace Data.Interface
         /// 查询记录条数
         /// </summary>
         long GetCount();
+
+        /// <summary>
+        /// 查询一个分类所有记录
+        /// </summary>
+        List<Data.Model.WorkFlowForm> GetAllByType(string types);
     }
 }

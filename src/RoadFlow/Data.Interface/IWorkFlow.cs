@@ -44,5 +44,10 @@ namespace Data.Interface
         /// 查询所有ID和名称
         /// </summary>
         Dictionary<Guid, string> GetAllIDAndName();
+
+        /// <summary>
+        /// 查询所有记录
+        /// </summary>
+        List<Data.Model.WorkFlow> GetByTypes(string typeString);
     }
 }

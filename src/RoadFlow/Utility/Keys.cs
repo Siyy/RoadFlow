@@ -48,6 +48,10 @@ namespace Utility
             /// </summary>
             RoleApp,
             /// <summary>
+            /// 个人所有应用
+            /// </summary>
+            UsersApp,
+            /// <summary>
             /// 应用程序库
             /// </summary>
             AppLibrary,
@@ -74,7 +78,11 @@ namespace Utility
             /// <summary>
             /// 在线用户
             /// </summary>
-            OnlineUsers
+            OnlineUsers,
+            /// <summary>
+            /// 工作流委托
+            /// </summary>
+            WorkFlowDelegation
         }
         
     }

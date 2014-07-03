@@ -3,14 +3,15 @@
     Layout = "~/_SiteLayout.cshtml";
     string appid = Request.QueryString["appid"];
     string tabid = Request.QueryString["tabid"];
+    string typeid = Request.QueryString["typeid"];
     string title = string.Empty;
-    string type = string.Empty;
     string address = string.Empty;
-    
+
+    Business.Platform.Dictionary bdict = new Business.Platform.Dictionary();
+    Business.Platform.AppLibrary bapp = new Business.Platform.AppLibrary();
     if(IsPost)
     {
         title = Request.Form["Title"];
-        type = Request.Form["Type"];
         address = Request.Form["Address"];
 
         if (!Request.Form["DeleteBut"].IsNullOrEmpty())
@@ -33,18 +34,18 @@
     else
     {
         title = Request.QueryString["Title"];
-        type = Request.QueryString["Type"];
         address = Request.QueryString["Address"];
     }
-    string typeOptions=new Business.Platform.AppLibrary().GetTypeOptions(type);
-    string query = string.Format("&appid={0}&tabid={1}&Title={2}&Type={3}&Address={4}",
+    
+    string query = string.Format("&appid={0}&tabid={1}&Title={2}&typeid={3}&Address={4}",
                 Request.QueryString["appid"],
                 Request.QueryString["tabid"],
-                title.UrlEncode(), type.UrlEncode(), address.UrlEncode()
+                title.UrlEncode(), typeid, address.UrlEncode()
                 );
     string query1 = string.Format("{0}&pagesize={1}&pagenumber={2}", query, Request.QueryString["pagesize"], Request.QueryString["pagenumber"]);
     string pager;
-    List<Data.Model.AppLibrary> appList = new Business.Platform.AppLibrary().GetPagerData(out pager, query, title, type, address);
+    string typeidstring = typeid.IsGuid() ? bapp.GetAllChildsIDString(typeid.ToGuid()) : "";
+    List<Data.Model.AppLibrary> appList = bapp.GetPagerData(out pager, query, title, typeidstring, address);
     
 }
 
@@ -53,9 +54,8 @@
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
             <td>
-                名称：<input type="text" class="mytext" id="Title" name="Title" value="@title" />
-                分类：<select class="myselect" onchange="document.forms[0].submit();" id="Type" name="Type"><option value="">==全部==</option>@Html.Raw(typeOptions)</select>
-                地址：<input type="text" class="mytext" id="Address" name="Address" value="@address" style="width:230px" />
+                应用名称：<input type="text" class="mytext" id="Title" name="Title" value="@title" style="width:180px" />
+                应用地址：<input type="text" class="mytext" id="Address" name="Address" value="@address" style="width:280px" />
                 <input type="submit" name="Search" value="查询" class="mybutton" />
             </td>
         </tr>
@@ -83,7 +83,7 @@
         <tr>
             <td><input type="checkbox" value="@app.ID" name="checkbox_app" />@app.Title</td>
             <td>@app.Address</td>
-            <td>@app.Type</td>
+            <td>@bdict.GetTitle(app.Type)</td>
             <td><a class="editlink" href="javascript:void(0);" onclick="edit('@app.ID');return false;">编辑</a></td>
         </tr>
     }    
@@ -96,6 +96,7 @@
 <script type="text/javascript">
     var appid = '@appid';
     var iframeid = '@tabid';
+    var typeid = '@typeid';
     var dialog = top.mainDialog;
     function add()
     {

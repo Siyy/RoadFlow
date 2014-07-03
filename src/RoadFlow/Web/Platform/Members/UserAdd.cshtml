@@ -47,6 +47,9 @@
             //更新父级[ChildsLength]字段
             borganize.UpdateChildsLength(parentID);
             
+            //更新角色
+            new Business.Platform.UsersRole().UpdateByUserID(userID);
+            
             userXML=user.Serialize();
             
             scope.Complete();

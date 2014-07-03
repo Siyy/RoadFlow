@@ -14,22 +14,22 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// Title
+        /// 标题
         /// </summary>
-        [DisplayName("Title")]
+        [DisplayName("标题")]
         public string Title { get; set; }
 
         /// <summary>
-        /// Address
+        /// 地址
         /// </summary>
-        [DisplayName("Address")]
+        [DisplayName("地址")]
         public string Address { get; set; }
 
         /// <summary>
-        /// Type
+        /// 分类ID
         /// </summary>
-        [DisplayName("Type")]
-        public string Type { get; set; }
+        [DisplayName("分类ID")]
+        public Guid Type { get; set; }
 
         /// <summary>
         /// 打开方式{0-默认,1-弹出模态窗口,2-弹出窗口,3-新窗口}
@@ -68,9 +68,9 @@ namespace Data.Model
         public string Note { get; set; }
 
         /// <summary>
-        /// 唯一标识符，流程应用时为流程ID
+        /// 唯一标识符，流程应用时为流程ID，表单应用时对应表单ID
         /// </summary>
-        [DisplayName("唯一标识符，流程应用时为流程ID")]
+        [DisplayName("唯一标识符，流程应用时为流程ID，表单应用时对应表单ID")]
         public string Code { get; set; }
 
     }

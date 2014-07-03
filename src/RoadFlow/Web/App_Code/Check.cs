@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,14 +15,12 @@ public class Check
 
     public static bool CheckLogin(bool response=true)
     {
-        object session = HttpContext.Current.Session["UserID"];
+        object session = System.Web.HttpContext.Current.Session[Utility.Keys.SessionKeys.UserID.ToString()];
         Guid uid;
-        if (session == null || !session.ToString().IsGuid(out uid))
+        if (session == null || !session.ToString().IsGuid(out uid) || uid == Guid.Empty)
         {
             return false;
         }
-
-        return true;
 
         string uniqueIDSessionKey = Utility.Keys.SessionKeys.UserUniqueID.ToString();
         var user = new Business.Platform.OnlineUsers().Get(uid);
@@ -38,9 +36,8 @@ public class Check
         {
             if (response)
             {
-                HttpContext.Current.Response.Write("<script type='text/javascript'>");
-                HttpContext.Current.Response.Write(string.Format("alert('您的帐号已经在{0}登录您被迫离线');", user.IP));
-                HttpContext.Current.Response.Write("</script>");
+                HttpContext.Current.Response.Write("<script type='text/javascript'>alert('您的帐号在" + user.IP + "登录,您被迫下线!');top.location='/Login';</script>");
+                HttpContext.Current.Response.End();
             }
             return false;
         }

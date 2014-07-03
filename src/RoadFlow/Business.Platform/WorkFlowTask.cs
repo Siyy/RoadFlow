@@ -893,11 +893,11 @@ namespace Business.Platform
         }
 
         /// <summary>
-        /// 执行自定义步骤事件
+        /// 执行自定义方法
         /// </summary>
         /// <param name="eventName"></param>
         /// <returns></returns>
-        public object ExecuteFlowCustomEvent(string eventName, Data.Model.WorkFlowCustomEventParams eventParams, string dllName = "App_Code")
+        public object ExecuteFlowCustomEvent(string eventName, object eventParams, string dllName = "App_Code")
         {
             System.Reflection.Assembly assembly = System.Reflection.Assembly.Load(dllName);
             string typeName = System.IO.Path.GetFileNameWithoutExtension(eventName);

@@ -8,9 +8,9 @@ namespace Data.Model
     public class WorkFlow
     {
         /// <summary>
-        /// 流程ID
+        /// ID
         /// </summary>
-        [DisplayName("流程ID")]
+        [DisplayName("ID")]
         public Guid ID { get; set; }
 
         /// <summary>
@@ -20,21 +20,21 @@ namespace Data.Model
         public string Name { get; set; }
 
         /// <summary>
-        /// 分类
+        /// 流程分类
         /// </summary>
-        [DisplayName("分类")]
-        public string Type { get; set; }
+        [DisplayName("流程分类")]
+        public Guid Type { get; set; }
 
         /// <summary>
-        /// 管理者
+        /// 管理人员
         /// </summary>
-        [DisplayName("管理者")]
+        [DisplayName("管理人员")]
         public string Manager { get; set; }
 
         /// <summary>
-        /// 实例管理者
+        /// 实例管理人员
         /// </summary>
-        [DisplayName("实例管理者")]
+        [DisplayName("实例管理人员")]
         public string InstanceManager { get; set; }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace Data.Model
         public Guid CreateUserID { get; set; }
 
         /// <summary>
-        /// 设计时json
+        /// 设计时
         /// </summary>
-        [DisplayName("设计时json")]
+        [DisplayName("设计时")]
         public string DesignJSON { get; set; }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace Data.Model
         public Guid? InstallUserID { get; set; }
 
         /// <summary>
-        /// 运行时json
+        /// 运行时
         /// </summary>
-        [DisplayName("运行时json")]
+        [DisplayName("运行时")]
         public string RunJSON { get; set; }
 
         /// <summary>

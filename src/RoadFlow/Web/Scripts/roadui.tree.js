@@ -143,7 +143,7 @@
                 {
                     if (istop)
                     {
-                        line1Class = isLast ? "tree_minus_bottom_noprev" : "tree_minus_top_noprev";
+                        line1Class = isLast ? "tree_line_bottom" : "tree_line_top";
                     }
                     else
                     {

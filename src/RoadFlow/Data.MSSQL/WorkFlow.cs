@@ -28,7 +28,7 @@ namespace Data.MSSQL
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
-				new SqlParameter("@Type", SqlDbType.NVarChar, 1000){ Value = model.Type },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@Manager", SqlDbType.VarChar, 5000){ Value = model.Manager },
 				new SqlParameter("@InstanceManager", SqlDbType.VarChar, 5000){ Value = model.InstanceManager },
 				new SqlParameter("@CreateDate", SqlDbType.DateTime, 8){ Value = model.CreateDate },
@@ -52,7 +52,7 @@ namespace Data.MSSQL
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
-				new SqlParameter("@Type", SqlDbType.NVarChar, 1000){ Value = model.Type },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@Manager", SqlDbType.VarChar, 5000){ Value = model.Manager },
 				new SqlParameter("@InstanceManager", SqlDbType.VarChar, 5000){ Value = model.InstanceManager },
 				new SqlParameter("@CreateDate", SqlDbType.DateTime, 8){ Value = model.CreateDate },
@@ -89,7 +89,7 @@ namespace Data.MSSQL
                 model = new Data.Model.WorkFlow();
                 model.ID = dataReader.GetGuid(0);
                 model.Name = dataReader.GetString(1);
-                model.Type = dataReader.GetString(2);
+                model.Type = dataReader.GetGuid(2);
                 model.Manager = dataReader.GetString(3);
                 model.InstanceManager = dataReader.GetString(4);
                 model.CreateDate = dataReader.GetDateTime(5);
@@ -164,7 +164,7 @@ namespace Data.MSSQL
         /// </summary>
         public Dictionary<Guid,string> GetAllIDAndName()
         {
-            string sql = "SELECT ID,Name FROM WorkFlow ORDER BY Name";
+            string sql = "SELECT ID,Name FROM WorkFlow WHERE Status<4 ORDER BY Name";
             Dictionary<Guid, string> dict = new Dictionary<Guid, string>();
             SqlDataReader dataReader = dbHelper.GetDataReader(sql);
             while (dataReader.Read())
@@ -173,6 +173,18 @@ namespace Data.MSSQL
             }
             dataReader.Close();
             return dict;
+        }
+
+        /// <summary>
+        /// 查询所有记录
+        /// </summary>
+        public List<Data.Model.WorkFlow> GetByTypes(string typeString)
+        {
+            string sql = "SELECT * FROM WorkFlow where Type IN(" + Utility.Tools.GetSqlInString(typeString) + ")";
+            SqlDataReader dataReader = dbHelper.GetDataReader(sql);
+            List<Data.Model.WorkFlow> List = DataReaderToList(dataReader);
+            dataReader.Close();
+            return List;
         }
     }
 }

@@ -111,7 +111,7 @@
     app.OpenMode = 0;
     app.Params = "";
     app.Title = name.Trim();
-    app.Type = appType.IsNullOrEmpty() ? "其它类别" : appType.Trim();
+    app.Type = appType.IsGuid() ? appType.ToGuid() : new Business.Platform.Dictionary().GetIDByCode("FormTypes");
     if(isAdd)
     {
         App.Add(app);
@@ -122,7 +122,8 @@
     }
 
     Business.Platform.Log.Add("发布了流程表单", app.Serialize() + "内容：" + html, Business.Platform.Log.Types.流程相关);
-    
+    wff.Status = 1;
+    WFF.Update(wff);
     Response.Write("发布成功!");
     Response.End();
 }

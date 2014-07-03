@@ -363,5 +363,34 @@ namespace Business.Platform
             }
             return Utility.Tools.GetCheckBoxString(items.ToArray(), name, (value ?? "").Split(','), attr);
         }
+
+
+        /// <summary>
+        /// 得到下级ID字符串
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string GetAllChildsIDString(Guid id, bool isSelf = true)
+        {
+            return new Dictionary().GetAllChildsIDString(id, true);
+        }
+
+        /// <summary>
+        /// 查询一个分类所有记录
+        /// </summary>
+        public List<Data.Model.WorkFlowForm> GetAllByType(Guid id)
+        {
+            return dataWorkFlowForm.GetAllByType(GetAllChildsIDString(id));
+        }
+
+        /// <summary>
+        /// 得到类型选择项
+        /// </summary>
+        /// <returns></returns>
+        public string GetTypeOptions(string value = "")
+        {
+            return new Dictionary().GetOptionsByCode("FormTypes", Dictionary.OptionValueField.ID, value);
+        }
+
     }
 }

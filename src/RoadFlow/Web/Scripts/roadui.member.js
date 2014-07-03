@@ -31,23 +31,30 @@
                 });
             }
 
-            $but.bind("click", function ()
+            if ($_member.prop("disabled"))
             {
-                var $obj = $(this).prev().prev();
-                var val = $obj.val();
-                var $obj1 = $(this).prev();
-                var isunit = $obj1.attr("unit") || "";
-                var isdept = $obj1.attr("dept") || "";
-                var isstation = $obj1.attr("station") || "";
-                var isuser = $obj1.attr("user") || "";
-                var ismore = $obj1.attr("more") || "";
-                var isgroup = $obj1.attr("group") || "";
-                var rootid = $obj1.attr("rootid") || "";
-                var isall = $obj1.attr("all") || "";
+                $but.prop("disabled", true);
+            }
+            else
+            {
+                $but.bind("click", function ()
+                {
+                    var $obj = $(this).prev().prev();
+                    var val = $obj.val();
+                    var $obj1 = $(this).prev();
+                    var isunit = $obj1.attr("unit") || "";
+                    var isdept = $obj1.attr("dept") || "";
+                    var isstation = $obj1.attr("station") || "";
+                    var isuser = $obj1.attr("user") || "";
+                    var ismore = $obj1.attr("more") || "";
+                    var isgroup = $obj1.attr("group") || "";
+                    var rootid = $obj1.attr("rootid") || "";
+                    var isall = $obj1.attr("all") || "";
 
-                var params = "eid=" + id + "&isunit=" + isunit + "&isdept=" + isdept + "&isstation=" + isstation + "&isuser=" + isuser + "&ismore=" + ismore + "&isall=" + isall + "&isgroup=" + isgroup + "&rootid=" + rootid + "&values=" + val;
-                new RoadUI.Window().open({ id: "member_" + id, url: "/Content/Controls/Member/Default?" + params, width: 500, height: 470, resize: false, title: "选择组织机构成员", openerid: RoadUI.Core.query("tabid")||"" });
-            });
+                    var params = "eid=" + id + "&isunit=" + isunit + "&isdept=" + isdept + "&isstation=" + isstation + "&isuser=" + isuser + "&ismore=" + ismore + "&isall=" + isall + "&isgroup=" + isgroup + "&rootid=" + rootid + "&values=" + val;
+                    new RoadUI.Window().open({ id: "member_" + id, url: "/Content/Controls/Member/Default?" + params, width: 500, height: 470, resize: false, title: "选择组织机构成员", openerid: RoadUI.Core.query("tabid") || "" });
+                });
+            }
 
             $_member.after($but).before($hide);
         });

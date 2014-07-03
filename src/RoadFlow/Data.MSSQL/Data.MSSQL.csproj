@@ -52,13 +52,16 @@
     <Compile Include="Role.cs" />
     <Compile Include="RoleApp.cs" />
     <Compile Include="Users.cs" />
+    <Compile Include="UsersApp.cs" />
     <Compile Include="UsersInfo.cs" />
     <Compile Include="UsersRelation.cs" />
     <Compile Include="UsersRole.cs" />
     <Compile Include="WorkFlow.cs" />
+    <Compile Include="WorkFlowArchives.cs" />
     <Compile Include="WorkFlowButtons.cs" />
     <Compile Include="WorkFlowComment.cs" />
     <Compile Include="WorkFlowData.cs" />
+    <Compile Include="WorkFlowDelegation.cs" />
     <Compile Include="WorkFlowForm.cs" />
     <Compile Include="WorkFlowTask.cs" />
     <Compile Include="WorkGroup.cs" />

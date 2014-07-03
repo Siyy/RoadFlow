@@ -12,7 +12,6 @@ namespace Data.MSSQL
     public class DBHelper
     {
         private string connectionString;
-        private SqlConnection connection;
 
         public DBHelper()
         {
@@ -22,7 +21,7 @@ namespace Data.MSSQL
         {
             this.connectionString = connString;
         }
-       
+
         /// <summary>
         /// 连接字符串
         /// </summary>
@@ -30,36 +29,13 @@ namespace Data.MSSQL
         {
             get { return this.connectionString; }
         }
-        /// <summary>
-        /// 数据连接
-        /// </summary>
-        public SqlConnection Connection
-        {
-            get
-            {
-                if (this.connection == null)
-                {
-                    this.connection = new SqlConnection(this.connectionString);
-                    this.connection.Open();
-                }
-                else if (this.connection.State != ConnectionState.Open)
-                {
-                    this.connection.Open();
-                }
-                return this.connection;
-            }
-        }
 
         /// <summary>
         /// 释放连接
         /// </summary>
         public void Dispose()
         {
-            if (this.connection != null && this.connection.State != ConnectionState.Closed)
-            {
-                this.connection.Close();
-            }
-            this.connection.Dispose();
+
         }
 
         /// <summary>
@@ -69,9 +45,9 @@ namespace Data.MSSQL
         /// <returns></returns>
         public SqlDataReader GetDataReader(string sql)
         {
-            this.connection = new SqlConnection(ConnectionString);
-            this.connection.Open();
-            using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+            SqlConnection conn = new SqlConnection(ConnectionString);
+            conn.Open();
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
             {
                 cmd.Prepare();
                 return cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -85,9 +61,9 @@ namespace Data.MSSQL
         /// <returns></returns>
         public SqlDataReader GetDataReader(string sql, SqlParameter[] parameter)
         {
-            this.connection = new SqlConnection(ConnectionString);
-            this.connection.Open();
-            using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+            SqlConnection conn = new SqlConnection(ConnectionString);
+            conn.Open();
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
             {
                 if (parameter != null && parameter.Length > 0)
                     cmd.Parameters.AddRange(parameter);
@@ -105,10 +81,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public DataTable GetDataTable(string sql)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     SqlDataReader dr = cmd.ExecuteReader();
                     DataTable dt = new DataTable();
@@ -128,10 +104,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public DataTable GetDataTable(string sql, SqlParameter[] parameter)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     if (parameter != null && parameter.Length > 0)
                         cmd.Parameters.AddRange(parameter);
@@ -154,10 +130,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public DataSet GetDataSet(string sql)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlDataAdapter dap = new SqlDataAdapter(sql, this.connection))
+                conn.Open();
+                using (SqlDataAdapter dap = new SqlDataAdapter(sql, conn))
                 {
                     DataSet ds = new DataSet();
                     dap.Fill(ds);
@@ -173,10 +149,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public int Execute(string sql)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Prepare();
                     return cmd.ExecuteNonQuery();
@@ -191,13 +167,13 @@ namespace Data.MSSQL
         /// <returns></returns>
         public int Execute(List<string> sqlList)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
+                conn.Open();
                 using (SqlCommand cmd = new SqlCommand())
                 {
                     int i = 0;
-                    cmd.Connection = connection;
+                    cmd.Connection = conn;
                     foreach (string sql in sqlList)
                     {
                         cmd.CommandType = CommandType.Text;
@@ -218,10 +194,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public int Execute(string sql, SqlParameter[] parameter)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     if (parameter != null && parameter.Length > 0)
                         cmd.Parameters.AddRange(parameter);
@@ -244,13 +220,13 @@ namespace Data.MSSQL
             {
                 throw new Exception("参数错误");
             }
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
+                conn.Open();
                 using (SqlCommand cmd = new SqlCommand())
                 {
                     int i = 0;
-                    cmd.Connection = connection;
+                    cmd.Connection = conn;
                     for (int j = 0; j < sqlList.Count; j++)
                     {
                         cmd.CommandType = CommandType.Text;
@@ -275,10 +251,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public string ExecuteScalar(string sql)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     object obj = cmd.ExecuteScalar();
                     cmd.Prepare();
@@ -294,10 +270,10 @@ namespace Data.MSSQL
         /// <returns></returns>
         public string ExecuteScalar(string sql, SqlParameter[] parameter)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     if (parameter != null && parameter.Length > 0)
                         cmd.Parameters.AddRange(parameter);
@@ -335,11 +311,11 @@ namespace Data.MSSQL
         /// <returns></returns>
         public string GetFields(string sql, SqlParameter[] param)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
+                conn.Open();
                 System.Text.StringBuilder names = new System.Text.StringBuilder(500);
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     if (param != null && param.Length > 0)
                         cmd.Parameters.AddRange(param);
@@ -366,11 +342,11 @@ namespace Data.MSSQL
         /// <returns></returns>
         public string GetFields(string sql, SqlParameter[] param, out string tableName)
         {
-            using (this.connection = new SqlConnection(ConnectionString))
+            using (SqlConnection conn = new SqlConnection(ConnectionString))
             {
-                this.connection.Open();
+                conn.Open();
                 System.Text.StringBuilder names = new System.Text.StringBuilder(500);
-                using (SqlCommand cmd = new SqlCommand(sql, this.connection))
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     if (param != null && param.Length > 0)
                         cmd.Parameters.AddRange(param);

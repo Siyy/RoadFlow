@@ -48,6 +48,7 @@
         Response.Write("未找到流程步骤!");
         Response.End();
     }
+    int isArchives = currentStep.Archives;//是否要归档
     string query = string.Format("flowid={0}&instanceid={1}&taskid={2}&stepid={3}&groupid={4}&appid={5}&tabid={6}",
         flowID, instanceid, taskid, stepID, groupid, Request.QueryString["appid"], Request.QueryString["tabid"]);
     
@@ -143,7 +144,7 @@
     <!--显示流程名称和当前步骤-->
 
     <!--表单主体--> 
-    <div style="margin:8px;">
+    <div style="margin:8px;" id="form_body_div">
     @{
         if (!src.IsNullOrEmpty())
         {
@@ -165,7 +166,7 @@
     {
         string commentsOptions = new Business.Platform.WorkFlowComment().GetOptionsStringByUserID(Business.Platform.Users.CurrentUserID);
     <div style="height:12px; margin:16px 8px 8px 8px; border-bottom:1px dashed #ccc;"></div>
-    <div style="height:30px; margin:15px auto 8px auto; text-align:left; width:95%;">
+    <div style="height:30px; margin:15px auto 8px auto; text-align:left; width:96%;">
         处理意见：<select class="myselect" id="mycomment" style="margin-right:6px; width:100px;" onchange="$('#comment').val(this.value);"><option value=""></option>@Html.Raw(commentsOptions)</select>&nbsp;<input type="text" class="mytext" id="comment" name="comment" value="" style="width:70%; margin-right:6px;" />
         @if (signType == 2)
         {
@@ -189,11 +190,18 @@
     <!--意见处理栏--> 
 
     <!--历史意见显示-->
+    <div id="form_commentlist_div">
     @if (currentStep.OpinionDisplay == 1)//如果步骤设置为要显示意见
     {
         @RenderPage("ShowComment.cshtml")
     }
+    </div>
     <!--历史意见显示-->
+
+    <!--归档内容-->
+    <textarea id="form_body_div_textarea" name="form_body_div_textarea" style="display:none;"></textarea>
+    <textarea id="form_commentlist_div_textarea" name="form_commentlist_div_textarea" style="display:none;"></textarea>
+    <!--归档内容-->
 </form>
 <script type="text/javascript">
     var isDebug = '@isDebug' == 'True' && '1' == '@debugType';
@@ -204,5 +212,12 @@
     var appid = '@Request.QueryString["appid"]';
     var query = '@Html.Raw(query)';
     var instanceid='@instanceid';
+    $(function(){
+        if("1" == "@isArchives")
+        {
+            $("#form_body_div_textarea").val($("#form_body_div").html());
+            $("#form_commentlist_div_textarea").val($("#form_commentlist_div").html());
+        }
+    });
 </script>
 <script type="text/javascript" src="common.js" ></script>

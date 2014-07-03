@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,40 +14,52 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// ParentID
+        /// 上级ID
         /// </summary>
-        [DisplayName("ParentID")]
+        [DisplayName("上级ID")]
         public Guid ParentID { get; set; }
 
         /// <summary>
-        /// RoleID
+        /// 角色ID
         /// </summary>
-        [DisplayName("RoleID")]
+        [DisplayName("角色ID")]
         public Guid RoleID { get; set; }
 
         /// <summary>
-        /// AppID
+        /// 应用ID
         /// </summary>
-        [DisplayName("AppID")]
+        [DisplayName("应用ID")]
         public Guid? AppID { get; set; }
 
         /// <summary>
-        /// Title
+        /// 显示标题
         /// </summary>
-        [DisplayName("Title")]
+        [DisplayName("显示标题")]
         public string Title { get; set; }
 
         /// <summary>
-        /// Params
+        /// 相关参数
         /// </summary>
-        [DisplayName("Params")]
+        [DisplayName("相关参数")]
         public string Params { get; set; }
 
         /// <summary>
-        /// Sort
+        /// 显示顺序
         /// </summary>
-        [DisplayName("Sort")]
+        [DisplayName("显示顺序")]
         public int Sort { get; set; }
+
+        /// <summary>
+        /// 应用图标
+        /// </summary>
+        [DisplayName("应用图标")]
+        public string Ico { get; set; }
+
+        /// <summary>
+        /// 0:模板应用 1:个人应用
+        /// </summary>
+        [DisplayName("0:模板应用 1:个人应用")]
+        public int Type { get; set; }
 
     }
 }

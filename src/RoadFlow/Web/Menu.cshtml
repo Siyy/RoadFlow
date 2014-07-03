@@ -1,13 +1,14 @@
 ﻿@{
-    string roleID=Request.QueryString["roleid"];
-    Guid gid;
-    if(!roleID.IsGuid(out gid))
+    string roleID = Request.QueryString["roleid"];
+    string userID = Request.QueryString["userid"];
+    Guid gid,uid;
+    if(!roleID.IsGuid(out gid) || !userID.IsGuid(out uid))
     {
         @:[]
     }
     else
     {
-        string json=new Business.Platform.RoleApp().GetRoleAppJsonString(gid);
+        string json = new Business.Platform.RoleApp().GetRoleAppJsonString(gid, uid);
         Response.Write(json);
     }
 }

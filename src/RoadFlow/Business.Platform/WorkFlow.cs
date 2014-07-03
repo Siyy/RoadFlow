@@ -146,7 +146,7 @@ namespace Business.Platform
                 wf.InstanceManager = jsonData["instanceManager"].ToString();
                 wf.Manager = jsonData["manager"].ToString();
                 wf.Name = name.Trim();
-                wf.Type = type.IsNullOrEmpty() ? "默认分类" : type.Trim();
+                wf.Type = type.IsGuid() ? type.ToGuid() : new Dictionary().GetIDByCode("FlowTypes");
                 try
                 {
                     if (isAdd)
@@ -221,7 +221,7 @@ namespace Business.Platform
                         app.OpenMode = 0;
                         app.Params = "flowid=" + wfInstalled.ID.ToString();
                         app.Title = wfInstalled.Name;
-                        app.Type = "流程应用";
+                        app.Type = wfInstalled.Type.IsGuid() ? wfInstalled.Type.ToGuid() : new Dictionary().GetIDByCode("FlowTypes");
                         if (isAdd)
                         {
                             bappLibrary.Add(app);
@@ -419,7 +419,7 @@ namespace Business.Platform
             }
 
             string type = json["type"].ToString();
-            wfInstalled.Type = type.IsNullOrEmpty() ? "默认类型" : type.Trim();
+            wfInstalled.Type = type.IsNullOrEmpty() ? new Dictionary().GetIDByCode("FlowTypes").ToString() : type.Trim();
             
 
             string manager = json["manager"].ToString();
@@ -870,7 +870,7 @@ namespace Business.Platform
         /// 得到一个人员可管理实例的所有流程选择项
         /// </summary>
         /// <returns></returns>
-        public string GetOptions(Dictionary<Guid,string> flows, string value = "")
+        public string GetOptions(Dictionary<Guid,string> flows, string typeid, string value = "")
         {
             var dicts = flows;
             StringBuilder options = new StringBuilder();
@@ -886,15 +886,23 @@ namespace Business.Platform
         /// 得到一个人员可管理实例的流程ID和名称列表
         /// </summary>
         /// <param name="userID"></param>
+        /// <param name="typeID">分类ID</param>
         /// <returns></returns>
-        public Dictionary<Guid,string> GetInstanceManageFlowIDList(Guid userID)
+        public Dictionary<Guid,string> GetInstanceManageFlowIDList(Guid userID, string typeID="")
         {
-            var flows = this.GetAll().Where(p => p.InstanceManager.Contains(Business.Platform.Users.PREFIX + userID.ToString(),
-            StringComparison.CurrentCultureIgnoreCase));
+            var flows = this.GetAll();
+            Organize borg = new Organize();
             Dictionary<Guid, string> flowids = new Dictionary<Guid, string>();
             foreach (var flow in flows)
             {
-                flowids.Add(flow.ID, flow.Name);
+                if (typeID.IsGuid() && !GetAllChildsIDString(typeID.ToGuid()).Contains(flow.Type.ToString(), StringComparison.CurrentCultureIgnoreCase))
+                {
+                    continue;
+                }
+                if (borg.GetAllUsers(flow.InstanceManager).Exists(p => p.ID == userID))
+                {
+                    flowids.Add(flow.ID, flow.Name);
+                }
             }
             return flowids;
         }
@@ -1032,8 +1040,15 @@ namespace Business.Platform
         /// <summary>
         /// 保存表单数据
         /// </summary>
-        public string SaveFromData(string instanceid)
+        public string SaveFromData(string instanceid, Data.Model.WorkFlowCustomEventParams eventParams)
         {
+            //保存自定义表单内容
+            string form_CustomSaveMethod = System.Web.HttpContext.Current.Request.Form["Form_CustomSaveMethod"];
+            if (!form_CustomSaveMethod.IsNullOrEmpty())
+            {
+                return new WorkFlowTask().ExecuteFlowCustomEvent(form_CustomSaveMethod, eventParams).ToString();
+            }
+
             if ("1" != System.Web.HttpContext.Current.Request.Form["Form_AutoSaveData"])
             {
                 return "";
@@ -1614,6 +1629,50 @@ namespace Business.Platform
                 }
             }
             return sb.ToString() + "}";
+        }
+
+        /// <summary>
+        /// 得到下级ID字符串
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string GetAllChildsIDString(Guid id, bool isSelf = true)
+        {
+            return new Dictionary().GetAllChildsIDString(id, true);
+        }
+
+        /// <summary>
+        /// 得到类型选择项
+        /// </summary>
+        /// <returns></returns>
+        public string GetTypeOptions(string value = "")
+        {
+            return new Dictionary().GetOptionsByCode("FlowTypes", Dictionary.OptionValueField.ID, value);
+        }
+
+        /// <summary>
+        /// 查询所有记录
+        /// </summary>
+        public List<Data.Model.WorkFlow> GetByTypes(string typeString)
+        {
+            return dataWorkFlow.GetByTypes(typeString);
+        }
+
+        /// <summary>
+        /// 得到一个类型下的流程ID
+        /// </summary>
+        /// <param name="typeID"></param>
+        /// <returns></returns>
+        public string GetFlowIDFromType(Guid typeID)
+        {
+            var flows = GetByTypes(GetAllChildsIDString(typeID));
+            StringBuilder sb = new StringBuilder();
+            foreach (var flow in flows)
+            {
+                sb.Append(flow.ID);
+                sb.Append(",");
+            }
+            return sb.ToString().TrimEnd(',');
         }
 
         

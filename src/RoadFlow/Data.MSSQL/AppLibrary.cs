@@ -29,7 +29,7 @@ namespace Data.MSSQL
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Title", SqlDbType.NVarChar, 510){ Value = model.Title },
 				new SqlParameter("@Address", SqlDbType.VarChar, 200){ Value = model.Address },
-				new SqlParameter("@Type", SqlDbType.NVarChar, 100){ Value = model.Type },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@OpenMode", SqlDbType.Int, -1){ Value = model.OpenMode },
 				model.Width == null ? new SqlParameter("@Width", SqlDbType.Int, -1) { Value = DBNull.Value } : new SqlParameter("@Width", SqlDbType.Int, -1) { Value = model.Width },
 				model.Height == null ? new SqlParameter("@Height", SqlDbType.Int, -1) { Value = DBNull.Value } : new SqlParameter("@Height", SqlDbType.Int, -1) { Value = model.Height },
@@ -52,7 +52,7 @@ namespace Data.MSSQL
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Title", SqlDbType.NVarChar, 510){ Value = model.Title },
 				new SqlParameter("@Address", SqlDbType.VarChar, 200){ Value = model.Address },
-				new SqlParameter("@Type", SqlDbType.NVarChar, 100){ Value = model.Type },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@OpenMode", SqlDbType.Int, -1){ Value = model.OpenMode },
 				model.Width == null ? new SqlParameter("@Width", SqlDbType.Int, -1) { Value = DBNull.Value } : new SqlParameter("@Width", SqlDbType.Int, -1) { Value = model.Width },
 				model.Height == null ? new SqlParameter("@Height", SqlDbType.Int, -1) { Value = DBNull.Value } : new SqlParameter("@Height", SqlDbType.Int, -1) { Value = model.Height },
@@ -88,7 +88,7 @@ namespace Data.MSSQL
                 model.ID = dataReader.GetGuid(0);
                 model.Title = dataReader.GetString(1);
                 model.Address = dataReader.GetString(2);
-                model.Type = dataReader.GetString(3);
+                model.Type = dataReader.GetGuid(3);
                 model.OpenMode = dataReader.GetInt32(4);
                 if (!dataReader.IsDBNull(5))
                     model.Width = dataReader.GetInt32(5);
@@ -142,22 +142,6 @@ namespace Data.MSSQL
         }
 
         /// <summary>
-        /// 得到所有分类
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetAllTypes()
-        {
-            string sql = "SELECT Type FROM AppLibrary GROUP BY Type";
-            DataTable dt = dbHelper.GetDataTable(sql);
-            List<string> list = new List<string>();
-            foreach (DataRow dr in dt.Rows)
-            {
-                list.Add(dr[0].ToString());
-            }
-            return list;
-        }
-
-        /// <summary>
         /// 得到一页数据
         /// </summary>
         /// <param name="pager"></param>
@@ -180,8 +164,7 @@ namespace Data.MSSQL
             }
             if (!type.IsNullOrEmpty())
             {
-                WHERE.Append("AND Type=@Type ");
-                parList.Add(new SqlParameter("@Type", SqlDbType.NVarChar) { Value = type });
+                WHERE.AppendFormat("AND Type IN({0}) ", Utility.Tools.GetSqlInString(type));
             }
             if (!address.IsNullOrEmpty())
             {
@@ -201,13 +184,10 @@ namespace Data.MSSQL
         /// <summary>
         /// 查询一个类别下所有记录
         /// </summary>
-        public List<Data.Model.AppLibrary> GetAllByType(string type)
+        public List<Data.Model.AppLibrary> GetAllByType(string types)
         {
-            string sql = "SELECT * FROM AppLibrary WHERE Type=@Type";
-            SqlParameter[] parameters = new SqlParameter[]{
-				new SqlParameter("@Type", SqlDbType.NVarChar){ Value = type }
-			};
-            SqlDataReader dataReader = dbHelper.GetDataReader(sql, parameters);
+            string sql = "SELECT * FROM AppLibrary WHERE Type IN(" + Utility.Tools.GetSqlInString(types) + ")";
+            SqlDataReader dataReader = dbHelper.GetDataReader(sql);
             List<Data.Model.AppLibrary> List = DataReaderToList(dataReader);
             dataReader.Close();
             return List;

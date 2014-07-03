@@ -48,13 +48,16 @@
     <Compile Include="IRole.cs" />
     <Compile Include="IRoleApp.cs" />
     <Compile Include="IUsers.cs" />
+    <Compile Include="IUsersApp.cs" />
     <Compile Include="IUsersInfo.cs" />
     <Compile Include="IUsersRelation.cs" />
     <Compile Include="IUsersRole.cs" />
     <Compile Include="IWorkFlow.cs" />
+    <Compile Include="IWorkFlowArchives.cs" />
     <Compile Include="IWorkFlowButtons.cs" />
     <Compile Include="IWorkFlowComment.cs" />
     <Compile Include="IWorkFlowData.cs" />
+    <Compile Include="IWorkFlowDelegation.cs" />
     <Compile Include="IWorkFlowForm.cs" />
     <Compile Include="IWorkFlowTask.cs" />
     <Compile Include="IWorkGroup.cs" />

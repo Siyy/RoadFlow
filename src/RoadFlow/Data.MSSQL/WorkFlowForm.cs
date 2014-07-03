@@ -23,11 +23,12 @@ namespace Data.MSSQL
         public int Add(Data.Model.WorkFlowForm model)
         {
             string sql = @"INSERT INTO WorkFlowForm
-				(ID,Name,CreateUserID,CreateUserName,CreateTime,LastModifyTime,Html,SubTableJson,Attribute,Status) 
-				VALUES(@ID,@Name,@CreateUserID,@CreateUserName,@CreateTime,@LastModifyTime,@Html,@SubTableJson,@Attribute,@Status)";
+				(ID,Name,Type,CreateUserID,CreateUserName,CreateTime,LastModifyTime,Html,SubTableJson,Attribute,Status) 
+				VALUES(@ID,@Name,@Type,@CreateUserID,@CreateUserName,@CreateTime,@LastModifyTime,@Html,@SubTableJson,@Attribute,@Status)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@CreateUserID", SqlDbType.UniqueIdentifier, -1){ Value = model.CreateUserID },
 				new SqlParameter("@CreateUserName", SqlDbType.NVarChar, 100){ Value = model.CreateUserName },
 				new SqlParameter("@CreateTime", SqlDbType.DateTime, 8){ Value = model.CreateTime },
@@ -46,10 +47,11 @@ namespace Data.MSSQL
         public int Update(Data.Model.WorkFlowForm model)
         {
             string sql = @"UPDATE WorkFlowForm SET 
-				Name=@Name,CreateUserID=@CreateUserID,CreateUserName=@CreateUserName,CreateTime=@CreateTime,LastModifyTime=@LastModifyTime,Html=@Html,SubTableJson=@SubTableJson,Attribute=@Attribute,Status=@Status
+				Name=@Name,Type=@Type,CreateUserID=@CreateUserID,CreateUserName=@CreateUserName,CreateTime=@CreateTime,LastModifyTime=@LastModifyTime,Html=@Html,SubTableJson=@SubTableJson,Attribute=@Attribute,Status=@Status
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Name", SqlDbType.NVarChar, 1000){ Value = model.Name },
+				new SqlParameter("@Type", SqlDbType.UniqueIdentifier, -1){ Value = model.Type },
 				new SqlParameter("@CreateUserID", SqlDbType.UniqueIdentifier, -1){ Value = model.CreateUserID },
 				new SqlParameter("@CreateUserName", SqlDbType.NVarChar, 100){ Value = model.CreateUserName },
 				new SqlParameter("@CreateTime", SqlDbType.DateTime, 8){ Value = model.CreateTime },
@@ -85,17 +87,18 @@ namespace Data.MSSQL
                 model = new Data.Model.WorkFlowForm();
                 model.ID = dataReader.GetGuid(0);
                 model.Name = dataReader.GetString(1);
-                model.CreateUserID = dataReader.GetGuid(2);
-                model.CreateUserName = dataReader.GetString(3);
-                model.CreateTime = dataReader.GetDateTime(4);
-                model.LastModifyTime = dataReader.GetDateTime(5);
-                if (!dataReader.IsDBNull(6))
-                    model.Html = dataReader.GetString(6);
+                model.Type = dataReader.GetGuid(2);
+                model.CreateUserID = dataReader.GetGuid(3);
+                model.CreateUserName = dataReader.GetString(4);
+                model.CreateTime = dataReader.GetDateTime(5);
+                model.LastModifyTime = dataReader.GetDateTime(6);
                 if (!dataReader.IsDBNull(7))
-                    model.SubTableJson = dataReader.GetString(7);
+                    model.Html = dataReader.GetString(7);
                 if (!dataReader.IsDBNull(8))
-                    model.Attribute = dataReader.GetString(8);
-                model.Status = dataReader.GetInt32(9);
+                    model.SubTableJson = dataReader.GetString(8);
+                if (!dataReader.IsDBNull(9))
+                    model.Attribute = dataReader.GetString(9);
+                model.Status = dataReader.GetInt32(10);
                 List.Add(model);
             }
             return List;
@@ -133,6 +136,20 @@ namespace Data.MSSQL
             List<Data.Model.WorkFlowForm> List = DataReaderToList(dataReader);
             dataReader.Close();
             return List.Count > 0 ? List[0] : null;
+        }
+
+
+
+        /// <summary>
+        /// 查询一个分类所有记录
+        /// </summary>
+        public List<Data.Model.WorkFlowForm> GetAllByType(string types)
+        {
+            string sql = "SELECT * FROM WorkFlowForm where Type IN(" + Utility.Tools.GetSqlInString(types) + ")";
+            SqlDataReader dataReader = dbHelper.GetDataReader(sql);
+            List<Data.Model.WorkFlowForm> List = DataReaderToList(dataReader);
+            dataReader.Close();
+            return List;
         }
     }
 }

@@ -24,14 +24,23 @@
     source = source == null || source == undefined ? "" : source;
     $source.removeClass().addClass("mytext");
     $source.prop("readonly", true);
-    var $but = $('<input type="button" class="mybutton" style="border-left:none;" value="选择" />');
+    var $but = $('<input type="button" class="mybutton" style="border-left:none;margin:0;" value="选择" />');
     var $label = $('<label type="msg"></label>');
 
-    $but.bind('click', function ()
+    if ($source.prop("disabled"))
     {
-        new RoadUI.Window().open({ id: "ico_" + id, title: title, width: 600, height: 406,
-            url: '/Content/Controls/SelectIco/Default?more=' + more + '&id=' + id + '&source=' + source + '&values=' + val, openerid: RoadUI.Core.query("tabid")
+        $but.prop("disabled", true);
+    }
+    else
+    {
+        $but.bind('click', function ()
+        {
+            new RoadUI.Window().open({
+                id: "ico_" + id, title: title, width: 600, height: 406,
+                url: '/Content/Controls/SelectIco/Default?more=' + more + '&id=' + id + '&source=' + source + '&values=' + val, openerid: RoadUI.Core.query("tabid")
+            });
         });
-    });
+    }
+
     $source.after($but, $label);
 }

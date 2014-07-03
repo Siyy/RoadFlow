@@ -8,6 +8,7 @@ namespace Business.Platform
     public class Dictionary
     {
         private Data.Interface.IDictionary dataDictionary;
+        private static string cacheKey = Utility.Keys.CacheKeys.Dictionary.ToString();
         public Dictionary()
         {
             this.dataDictionary = Data.Factory.Platform.GetDictionaryInstance();
@@ -37,8 +38,7 @@ namespace Business.Platform
             }
             else
             {
-                string key = Utility.Keys.CacheKeys.Dictionary.ToString();
-                object obj = MyCache.IO.Opation.Get(key);
+                object obj = MyCache.IO.Opation.Get(cacheKey);
                 if (obj != null && obj is List<Data.Model.Dictionary>)
                 {
                     return obj as List<Data.Model.Dictionary>;
@@ -46,7 +46,7 @@ namespace Business.Platform
                 else
                 {
                     var list = dataDictionary.GetAll();
-                    MyCache.IO.Opation.Set(key, list);
+                    MyCache.IO.Opation.Set(cacheKey, list);
                     return list;
                 }
             }
@@ -54,7 +54,7 @@ namespace Business.Platform
         /// <summary>
         /// 查询单条记录
         /// </summary>
-        public Data.Model.Dictionary Get(Guid id, bool fromCache=false)
+        public Data.Model.Dictionary Get(Guid id, bool fromCache = false)
         {
             return fromCache ? GetAll(true).Find(p => p.ID == id) : dataDictionary.Get(id);
         }
@@ -150,6 +150,29 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 得到一个项的所有下级项ID字符串
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isSelf">是否包含自己</param>
+        /// <returns></returns>
+        public string GetAllChildsIDString(Guid id, bool isSelf = true)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (isSelf)
+            {
+                sb.Append(id);
+                sb.Append(",");
+            }
+            var childs = GetAllChilds(id, true);
+            foreach (var child in childs)
+            {
+                sb.Append(child.ID);
+                sb.Append(",");
+            }
+            return sb.ToString().TrimEnd(',');
+        }
+
+        /// <summary>
         /// 查询上级记录
         /// </summary>
         public Data.Model.Dictionary GetParent(Guid id)
@@ -191,7 +214,6 @@ namespace Business.Platform
         {
             return code.IsNullOrEmpty() ? null :
                 fromCache ? GetAll(true).Find(p => string.Compare(p.Code, code, true) == 0) : dataDictionary.GetByCode(code.Trim());
-
         }
 
         /// <summary>
@@ -215,14 +237,46 @@ namespace Business.Platform
         /// <returns></returns>
         public string GetOptionsByID(Guid id, OptionValueField valueField = OptionValueField.Value, string value = "")
         {
-            var childs = GetChilds(id, true);
+            var childs = GetAllChilds(id, true);
             StringBuilder options = new StringBuilder(childs.Count * 100);
+            StringBuilder space = new StringBuilder();
             foreach (var child in childs)
             {
+                space.Clear();
+                int parentCount = getParentCount(childs, child);
+                
+                for (int i = 0; i < parentCount-1; i++)
+                {
+                    space.Append("&nbsp;&nbsp;");
+                }
+                
+                if (parentCount > 0)
+                {
+                    space.Append("┝");
+                }
                 string value1 = getOptionsValue(valueField, child);
-                options.AppendFormat("<option value=\"{0}\" {1}>{2}</option>", value1, value1 == value ? "selected=\"selected\"" : "", child.Title);
+                options.AppendFormat("<option value=\"{0}\"{1}>{2}{3}</option>" + parentCount, value1, value1 == value ? " selected=\"selected\"" : "", space.ToString(), child.Title);
             }
             return options.ToString();
+        }
+
+
+        /// <summary>
+        /// 得到一个字典项的上级节点数
+        /// </summary>
+        /// <param name="dictList"></param>
+        /// <param name="dict"></param>
+        /// <returns></returns>
+        private int getParentCount(List<Data.Model.Dictionary> dictList, Data.Model.Dictionary dict)
+        {
+            int parent = 0;
+            Data.Model.Dictionary parentDict = dictList.Find(p => p.ID == dict.ParentID);
+            while (parentDict != null)
+            {
+                parentDict = dictList.Find(p => p.ID == parentDict.ParentID);
+                parent++;
+            }
+            return parent;
         }
 
         /// <summary>
@@ -233,15 +287,7 @@ namespace Business.Platform
         /// <returns></returns>
         public string GetOptionsByCode(string code, OptionValueField valueField = OptionValueField.Value, string value="")
         {
-            if (code.IsNullOrEmpty()) return "";
-            var childs = GetChilds(code.Trim(), true);
-            StringBuilder options = new StringBuilder(childs.Count * 100);
-            foreach (var child in childs)
-            {
-                string value1 = getOptionsValue(valueField, child);
-                options.AppendFormat("<option value=\"{0}\" {1}>{2}</option>", value1, value1 == value ? "selected=\"selected\"" : "", child.Title);
-            }
-            return options.ToString();
+            return GetOptionsByID(GetIDByCode(code), valueField, value);
         }
 
         /// <summary>
@@ -374,8 +420,7 @@ namespace Business.Platform
         /// </summary>
         public void RefreshCache()
         {
-            string key = Utility.Keys.CacheKeys.Dictionary.ToString();
-            MyCache.IO.Opation.Set(key, GetAll());
+            MyCache.IO.Opation.Set(cacheKey, GetAll());
         }
 
         /// <summary>
@@ -461,6 +506,17 @@ namespace Business.Platform
             var childs = getChildsByCodeFromCache(code.Trim());
             var child = childs.Find(p => p.Value == value);
             return child == null ? "" : child.Title;
+        }
+
+        /// <summary>
+        /// 根据代码得到ID
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public Guid GetIDByCode(string code)
+        {
+            var dict = GetByCode(code, true);
+            return dict == null ? Guid.Empty : dict.ID;
         }
     }
 }

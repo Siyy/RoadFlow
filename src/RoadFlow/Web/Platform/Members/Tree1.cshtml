@@ -104,24 +104,29 @@
         }
     }
 
-    int count1 = users.Count;
-    int j = 0;
-    foreach (var user in users)
+    if(users.Count>0)
     {
-        json.Append("{");
-        json.AppendFormat("\"id\":\"{0}\",", user.ID);
-        json.AppendFormat("\"parentID\":\"{0}\",", root.ID);
-        json.AppendFormat("\"title\":\"{0}\",", user.Name);
-        json.AppendFormat("\"ico\":\"{0}\",", "");
-        json.AppendFormat("\"link\":\"{0}\",", "");
-        json.AppendFormat("\"type\":\"{0}\",", "4");
-        json.AppendFormat("\"hasChilds\":\"{0}\",", "0");
-        json.Append("\"childs\":[");
-        json.Append("]");
-        json.Append("}");
-        if (j++ < count1 - 1)
+        var userRelations = new Business.Platform.UsersRelation().GetAllByOrganizeID(root.ID);
+        int count1 = users.Count;
+        int j = 0;
+        foreach (var user in users)
         {
-            json.Append(",");
+            var ur = userRelations.Find(p => p.UserID == user.ID);
+            json.Append("{");
+            json.AppendFormat("\"id\":\"{0}\",", user.ID);
+            json.AppendFormat("\"parentID\":\"{0}\",", root.ID);
+            json.AppendFormat("\"title\":\"{0}{1}\",", user.Name, ur != null && ur.IsMain == 0 ? "<span style='color:#999;'>[兼职]</span>" : "");
+            json.AppendFormat("\"ico\":\"{0}\",", "");
+            json.AppendFormat("\"link\":\"{0}\",", "");
+            json.AppendFormat("\"type\":\"{0}\",", "4");
+            json.AppendFormat("\"hasChilds\":\"{0}\",", "0");
+            json.Append("\"childs\":[");
+            json.Append("]");
+            json.Append("}");
+            if (j++ < count1 - 1)
+            {
+                json.Append(",");
+            }
         }
     }
    

@@ -90,6 +90,7 @@
                 buserRelation.DeleteByUserID(user.ID);
 
                 new Business.Platform.UsersInfo().Delete(user.ID);
+                new Business.Platform.UsersRole().DeleteByUserID(user.ID);
 
                 //更新父级[ChildsLength]字段
                 foreach (var ur in urs)
@@ -222,10 +223,12 @@
     </table>
     <div style="width:95%; margin:10px auto 10px auto; text-align:center;">
         <input type="button" value="调动" class="mybutton" onclick="stationMove();" />
-        <input type="button" class="mybutton" value="排序" id="sort" onclick="sort1();" runat="server" />
+        <input type="button" class="mybutton" value="排序" id="sort" onclick="sort1('@id');" runat="server" />
         <input type="submit" class="mybutton" onclick="return confirm('您真的要初始化密码吗?');" name="InitPass" value="初始密码" />
+        <input type="button" class="mybutton" value="设置应用" onclick="setUserApp();"/>
         <input type="submit" class="mybutton" name="Save" onclick="return validate.validateForm(document.forms[0]);" value="保存" />
         <input type="submit" class="mybutton" onclick="return confirm('您真的要删除该用户吗?');" name="DeleteBut" value="删除" />
+
     </div>
     </form>
     <script type="text/javascript">
@@ -247,5 +250,11 @@
         function sort1()
         {
             window.location = 'SortUsers' + '@Html.Raw(Request.Url.Query)';
+        }
+
+        function setUserApp()
+        {
+            top.mainDialog.open({url:"/Platform/UserApp/Default"+"@Request.Url.Query",width:760,height:530,title:"设置人员应用"});
+            return false;
         }
     </script>

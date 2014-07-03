@@ -75,12 +75,12 @@
                 <th >是否归档：</th>
                 <td>
                     <select class="myselect" value1="0" style="width:75%;" id="base_Archives">
-                        <option value="1">归档</option>
                         <option value="0">不归档</option>
+                        <option value="1">归档</option>
                     </select>
                 </td>
-                <th >归档参数：</th>
-                <td><input type="text" id="base_ArchivesParams" class="mytext" style="width:73%;"/></td>
+                <th ><!--归档参数：--></th>
+                <td><!--<input type="text" id="base_ArchivesParams" class="mytext" style="width:73%;"/>--></td>
             </tr>
             <tr>
                 <th >表单：</th>
@@ -131,9 +131,9 @@
                         <option value="6">前一步骤处理者</option>
                         <option value="7">某一步骤处理者</option>
                         <option value="8">字段值</option>
-                        <option value="9">发起者主管</option>
+                        <option value="9">发起者领导</option>
                         <option value="10">发起者分管领导</option>
-                        <option value="11">当前处理者主管</option>
+                        <option value="11">当前处理者领导</option>
                         <option value="12">当前处理者分管领导</option>
                     </select>
                 </td>
@@ -221,7 +221,7 @@
      <div id="div_button" class="mytab_div" style="display:none;width:99%;margin:0 auto;">
         <div id="button_List" style="width:220px; height:270px; overflow:auto; border:1px solid #e8e8e8; padding:3px; float:left;">
         <div style="width:94%;">  
-        <ul class="listulli" note="按钮之间的分隔线" title="按钮之间的分隔线" val="other_splitline" onmouseover="$(this).removeClass().addClass('listulli1');" onmouseout="if($currentButton==null || $currentButton.get(0)!==this){$(this).removeClass().addClass('listulli');}" onclick="button_click(this);" ondblclick="button_dblclick(this)" ><label style="background:url(/Images/ico/edit.gif) no-repeat left;padding-left:20px;">分隔线</label></ul>
+        <ul class="listulli" note="按钮之间的分隔线" title="按钮之间的分隔线" val="other_splitline" onmouseover="$(this).removeClass().addClass('listulli1');" onmouseout="if($currentButton==null || $currentButton.get(0)!==this){$(this).removeClass().addClass('listulli');}" onclick="button_click(this);" ondblclick="button_dblclick(this)" >- - - -分隔线- - - -</ul>
         @foreach(var button in bworkFlowButtons.GetAll(true))
         {
             <ul class="listulli" note="@button.Note" title="@button.Note"  val="@button.ID" onmouseover="$(this).removeClass().addClass('listulli1');" onmouseout="if($currentButton==null || $currentButton.get(0)!==this){$(this).removeClass().addClass('listulli');}" onclick="button_click(this);" ondblclick="button_dblclick(this)" ><label style="background:url(@button.Ico) no-repeat left;padding-left:20px;">@button.Title</label></ul>

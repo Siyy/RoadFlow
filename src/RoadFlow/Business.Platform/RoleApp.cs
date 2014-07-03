@@ -195,16 +195,31 @@ namespace Business.Platform
         {
             return dataRoleApp.DeleteByAppID(appID);
         }
+
+        /// <summary>
+        /// 克隆表
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public DataTable CloneDataTable(DataTable dt)
+        {
+            DataTable dt1 = dt.Clone();
+            dt1.Merge(dt);
+            return dt1;
+        }
+
         /// <summary>
         /// 得到角色应用JSON
         /// </summary>
         /// <param name="roleID"></param>
         /// <returns></returns>
-        public string GetRoleAppJsonString(Guid roleID)
+        public string GetRoleAppJsonString(Guid roleID, Guid userID)
         {
-
             Business.Platform.RoleApp RoleApp = new Business.Platform.RoleApp();
-            System.Data.DataTable appDt = RoleApp.GetAllDataTableFromCache();
+            Business.Platform.UsersApp UsersApp = new Platform.UsersApp();
+            System.Data.DataTable roleAppDt = RoleApp.GetAllDataTableFromCache();
+            System.Data.DataTable appDt = CloneDataTable(roleAppDt);
+            UsersApp.AppendUserApps(userID, appDt);
             if (appDt.Rows.Count == 0)
             {
                 return "[]";
@@ -214,13 +229,15 @@ namespace Business.Platform
             {
                 return "[]";
             }
+
             var apps = appDt.Select(string.Format("ParentID='{0}'", root[0]["ID"].ToString()));
+            
             System.Text.StringBuilder json = new System.Text.StringBuilder("[", 1000);
             System.Data.DataRow rootDr = root[0];
             json.Append("{");
             json.AppendFormat("\"id\":\"{0}\",", rootDr["ID"]);
             json.AppendFormat("\"title\":\"{0}\",", rootDr["Title"].ToString().Trim());
-            json.AppendFormat("\"ico\":\"{0}\",", "");
+            json.AppendFormat("\"ico\":\"{0}\",", rootDr["Ico"]);
             json.AppendFormat("\"link\":\"{0}\",", getAddress(rootDr));
             json.AppendFormat("\"model\":\"{0}\",", rootDr["OpenMode"]);
             json.AppendFormat("\"width\":\"{0}\",", rootDr["Width"]);
@@ -235,7 +252,7 @@ namespace Business.Platform
                 json.Append("{");
                 json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
                 json.AppendFormat("\"title\":\"{0}\",", dr["Title"]);
-                json.AppendFormat("\"ico\":\"{0}\",", "");
+                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"]);
                 json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
                 json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
                 json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);
@@ -251,7 +268,7 @@ namespace Business.Platform
                     json.Append("{");
                     json.AppendFormat("\"id\":\"{0}\",", dr1["ID"]);
                     json.AppendFormat("\"title\":\"{0}\",", dr1["Title"]);
-                    json.AppendFormat("\"ico\":\"{0}\",", "");
+                    json.AppendFormat("\"ico\":\"{0}\",", dr1["Ico"]);
                     json.AppendFormat("\"link\":\"{0}\",", getAddress(dr1));
                     json.AppendFormat("\"model\":\"{0}\",", dr1["OpenMode"]);
                     json.AppendFormat("\"width\":\"{0}\",", dr1["Width"]);
@@ -275,6 +292,52 @@ namespace Business.Platform
             }
             json.Append("]");
             json.Append("}");
+            json.Append("]");
+            return json.ToString();
+        }
+
+        /// <summary>
+        /// 得到角色应用刷新JSON
+        /// </summary>
+        /// <returns></returns>
+        public string GetRoleAppRefreshJsonString(Guid roleID, Guid userID, Guid refreshID)
+        {
+            Business.Platform.RoleApp roleApp = new Business.Platform.RoleApp();
+            Business.Platform.UsersApp UsersApp = new Platform.UsersApp();
+            DataTable roleAppDt = roleApp.GetAllDataTableFromCache();
+            DataTable appDt1 = CloneDataTable(roleAppDt);
+            UsersApp.AppendUserApps(userID, appDt1);
+            var dv = appDt1.DefaultView;
+            dv.RowFilter = string.Format("ParentID='{0}'", refreshID);
+            dv.Sort = "Sort";
+            var appDt = dv.ToTable();
+            if (appDt.Rows.Count == 0)
+            {
+                return "[]";
+            }
+            int count = appDt.Rows.Count;
+            System.Text.StringBuilder json = new System.Text.StringBuilder("[", count * 100);
+            int i = 0;
+            foreach (DataRow dr in appDt.Rows)
+            {
+                json.Append("{");
+                json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
+                json.AppendFormat("\"title\":\"{0}\",", dr["Title"].ToString().Trim());
+                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"]);
+                json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
+                json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
+                json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);
+                json.AppendFormat("\"height\":\"{0}\",", dr["Height"]);
+                json.AppendFormat("\"hasChilds\":\"{0}\",", appDt1.Select(string.Format("ParentID='{0}'", dr["id"])).Length > 0 ? "1" : "0");
+                json.AppendFormat("\"childs\":[");
+
+                json.Append("]");
+                json.Append("}");
+                if (i++ < count - 1)
+                {
+                    json.Append(",");
+                }
+            }
             json.Append("]");
             return json.ToString();
         }
@@ -307,49 +370,6 @@ namespace Business.Platform
 
             return address.Contains("?") ? string.Concat(address, "&", sb.ToString()) : string.Concat(address, "?", sb.ToString());
             
-        }
-
-        /// <summary>
-        /// 得到角色应用刷新JSON
-        /// </summary>
-        /// <returns></returns>
-        public string GetRoleAppRefreshJsonString(Guid roleID, Guid refreshID)
-        {
-            Business.Platform.RoleApp roleApp = new Business.Platform.RoleApp();
-            DataTable appDt1 = roleApp.GetAllDataTableFromCache();
-            var dv = appDt1.DefaultView;
-            dv.RowFilter = string.Format("ParentID='{0}'", refreshID);
-            dv.Sort = "Sort";
-            var appDt = dv.ToTable();
-            if (appDt.Rows.Count == 0)
-            {
-                return "[]";
-            }
-            int count = appDt.Rows.Count;
-            System.Text.StringBuilder json = new System.Text.StringBuilder("[", count * 100);
-            int i = 0;
-            foreach (DataRow dr in appDt.Rows)
-            {
-                json.Append("{");
-                json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
-                json.AppendFormat("\"title\":\"{0}\",", dr["Title"].ToString().Trim());
-                json.AppendFormat("\"ico\":\"{0}\",", "");
-                json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
-                json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
-                json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);
-                json.AppendFormat("\"height\":\"{0}\",", dr["Height"]);
-                json.AppendFormat("\"hasChilds\":\"{0}\",", appDt1.Select(string.Format("ParentID='{0}'", dr["id"])).Length > 0 ? "1" : "0");
-                json.AppendFormat("\"childs\":[");
-
-                json.Append("]");
-                json.Append("}");
-                if (i++ < count - 1)
-                {
-                    json.Append(",");
-                }
-            }
-            json.Append("]");
-            return json.ToString();
         }
 
         /// <summary>

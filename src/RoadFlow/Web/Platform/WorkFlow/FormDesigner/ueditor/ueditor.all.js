@@ -213,6 +213,7 @@
                     id: formid,
                     html: html,
                     name: formattributeJSON.name,
+                    type: formattributeJSON.apptype,
                     att: JSON.stringify(formattributeJSON),
                     subtable: JSON.stringify(formsubtabs)
                 }, async: false, cache: false, success: function (txt)

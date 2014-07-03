@@ -42,6 +42,11 @@ namespace Data.Factory
             return new Data.MSSQL.RoleApp();
         }
 
+        public static Data.Interface.IUsersApp GetUsersAppInstance()
+        {
+            return new Data.MSSQL.UsersApp();
+        }
+
         public static Data.Interface.IUsers GetUsersInstance()
         {
             return new Data.MSSQL.Users();
@@ -95,6 +100,16 @@ namespace Data.Factory
         public static Data.Interface.IWorkGroup GetWorkGroupInstance()
         {
             return new Data.MSSQL.WorkGroup();
+        }
+
+        public static Data.Interface.IWorkFlowDelegation GetWorkFlowDelegationInstance()
+        {
+            return new Data.MSSQL.WorkFlowDelegation();
+        }
+
+        public static Data.Interface.IWorkFlowArchives GetWorkFlowArchivesInstance()
+        {
+            return new Data.MSSQL.WorkFlowArchives();
         }
     }
 }

@@ -801,7 +801,7 @@ function flowAttrSetting(isAdd)
 function openFlow()
 {
     var url = "/Platform/WorkFlow/Designer/Open?appid=" + appid;
-    dialog.open({ title: "打开流程", width: 700, height: 450, url: url, openerid: iframeid, resize:false });
+    dialog.open({ title: "打开流程", width: 850, height: 450, url: url, openerid: iframeid, resize:false });
 }
 
 function openFlow1(id)

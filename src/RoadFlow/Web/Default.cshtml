@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/_NoBodyLayout.cshtml";
-    Page.Title = "主页";
+    Page.Title = "RoadFlow";
     Page.CheckApp = false;
     Page.CheckUrl = false;
     
@@ -46,8 +46,8 @@
                 <span style="margin-right:6px;"></span>
                 <span style="margin-right:6px;">日期：<span id="CurrentDateTimeSpan">@dateTime</span></span>
                 <span style="">主题：</span>
-                <span class="mainTheme_blue" onclick="changeTheme('Blue');"></span>
                 <span class="mainTheme_bluelight" onclick="changeTheme('BlueLight');"></span>
+                <span class="mainTheme_blue" onclick="changeTheme('Blue');"></span>
                 <span class="mainTheme_green" onclick="changeTheme('Green');"></span>
                 <span class="mainTheme_gray" onclick="changeTheme('Gray');"></span>
             </div>
@@ -78,7 +78,7 @@
                         @Html.Raw(rolesOptions)
                     </select>
                 </div>
-                <div id="treeDiv" style="margin:0; overflow:auto;  padding:3px 3px 0 8px; "></div>
+                <div id="treeDiv" style="margin:0; overflow:auto;  padding:3px 3px 0 4px; "></div>
             </div>
         </td>
         <td class="mainSplittd" id="mainSplittd"></td>
@@ -95,6 +95,7 @@
     var defaultRoleID = "@defaultRoleID";
     var currentDateTimeSpan = $("#CurrentDateTimeSpan");
     var rolesLength = @roles.Count;
+    var userID = '@Business.Platform.Users.CurrentUserID';
     $(function ()
     {
         if (rolesLength <= 1)
@@ -117,7 +118,7 @@
         openApp("/Home", 0, "首页", "index");
 
         //初始化主题按钮样式
-        var theme = $.cookies.get("theme_platform") || "Blue";
+        var theme = $.cookies.get("theme_platform") || "BlueLight";
         changeTheme(theme);
     });
 
@@ -165,10 +166,10 @@
                 mainTab.addTab({ id: "tab_" + id.replaceAll('-', ''), title: title, src: url });
                 break;
             case 1:
-                mainDialog.open({ id: "window_" + id.replaceAll('-', ''), title: title, url: url, width: width || 800, height: height || 460, resize: false, ismodal: false });
+                mainDialog.open({ id: "window_" + id.replaceAll('-', ''), title: title, url: url, width: width || 800, height: height || 460, ismodal: false });
                 break;
             case 2:
-                mainDialog.open({ id: "window_" + id.replaceAll('-', ''), title: title, url: url, width: width || 800, height: height || 460, resize: false, ismodal: true });
+                mainDialog.open({ id: "window_" + id.replaceAll('-', ''), title: title, url: url, width: width || 800, height: height || 460, ismodal: true });
                 break;
         }
     }
@@ -192,7 +193,7 @@
     function roleChange(roleID)
     {
         $("#treeDiv").html("");
-        mainTree = new RoadUI.Tree({ id: "treeDiv", path: "/Menu?roleid=" + roleID, refreshpath: "/MenuRefresh?roleid=" + roleID, showroot: true, onclick: treeClick });
+        mainTree = new RoadUI.Tree({ id: "treeDiv", path: "/Menu?roleid=" + roleID + "&userid=" + userID, refreshpath: "/MenuRefresh?roleid=" + roleID + "&userid=" + userID, showroot: true, onclick: treeClick });
     }
 
     function changeTheme(themeName)

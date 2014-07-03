@@ -1,6 +1,51 @@
 ﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.CheckLogin = false;
+    Page.CheckApp = false;
+    Page.CheckUrl = false;
     
-    Business.Platform.Users users = new Business.Platform.Users();
-
-    Response.Write(users.GetChargeLeader(Business.Platform.Users.CurrentUserID));    
 }
+<style>
+    
+</style>
+<div class="accordion" style="margin-left:30px; margin-top:30px; height:400px; width:200px;">
+    <div>
+        <div class="accordiontitle">标题1</div>
+        <div class="accordioncontent">
+            <p>111</p>
+            <p>111</p>
+            <p>111</p>
+        </div>
+    </div>
+    <div>
+        <div class="accordiontitle">标题2</div>
+        <div class="accordioncontent">
+            <p>222</p>
+            <p>222</p>
+            <p>222</p>
+        </div>
+    </div>
+    
+    <div>
+        <div class="accordiontitle">标题3</div>
+        <div class="accordioncontent">
+            <p>222</p>
+            <p>222</p>
+            <p>222</p>
+        </div>
+    </div>
+    <div>
+        <div class="accordiontitle">标题4</div>
+        <div class="accordioncontent">
+            <p>222</p>
+            <p>222</p>
+            <p>222</p>
+        </div>
+    </div>
+</div>
+<script>
+    $(function ()
+    {
+        new RoadUI.Accordion().init($(".accordion"));
+    })
+</script>

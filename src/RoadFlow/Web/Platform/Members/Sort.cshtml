@@ -24,7 +24,7 @@
     
     var orgs = new Business.Platform.Organize().GetChilds(parentid.ToGuid());
 }
-<form method="post"><br />
+    <form method="post"><br />
     <div style="width:82%; margin:0 auto; height:auto;" id="sortdiv">
         @{
         foreach(var org in orgs)
@@ -47,8 +47,4 @@
         {
             new RoadUI.DragSort($("#sortdiv"));
         });
-        function re()
-        {
-            window.location = "Body" + '@Request.Url.Query';
-        }
     </script>

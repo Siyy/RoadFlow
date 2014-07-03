@@ -25,7 +25,8 @@
             }
             broleApp.UpdateSort(guid, i + 1);
         }
-        string rid=roleApp.ParentID.ToString();
+        broleApp.ClearAllDataTableCache();
+        string rid = roleApp.ParentID.ToString();
         <script type="text/javascript">
             parent.frames[0].reLoad('@rid');
         </script>

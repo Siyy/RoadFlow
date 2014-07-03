@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Business.Platform
 {
@@ -87,14 +88,7 @@ namespace Business.Platform
         {
             return dataAppLibrary.GetCount();
         }
-        /// <summary>
-        /// 得到所有分类
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetAllTypes()
-        {
-            return dataAppLibrary.GetAllTypes();
-        }
+
         /// <summary>
         /// 得到一页数据
         /// </summary>
@@ -115,9 +109,13 @@ namespace Business.Platform
         /// <summary>
         /// 查询一个类别下所有记录
         /// </summary>
-        public List<Data.Model.AppLibrary> GetAllByType(string type)
+        public List<Data.Model.AppLibrary> GetAllByType(Guid type)
         {
-            return type.IsNullOrEmpty() ? new List<Data.Model.AppLibrary>() : dataAppLibrary.GetAllByType(type);
+            if (type.IsEmptyGuid())
+            {
+                return new List<Data.Model.AppLibrary>();
+            }
+            return dataAppLibrary.GetAllByType(GetAllChildsIDString(type)).OrderBy(p=>p.Title).ToList();
         }
 
         /// <summary>
@@ -140,23 +138,28 @@ namespace Business.Platform
         /// <returns></returns>
         public string GetTypeOptions(string value="")
         {
-            var types = GetAllTypes();
-            StringBuilder options = new StringBuilder();
-            foreach (var type in types)
-            {
-                options.AppendFormat("<option value=\"{0}\" {1}>{0}</option>", type, type == value ? "selected=\"selected\"" : "");
-            }
-            return options.ToString();
+            return new Dictionary().GetOptionsByCode("AppLibraryTypes", Dictionary.OptionValueField.ID, value);
         }
+
+        /// <summary>
+        /// 得到下级ID字符串
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string GetAllChildsIDString(Guid id, bool isSelf = true)
+        {
+            return new Dictionary().GetAllChildsIDString(id, true);
+        }
+
         /// <summary>
         /// 得到一个类型选择项
         /// </summary>
         /// <param name="type">程序类型</param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public string GetAppsOptions(string type, string value = "")
+        public string GetAppsOptions(Guid type, string value = "")
         {
-            if (type.IsNullOrEmpty()) return "";
+            if (type.IsEmptyGuid()) return "";
             var apps = GetAllByType(type);
             StringBuilder options = new StringBuilder();
             foreach (var app in apps)
@@ -176,7 +179,7 @@ namespace Business.Platform
         public string GetTypeByID(Guid id)
         {
             var app = Get(id);
-            return app == null ? "" : app.Type;
+            return app == null ? "" : app.Type.ToString();
         }
 
         /// <summary>

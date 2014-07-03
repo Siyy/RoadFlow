@@ -320,6 +320,7 @@
             id = RoadUI.Core.query("openerid");
         }
         id += "_iframe";
+        
         $("iframe", top.document).each(function ()
         {
             if (id == $(this).attr("id"))
@@ -334,7 +335,6 @@
             {
                 if (id == $(this).attr("id"))
                 {
-
                     var win = $(this).get(0).contentWindow;
                     win.location = !url || $.trim(url).length == 0 ? win.location : url;
                 }

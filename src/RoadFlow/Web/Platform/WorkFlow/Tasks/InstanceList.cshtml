@@ -10,6 +10,7 @@
     string date1 = "";
     string date2 = "";
     string status = "";
+    string typeid = Request.QueryString["typeid"];
     
     if(IsPost)
     {
@@ -44,15 +45,15 @@
     
     
     //可管理的流程ID数组
-    var flows = bworkFlow.GetInstanceManageFlowIDList(Business.Platform.Users.CurrentUserID);
+    var flows = bworkFlow.GetInstanceManageFlowIDList(Business.Platform.Users.CurrentUserID, typeid);
     List<Guid> flowids = new List<Guid>();
-    foreach(var flow in flows)
+    foreach(var flow in flows.OrderBy(p=>p.Value))
     {
         flowids.Add(flow.Key);
     }
     Guid[] manageFlows = flowids.ToArray();
 
-    string flowOptions = bworkFlow.GetOptions(flows, flowid);
+    string flowOptions = bworkFlow.GetOptions(flows, typeid, flowid);
 
     var taskList = bworkFlowTask.GetInstances(manageFlows, new Guid[] { },
         sender.IsNullOrEmpty() ? new Guid[] { } : new Guid[] { sender.Replace(Business.Platform.Users.PREFIX, "").ToGuid() },
@@ -64,10 +65,10 @@
         <tr>
             <td>
                 标题：<input type="text" class="mytext" id="Title" style="width:120px;" name="Title" value="@title" />
-                所属流程：<select class="myselect" style="width:130px;" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(flowOptions)</select>
+                流程：<select class="myselect" style="width:120px;" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(flowOptions)</select>
                 发送人：<input type="text" style="width:80px;"  class="mymember" id="SenderID" unit="0" dept="0" station="0" user="1" group="0" more="0" name="SenderID" value="@sender"  />
-                发送时间：<input type="text" class="mycalendar" value="@date1" style="width:90px;" name="Date1" /> 至 <input type="text" style="width:90px;" value="@date2" class="mycalendar" name="Date2" />
-                状态：@Html.DropDownList("Status", statusItems, new {@class="myselect", style="width:100px;"})
+                发送时间：<input type="text" class="mycalendar" value="@date1" style="width:80px;" name="Date1" /> 至 <input type="text" style="width:80px;" value="@date2" class="mycalendar" name="Date2" />
+                状态：@Html.DropDownList("Status", statusItems, new {@class="myselect", style="width:80px;"})
                 <input type="submit" name="Search" value="查询" class="mybutton" />
             </td>
         </tr>

@@ -23,8 +23,8 @@ namespace Data.MSSQL
         public int Add(Data.Model.Dictionary model)
         {
             string sql = @"INSERT INTO Dictionary
-				(ID,ParentID,Title,Code,Value,Note,Other,Sort,UseCache) 
-				VALUES(@ID,@ParentID,@Title,@Code,@Value,@Note,@Other,@Sort,@UseCache)";
+				(ID,ParentID,Title,Code,Value,Note,Other,Sort) 
+				VALUES(@ID,@ParentID,@Title,@Code,@Value,@Note,@Other,@Sort)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@ParentID", SqlDbType.UniqueIdentifier, -1){ Value = model.ParentID },
@@ -33,8 +33,7 @@ namespace Data.MSSQL
 				model.Value == null ? new SqlParameter("@Value", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Value", SqlDbType.VarChar, -1) { Value = model.Value },
 				model.Note == null ? new SqlParameter("@Note", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Note", SqlDbType.VarChar, -1) { Value = model.Note },
 				model.Other == null ? new SqlParameter("@Other", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Other", SqlDbType.VarChar, -1) { Value = model.Other },
-				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
-				new SqlParameter("@UseCache", SqlDbType.Bit, -1){ Value = model.UseCache }
+				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort }
 			};
             return dbHelper.Execute(sql, parameters);
         }
@@ -45,7 +44,7 @@ namespace Data.MSSQL
         public int Update(Data.Model.Dictionary model)
         {
             string sql = @"UPDATE Dictionary SET 
-				ParentID=@ParentID,Title=@Title,Code=@Code,Value=@Value,Note=@Note,Other=@Other,Sort=@Sort,UseCache=@UseCache
+				ParentID=@ParentID,Title=@Title,Code=@Code,Value=@Value,Note=@Note,Other=@Other,Sort=@Sort
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ParentID", SqlDbType.UniqueIdentifier, -1){ Value = model.ParentID },
@@ -55,7 +54,6 @@ namespace Data.MSSQL
 				model.Note == null ? new SqlParameter("@Note", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Note", SqlDbType.VarChar, -1) { Value = model.Note },
 				model.Other == null ? new SqlParameter("@Other", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Other", SqlDbType.VarChar, -1) { Value = model.Other },
 				new SqlParameter("@Sort", SqlDbType.Int, -1){ Value = model.Sort },
-				new SqlParameter("@UseCache", SqlDbType.Bit, -1){ Value = model.UseCache },
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID }
 			};
             return dbHelper.Execute(sql, parameters);
@@ -93,7 +91,6 @@ namespace Data.MSSQL
                 if (!dataReader.IsDBNull(6))
                     model.Other = dataReader.GetString(6);
                 model.Sort = dataReader.GetInt32(7);
-                model.UseCache = dataReader.GetBoolean(8);
                 List.Add(model);
             }
             return List;

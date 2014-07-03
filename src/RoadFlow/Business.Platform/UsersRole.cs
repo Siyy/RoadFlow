@@ -85,5 +85,36 @@ namespace Business.Platform
         {
             return dataUsersRole.GetByUserID(memberID);
         }
+
+        /// <summary>
+        /// 更新一个人员的所属角色
+        /// </summary>
+        /// <param name="userID"></param>
+        public void UpdateByUserID(Guid userID)
+        {
+            Organize borg=new Organize();
+            UsersRole busersRole = new UsersRole();
+            var roles = new Role().GetAll();
+            
+            busersRole.DeleteByUserID(userID);
+            foreach (var role in roles)
+            {
+                if (role.UseMember.IsNullOrEmpty())
+                {
+                    continue;
+                }
+                var users = borg.GetAllUsers(role.UseMember);
+                if (users.Exists(p => p.ID == userID))
+                {
+                    busersRole.Add(new Data.Model.UsersRole()
+                    {
+                        IsDefault = true,
+                        MemberID = userID,
+                        RoleID = role.ID
+                    });
+                }
+            }
+               
+        }
     }
 }

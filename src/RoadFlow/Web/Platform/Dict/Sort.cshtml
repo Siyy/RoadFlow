@@ -3,7 +3,7 @@
     
     Business.Platform.Dictionary BDict = new Business.Platform.Dictionary();
     string id = Request.QueryString["id"];
-    string refreshID="";
+    string refreshID = "";
     Guid dictid;
     List<Data.Model.Dictionary> dicts = new List<Data.Model.Dictionary>();
     if (id.IsGuid(out dictid))
@@ -18,8 +18,7 @@
     
     if(IsPost)
     {
-        string sortdict = Request.Form["sortdict"];
-        
+        string sortdict = Request.Form["sort"];
         if (sortdict.IsNullOrEmpty())
         {
             return;
@@ -40,27 +39,22 @@
             parent.frames[0].reLoad('@refreshID');
         </script>
     }
+    dicts = BDict.GetChilds(refreshID.ToGuid());
 }
 
     <form action="" method="post">
         <br />
-        <div style="padding-left:7px; width:95%;">
+        <div style="width:82%; margin:0 auto; height:auto;" id="sortdiv">
+        @{
+            foreach (var dict in dicts)
+            { 
         <ul class="sortul">
-             @{ 
-                
-                
-                
-                 foreach (var dict in dicts)
-                 { 
-            
-            <li>
-                <input type="hidden" value="@dict.ID" name="sortdict" />
-                @dict.Title
-            </li>
-                 }
-            }
+            <input type="hidden" value="@dict.ID" name="sort" />
+            @dict.Title
         </ul>
-        </div>
+            }  
+        }
+    </div>
         <div class="buttondiv">
             <input type="submit" class="mybutton" value="保存排序" />
             <input type="button" class="mybutton" value="返回" onclick="window.location='Body'+'@Request.Url.Query';" />
@@ -70,6 +64,6 @@
         var win = new RoadUI.Window();
         $(function ()
         {
-            $(".sortul").dragsort({ dragSelector: "li" });
+            new RoadUI.DragSort($("#sortdiv"));
         });
     </script>

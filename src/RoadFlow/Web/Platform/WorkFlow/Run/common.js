@@ -102,8 +102,9 @@ function formSubmit(options)
         return false;
     }
     var f = document.forms[0];
-    var validateAlertType = $("#Form_ValidateAlertType").val() || 2;
-    if (new RoadUI.Validate().validateForm(f, parseInt(validateAlertType)))
+    //验证提示类型 0-弹出 1-图标加提示信息 2-图标
+    var validateAlertType = $("#Form_ValidateAlertType").size() > 0 && !isNaN($("#Form_ValidateAlertType").val()) ? parseInt($("#Form_ValidateAlertType").val()) : 1;
+    if (new RoadUI.Validate().validateForm(f, validateAlertType))
     {
         showProcessing(options.type);
         window.setTimeout('', 100);
@@ -137,4 +138,9 @@ function sign()
 function showProcess()
 {
     top.mainDialog.open({ id: 'showprocess', title: '查看处理过程', url: '/Platform/WorkFlow/Tasks/Detail?' + query, width: 850, height: 450 });
+}
+
+function formPrint()
+{
+    RoadUI.Core.open("/Platform/WorkFlow/Run/Print?" + query, 980, 600, "打印表单");
 }

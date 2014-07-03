@@ -56,19 +56,24 @@
             <th>所属成员</th>
             <th>添加类型</th>
             }
+            <th>排序</th>
             <th>编辑</th>
         </tr>
     </thead>
     <tbody>
+    @{
+        int i = 1;   
+     }
     @foreach (var comment in workFlowCommentList.OrderBy(p=>p.Type).ThenBy(p=>p.Sort))
     { 
         <tr>
-            <td><input type="checkbox" value="@comment.ID" name="checkbox_app" />@comment.Sort</td>
+            <td><input type="checkbox" value="@comment.ID" name="checkbox_app" />@(i++)</td>
             <td>@comment.Comment</td>
             @if(!isOneSelf){
             <td>@borganize.GetNames(comment.MemberID)</td>
             <td>@(comment.Type==0?"管理员":"个人")</td>
             }
+            <td>@comment.Sort</td>
             <td><a class="editlink" href="javascript:edit('@comment.ID');">编辑</a></td>
         </tr>
     }
@@ -106,4 +111,3 @@
         return true;
     }
 </script>
-</form>

@@ -1,9 +1,9 @@
 ﻿@{
     Layout = "~/_SiteLayout.cshtml";
     Business.Platform.DBConnection bdbConn = new Business.Platform.DBConnection();
-    Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
+    Business.Platform.WorkFlowForm bworkflowform = new Business.Platform.WorkFlowForm();
     string link_DBConnOptions = bdbConn.GetAllOptions();
-    string typeOptions = new Business.Platform.AppLibrary().GetTypeOptions("");
+    string typeOptions = bworkflowform.GetTypeOptions("");
     string validatePromptType = new Business.Platform.WorkFlowForm().GetValidatePropTypeRadios("validatealerttype","","");
 }
 <br />
@@ -32,8 +32,8 @@
     </tr>
     <tr>
         <th>程序库分类:</th>
-        <td><input type="text" class="mytext" id="type" style="width:120px"/>
-            <select class="myselect" id="typeselect" style="width:100px" onchange="typeChange(this.value);"><option value=""></option>@Html.Raw(typeOptions)</select>
+        <td>
+            <select class="myselect" id="type" style=""><option value=""></option>@Html.Raw(typeOptions)</select>
         </td>
     </tr>
     <tr>

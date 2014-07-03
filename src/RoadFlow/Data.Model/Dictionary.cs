@@ -14,52 +14,46 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// ParentID
+        /// 上级ID
         /// </summary>
-        [DisplayName("ParentID")]
+        [DisplayName("上级ID")]
         public Guid ParentID { get; set; }
 
         /// <summary>
-        /// Title
+        /// 标题
         /// </summary>
-        [DisplayName("Title")]
+        [DisplayName("标题")]
         public string Title { get; set; }
 
         /// <summary>
-        /// Code
+        /// 唯一代码
         /// </summary>
-        [DisplayName("Code")]
+        [DisplayName("唯一代码")]
         public string Code { get; set; }
 
         /// <summary>
-        /// Value
+        /// 值
         /// </summary>
-        [DisplayName("Value")]
+        [DisplayName("值")]
         public string Value { get; set; }
 
         /// <summary>
-        /// Note
+        /// 备注
         /// </summary>
-        [DisplayName("Note")]
+        [DisplayName("备注")]
         public string Note { get; set; }
 
         /// <summary>
-        /// Other
+        /// 其它信息
         /// </summary>
-        [DisplayName("Other")]
+        [DisplayName("其它信息")]
         public string Other { get; set; }
 
         /// <summary>
-        /// Sort
+        /// 排序
         /// </summary>
-        [DisplayName("Sort")]
+        [DisplayName("排序")]
         public int Sort { get; set; }
-
-        /// <summary>
-        /// 是否使用缓存
-        /// </summary>
-        [DisplayName("是否使用缓存")]
-        public bool UseCache { get; set; }
 
     }
 }

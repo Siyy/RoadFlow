@@ -20,7 +20,6 @@
         dict.ParentID = id.ToGuid();
         dict.Sort = bdict.GetMaxSort(id.ToGuid());
         dict.Title = title.Trim();
-        dict.UseCache = false;
         dict.Value = values.IsNullOrEmpty() ? null : values.Trim();
 
         bdict.Add(dict);

@@ -38,3 +38,4 @@ src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/upload*
 src/RoadFlow/Web/Platform/WorkFlow/Sign/*
 !src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/Uploader.cs
 tree副本.gif
+*.vssscc

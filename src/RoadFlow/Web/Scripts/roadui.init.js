@@ -21,17 +21,9 @@
 {
     this.theme = function (themeName)
     {
-        if (themeName && themeName == $.cookies.get("theme_platform"))
-        {
-            return;
-        }
         if (!themeName || themeName.toString().trim().length == 0)
         {
             themeName = $.cookies.get("theme_platform")
-        }
-        if (!themeName || themeName.toString().trim().length == 0)
-        {
-            return;
         }
 
         $("#style_style").attr("href", "/Content/Theme/" + themeName + "/Style/style.css");
@@ -41,6 +33,7 @@
         {
             $("#style_style", iframes[i].document).attr("href", "/Content/Theme/" + themeName + "/Style/style.css");
             $("#style_ui", iframes[i].document).attr("href", "/Content/Theme/" + themeName + "/Style/ui.css");
+            $("#style_form", iframes[i].document).attr("href", "/Platform/WorkFlow/FormDesigner/Forms/Public/flowform_" + themeName + ".css");
         }
         $.cookies.set("theme_platform", themeName, { expiresAt: new Date(2099, 1, 1) });
     };

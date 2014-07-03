@@ -1,0 +1,11 @@
+﻿body { margin: 0px; font-size: 14px; color:#000000;}
+table { border-collapse:collapse;border:1px solid #000000;}
+table, td, th, p, div, span, label { font-size: 14px; }
+p { margin:8px 0;}
+.flowformtable { background-color:#dddddd; width:98%; margin:0 auto; border-collapse:collapse; border:1px solid #000000;}
+.flowformtable tbody tr td { background:#ffffff; padding:5px 0 5px 3px; vertical-align:middle; border-collapse:collapse; border:1px solid #000000;}
+.flowformtable thead tr td { background:#ffffff; padding:5px 0 5px 3px; vertical-align:middle; border-collapse:collapse; border:1px solid #000000;}
+
+.flowformsubtable { background-color:#dddddd; width:100%; margin:0 auto; border-collapse:collapse; border:1px solid #000000;}
+.flowformsubtable tbody tr td { background:#ffffff; padding:5px 0 5px 3px; vertical-align:middle; border-collapse:collapse; border:1px solid #000000;}
+.flowformsubtable thead tr td { background:#ffffff; padding:5px 0 5px 3px; vertical-align:middle; border-collapse:collapse; border:1px solid #000000;}
