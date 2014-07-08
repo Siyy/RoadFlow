@@ -99,8 +99,8 @@
                     break;
                 case 9://发起者主管
                     Guid firstSenderID = btask.GetFirstSnderID(wfInstalled.ID, groupid.ToGuid());
-                    if (firstSenderID.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)//如果是第一步则发起者为当前人员
-                    {
+                    if (firstSenderID.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)
+                    {//如果是第一步则发起者为当前人员
                         firstSenderID = Business.Platform.Users.CurrentUserID;
                     }
                     if (!firstSenderID.IsEmptyGuid())
@@ -110,8 +110,8 @@
                     break;
                 case 10://发起者分管领导
                     Guid firstSenderID1 = btask.GetFirstSnderID(wfInstalled.ID, groupid.ToGuid());
-                    if (firstSenderID1.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)//如果是第一步则发起者为当前人员
-                    {
+                    if (firstSenderID1.IsEmptyGuid() && currentStep.ID == wfInstalled.FirstStepID)
+                    {//如果是第一步则发起者为当前人员
                         firstSenderID1 = Business.Platform.Users.CurrentUserID;
                     }
                     if (!firstSenderID1.IsEmptyGuid())

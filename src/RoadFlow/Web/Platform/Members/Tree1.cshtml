@@ -10,8 +10,8 @@
     Business.Platform.Organize BOrganize = new Business.Platform.Organize();
     System.Text.StringBuilder json = new System.Text.StringBuilder("[", 1000);
 
-    if ("1" == showtype)//显示工作组
-    {
+    if ("1" == showtype)
+    { //显示工作组
         Business.Platform.WorkGroup BWorkGroup = new Business.Platform.WorkGroup();
         var workGroups = BWorkGroup.GetAll();
         

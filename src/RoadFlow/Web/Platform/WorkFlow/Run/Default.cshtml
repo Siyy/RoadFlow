@@ -90,8 +90,8 @@
 }
 <body onload="$('#mainform').show();">
 <form id="mainform" name="mainform" method="post" target="submiter" style="display:none;">
-@if ("0" == display)//display为0表示执行，1表示查看
-{
+@if ("0" == display)
+{//display为0表示执行，1表示查看
     <div class="toolbar" style="margin-top:0; border-top:none 0; position:fixed; top:0; left:0; right:0; margin-left:auto; z-index:99999999; width:100%; margin-right:auto; height:26px;">
         <div>
         @foreach (var button in currentStep.Buttons)
@@ -112,8 +112,8 @@
                 function @funName {@Html.Raw(button1.Script)}
             </script>
             }
-            else if (string.Compare(button.ID, "other_splitline", true) == 0)//显示其它特定按钮如分隔线|
-            { 
+            else if (string.Compare(button.ID, "other_splitline", true) == 0)
+            { //显示其它特定按钮如分隔线|
             <span class="toolbarsplit">&nbsp;</span>
             }
         }
@@ -191,8 +191,8 @@
 
     <!--历史意见显示-->
     <div id="form_commentlist_div">
-    @if (currentStep.OpinionDisplay == 1)//如果步骤设置为要显示意见
-    {
+    @if (currentStep.OpinionDisplay == 1)
+    {//如果步骤设置为要显示意见
         @RenderPage("ShowComment.cshtml")
     }
     </div>
