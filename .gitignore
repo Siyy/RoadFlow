@@ -28,16 +28,20 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 
+#本案排除
 *.scc
 *.psd
 */*/packages/*
-!*/*/*/*.config
 src/RoadFlow/Web/Content/Upload/*
 src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/tmp/*
 src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/upload*
 src/RoadFlow/Web/Platform/WorkFlow/Sign/*
-!src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/Uploader.cs
 */*/*/[Bb]in/*
-!*/*/*/*/*.refresh
 tree副本.gif
 *.vssscc
+
+#一定排除
+!*.config
+!*.refresh
+!*.cs
+!.[Xx][Mm][Ll]
