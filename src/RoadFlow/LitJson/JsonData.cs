@@ -1,4 +1,4 @@
-#region Header
+﻿#region Header
 /**
  * JsonData.cs
  *   Generic type to hold JSON data (objects, arrays, and so on). This is
@@ -19,7 +19,7 @@ using System.IO;
 
 namespace LitJson
 {
-    public class JsonData : IJsonWrapper, IEquatable<JsonData>
+    public partial class JsonData : IJsonWrapper, IEquatable<JsonData>
     {
         #region Fields
         private IList<JsonData>               inst_array;

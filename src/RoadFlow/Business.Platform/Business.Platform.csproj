@@ -31,7 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitJSON" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -70,6 +69,10 @@
     <Compile Include="WorkGroup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LitJson\LitJson.csproj">
+      <Project>{9e58b6e8-e4aa-449d-82a6-37be530af417}</Project>
+      <Name>LitJson</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyCache.Factory\MyCache.Factory.csproj">
       <Project>{1E605362-7767-45F9-9BC1-F8E495FA3F4E}</Project>
       <Name>MyCache.Factory</Name>
