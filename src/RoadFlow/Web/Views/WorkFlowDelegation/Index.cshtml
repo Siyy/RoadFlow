@@ -1,0 +1,97 @@
+﻿@{
+    ViewBag.Title = "Index";
+    bool isOneSelf = "1" == Request.QueryString["isoneself"];
+    Business.Platform.Organize borganize = new Business.Platform.Organize();
+    Business.Platform.Users busers = new Business.Platform.Users();
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+}
+@model IEnumerable<Data.Model.WorkFlowDelegation>
+<form method="post" >
+@Html.AntiForgeryToken()
+<div class="querybar">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td>
+                委托人：<input type="text" class="mymember" style="width:100px;" id="S_UserID" name="S_UserID" value="" />
+                被委托人：<input type="text" class="mymember" style="width:100px;" id="S_ToUserID" name="S_ToUserID" value="" />
+                开始时间：<input type="text" class="mycalendar" style="width:100px;" id="S_StartTime" name="S_StartTime" value="" />
+                结束时间：<input type="text" class="mycalendar" style="width:100px;" id="S_EndTime" name="S_EndTime" value="" />
+                <input type="submit" name="Search" value="查询" class="mybutton" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="toolbar" style="margin-top:0; border-top:0;">
+    <a href="javascript:void(0);" onclick="add();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_add.png"));">添加委托</span></a>
+    <span class="toolbarsplit">&nbsp;</span>
+    <input type="submit" style="display:none;" value="d" id="DeleteBut" name="DeleteBut" />
+    <a href="javascript:void(0);" onclick="del();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_remove.png"));">删除所选</span></a>
+</div>
+<table cellpadding="0" cellspacing="1" border="0" class="listtable">
+    <thead>
+        <tr>
+            <th><input type="checkbox" onclick="checkAll(this.checked);" style="vertical-align:middle;" />序号</th>
+            <th>委托人</th>
+            <th>被委托人</th>
+            <th>委托流程</th>
+            <th>开始时间</th>
+            <th>结束时间</th>
+            <th>备注说明</th>
+            <th>状态</th>
+            <th>编辑</th>
+        </tr>
+    </thead>
+    <tbody>
+    @{
+      int i=1;  
+    }
+    @foreach (var deletation in Model.OrderByDescending(p => p.WriteTime))
+    { 
+        <tr>
+            <td><input type="checkbox" value="@deletation.ID" name="checkbox_app" />@(i++)</td>
+            <td>@busers.GetName(deletation.UserID)</td>
+            <td>@busers.GetName(deletation.ToUserID)</td>
+            <td>@(deletation.FlowID.HasValue && !deletation.FlowID.Value.IsEmptyGuid()? bworkFlow.GetFlowName(deletation.FlowID.Value):"所有流程")</td>
+            <td>@deletation.StartTime</td>
+            <td>@deletation.EndTime</td>
+            <td>@deletation.Note</td>
+            <td>@(deletation.EndTime>=Utility.DateTimeNew.Now?"委托中":"已失效")</td>
+            <td><a class="editlink" href="javascript:edit('@deletation.ID');">编辑</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+<div class="buttondiv">@Html.Raw(ViewBag.Pager)</div>
+</form>
+<script type="text/javascript">
+    var appid = '@Request.QueryString["appid"]';
+    var iframeid = '@Request.QueryString["tabid"]';
+    var dialog = top.mainDialog;
+    function add()
+    {
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "添加委托", width: 700, height: 360, url: 'WorkFlowDelegation/Edit?1=1' + '@ViewBag.Query1', openerid: iframeid });
+    }
+    function edit(id)
+    {
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "编辑委托", width: 700, height: 360, url: 'WorkFlowDelegation/Edit?id=' + id + '@ViewBag.Query1', openerid: iframeid });
+    }
+    function checkAll(checked)
+    {
+        $("input[name='checkbox_app']").prop("checked", checked);
+    }
+    function del()
+    {
+        if ($(":checked[name='checkbox_app']").size() == 0)
+        {
+            alert("您没有选择要删除的项!");
+            return false;
+        }
+        if (!confirm('您真的要删除所选委托吗?'))
+        {
+            return false;
+        }
+        $("#DeleteBut").click();
+        return true;
+    }
+</script>

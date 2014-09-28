@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Page.BodyStyle = "style='padding:2px 0; overflow:hidden;'";
+}
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td style="width:250px; vertical-align:top; padding:5px 5px 0 5px;">
+            <iframe id="Iframe1" frameborder="0" scrolling="auto" src="Members/Tree?appid=@Request.QueryString["appid"]" style="width:100%;margin:0;padding:0;"></iframe> 
+        </td>
+        <td class="organizesplit">
+            <iframe id="Iframe2" frameborder="0" scrolling="auto" src="Members/Body?appid=@Request.QueryString["appid"]" style="width:100%;margin:0;padding:0;"></iframe> 
+        </td>
+    </tr>
+</table>
+<script type="text/javascript">
+    $(function ()
+    {
+        var height = $(window).height();
+        $('#Iframe1').attr('height', height - 10);
+        $('#Iframe2').attr('height', height - 10);
+    });
+</script>

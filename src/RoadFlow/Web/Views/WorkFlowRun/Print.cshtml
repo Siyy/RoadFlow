@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Print";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>打印表单</title>
+    <link href="~/Scripts/FlowRun/Forms/flowform_print.css" rel="stylesheet" />
+    <style type="text/css" media="print">
+        .Noprint { display: none; }
+    </style>
+</head>
+<body>
+<div id="buttondiv" class="Noprint" style="margin-left:20px;">
+    <button onclick="print1();" style="margin-right:6px;">确认打印</button>
+    <button onclick="window.close();">取消关闭</button>
+</div>
+<div>
+<script type="text/javascript">
+   document.write(window.opener.document.getElementById("form_body_div").outerHTML);
+</script>
+</div>
+<div id="commentdiv">
+<script type="text/javascript">
+    document.write(window.opener.document.getElementById("form_commentlist_div").outerHTML);
+</script>
+</div>
+<script type="text/javascript">
+    function print1()
+    {
+        window.print();
+    }
+</script>
+</body>
+</html>

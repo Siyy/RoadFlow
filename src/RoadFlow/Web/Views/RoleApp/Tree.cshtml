@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Tree";
+    var roleOptions = new Business.Platform.Role().GetRoleOptions(Request.QueryString["roleid"]);
+}
+
+<form>
+    <div style="margin:3px 0 3px 0;">
+    <select id="role" onchange="loadTree(this.value);" class="myselect" style="width:100px;">
+        @Html.Raw(roleOptions)
+    </select>
+    <input type="button" class="mybutton" value="编辑角色" onclick="editRole();" />
+    <input type="button" class="mybutton" value="添加角色" onclick="addRole();" />
+    </div>
+    <div id="menu"></div>
+</form>
+<script type="text/javascript">
+    var AppID = '@Request.QueryString["appid"]';
+    var roadTree = null;
+    $(function ()
+    {
+        loadTree($('#role').val());
+        parent.frames[1].location = 'EditRole?id=' + $("#role").val() + '&appid=' + AppID;
+    });
+    function loadTree(id)
+    {
+        $("#menu").html('');
+        if (id.length > 0)
+        {
+            roadTree = new RoadUI.Tree({ id: "menu", path: "Tree1?roleid=" + id, refreshpath: "TreeRefresh", onclick: openUrl });
+            parent.frames[1].location = 'EditRole?id=' + id + '&appid=' + AppID;
+        }
+    }
+    function reLoad(id)
+    {
+        if (roadTree != null)
+        {
+            roadTree.refresh(id);
+        }
+    }
+    function openUrl(json)
+    {
+        parent.frames[1].location = "Body?id=" + json.id + "&appid=" + AppID + "&roleid=" + $("#role").val();
+    }
+    function editRole()
+    {
+        $('#Iframe2', $(parent.document)).attr('src', 'RoleApp/EditRole?id=' + $('#role').val() + '&appid=' + AppID);
+    }
+    function addRole()
+    {
+        $('#Iframe2', $(parent.document)).attr('src', 'RoleApp/AddRole?id=' + $('#role').val() + '&appid=' + AppID);
+    }
+</script>

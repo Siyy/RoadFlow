@@ -36,14 +36,14 @@ a.red:hover {color:red; text-decoration:underline;}
 .menuDiv1{width:22px; height:26px; background:url(../images/main/menu_r.gif) no-repeat center center; display:none; cursor:pointer;}
 .menuDiv1:hover{width:20px; height:26px; background:url(../images/main/menu_r0.gif) no-repeat center center; display:none; cursor:pointer;}
 
-.mainTheme_blue{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_blue.gif) no-repeat; }
-.mainTheme_blue1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_blue1.gif) no-repeat;}
-.mainTheme_bluelight{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_bluelight.gif) no-repeat; }
-.mainTheme_bluelight1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_bluelight1.gif) no-repeat;}
-.mainTheme_green{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_green.gif) no-repeat;}
-.mainTheme_green1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_green1.gif) no-repeat;}
-.mainTheme_gray{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_gray.gif) no-repeat;}
-.mainTheme_gray1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(/images/theme_gray1.gif) no-repeat;}
+.mainTheme_blue{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_blue.gif) no-repeat; }
+.mainTheme_blue1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_blue1.gif) no-repeat;}
+.mainTheme_bluelight{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_bluelight.gif) no-repeat; }
+.mainTheme_bluelight1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_bluelight1.gif) no-repeat;}
+.mainTheme_green{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_green.gif) no-repeat;}
+.mainTheme_green1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_green1.gif) no-repeat;}
+.mainTheme_gray{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_gray.gif) no-repeat;}
+.mainTheme_gray1{display:inline-block; cursor:pointer; margin-right:5px; width:13px; height:11px; vertical-align:middle; background:url(../../../../images/theme_gray1.gif) no-repeat;}
 
 /*首页样式*/
 .homediv{width:100%; border:1px solid #99bbe8; }
@@ -93,13 +93,13 @@ a.pager:hover{padding:1px 5px; margin:2px; color:#000000; background:#CEE0F7; bo
 .pagerarrow{font-family:Verdana;}
 
 /*编辑连接背景图片*/
-.editlink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(/images/ico/topic_edit.gif) no-repeat left center; padding-left:18px; }
+.editlink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(../../../../images/ico/topic_edit.gif) no-repeat left center; padding-left:18px; }
 /*查看连接背景图片*/
-.viewlink{height:16px; padding-top:4px;  display:inline-block; border:none 0; background:url(/images/ico/topic.gif) no-repeat left center; padding-left:16px; }
+.viewlink{height:16px; padding-top:4px;  display:inline-block; border:none 0; background:url(../../../../images/ico/topic.gif) no-repeat left center; padding-left:16px; }
 /*删除连接背景图片*/
-.deletelink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(/images/ico/topic_del.gif) no-repeat left center; padding-left:18px; }
+.deletelink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(../../../../images/ico/topic_del.gif) no-repeat left center; padding-left:18px; }
 /*打印连接背景图片*/
-.printlink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(/images/ico/printer.gif) no-repeat left center; padding-left:18px; }
+.printlink{height:16px; padding-top:4px; display:inline-block; border:none 0; background:url(../../../../images/ico/printer.gif) no-repeat left center; padding-left:18px; }
 
 /*拖动排序样式*/
 .sortul{height:19px; padding:4px 0 0 10px; overflow:hidden; margin:5px 0; background:#daeef9 url(../images/public/buttonbg1.gif) repeat-x center; border:1px solid #b3daf4;}

@@ -35,7 +35,11 @@ namespace Utility
             /// <summary>
             /// 主题
             /// </summary>
-            Theme
+            Theme,
+            /// <summary>
+            /// 根路径
+            /// </summary>
+            BaseUrl
         }
 
         /// <summary>
@@ -82,7 +86,11 @@ namespace Utility
             /// <summary>
             /// 工作流委托
             /// </summary>
-            WorkFlowDelegation
+            WorkFlowDelegation,
+            /// <summary>
+            /// 用户角色
+            /// </summary>
+            UserRoles
         }
         
     }

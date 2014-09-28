@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LitJSON, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Source\Web\bin\LitJSON.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -73,6 +69,10 @@
     <Compile Include="WorkGroup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LitJSON\LitJSON.csproj">
+      <Project>{28d9f7ba-2923-4364-9bea-9e1ccd70dd22}</Project>
+      <Name>LitJSON</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyCache.Factory\MyCache.Factory.csproj">
       <Project>{1E605362-7767-45F9-9BC1-F8E495FA3F4E}</Project>
       <Name>MyCache.Factory</Name>

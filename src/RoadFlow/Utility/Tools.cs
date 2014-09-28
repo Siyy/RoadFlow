@@ -18,12 +18,12 @@ namespace Utility
             }
         }
 
-        public static System.IO.MemoryStream GetValidateImg(out string code)
+        public static System.IO.MemoryStream GetValidateImg(out string code, string bgImg = "/Images/vcodebg.png")
         {
             code = GetValidateCode();
             Random rnd = new Random();
             System.Drawing.Bitmap img = new System.Drawing.Bitmap((int)Math.Ceiling((code.Length * 17.2)), 28);
-            System.Drawing.Image bg = System.Drawing.Bitmap.FromFile(HttpContext.Current.Server.MapPath("/Images/vcodebg.png"));
+            System.Drawing.Image bg = System.Drawing.Bitmap.FromFile(HttpContext.Current.Server.MapPath(bgImg));
             System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(img);
             System.Drawing.Font font = new System.Drawing.Font("Arial", 16, (System.Drawing.FontStyle.Regular | System.Drawing.FontStyle.Italic));
             System.Drawing.Font fontbg = new System.Drawing.Font("Arial", 16, (System.Drawing.FontStyle.Regular | System.Drawing.FontStyle.Italic));

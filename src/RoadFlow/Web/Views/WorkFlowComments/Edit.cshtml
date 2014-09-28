@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Edit";
+    bool isOneSelf = "1" == Request.QueryString["isoneself"];
+}
+@model Data.Model.WorkFlowComment
+<form method="post">
+@Html.AntiForgeryToken()
+<br />
+<table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+<tr>
+    <th>
+        意见：
+    </th>
+    <td>
+        <textarea class="mytext" name="Comment" id="Comment" validate="empty" style="width:75%; height:60px;">@Model.Comment</textarea>
+    </td>
+</tr>
+@if(!isOneSelf)
+{
+<tr>
+    <th style="width: 80px;">
+        使用成员：
+    </th>
+    <td>
+        <input type="text" name="Member" id="Member" class="mymember" value="@Model.MemberID" style="width:60%" /> //为空表示给所有成员
+    </td>
+</tr>
+}
+<tr>
+    <th style="width: 80px;">
+        序号：
+    </th>
+    <td>
+        <input type="text" name="Sort" id="Sort" class="mytext" validate="canempty,int" value="@Model.Sort" />
+    </td>
+</tr>
+</table>
+<div class="buttondiv">
+    <input type="submit" value="确定保存" class="mybutton" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+    <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="new RoadUI.Window().close();" />
+</div>
+</form>
+<script type="text/javascript">
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+    });
+</script>

@@ -1,0 +1,40 @@
+﻿@{
+    string groupid=Request.QueryString["groupid"];
+    string stepid = Request.QueryString["stepid"];
+    string flowid = Request.QueryString["flowid"];
+    
+    Business.Platform.WorkFlowTask bwfTask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlow bwf = new Business.Platform.WorkFlow();
+
+
+    var taskList = bwfTask.GetTaskList(flowid.ToGuid(), groupid.ToGuid()).Where(p => !p.Comment.IsNullOrEmpty() && p.CompletedTime1.HasValue).OrderBy(p => p.Sort);
+}
+    <style type="text/css">
+        .commenttable { margin:12px auto 0 auto; width:96%; background:#ededee; }
+        .commenttable tr th { text-align:left; height:25px; background:#ffffff; font-weight:normal;}
+        .commenttable tr td { height:28px; background:#ffffff;}
+    </style>
+@foreach (var task in taskList)
+{
+    string signSrc=string.Empty;
+    if (task.IsSign.HasValue && task.IsSign == 1) 
+    {
+        signSrc = string.Concat("/Platform/WorkFlow/Sign/Signs/", task.ReceiveID, ".gif"); 
+    }
+    <table cellpadding="0" cellspacing="1" border="0" class="commenttable">
+    <tr>
+        <th style="width:30%;">&nbsp;步骤：@bwf.GetStepName(task.StepID, task.FlowID)</th>
+        <th style="width:20%;">&nbsp;处理人：@task.ReceiveName</th>
+        <th style="width:25%;">&nbsp;收件时间：@task.ReceiveTime</th>
+        <th style="width:25%;">&nbsp;完成时间：@task.CompletedTime1</th>
+    </tr>
+    <tr>
+        <td colspan="4" style="">
+        <div style="float:left; height:26px; padding:9px 0 0 6px; ">
+        处理意见：@Html.Raw(task.Comment) 
+        </div>
+        <div style="float:left; height:26px; width:77px; margin:5px 20px 0 20px; background:url(@signSrc) no-repeat left center;">&nbsp;</div>
+        </td>
+    </tr>
+    </table>
+}

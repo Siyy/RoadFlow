@@ -20,14 +20,14 @@
             $_member.attr("id", id + "_text");
             $_member.attr("name", name + "_text");
             $_member.removeClass().addClass("mytext");
-
+           
             if (value && value.length > 0)
             {
                 $.ajax({
-                    url: "/Content/Controls/Member/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
-                {
-                    $_member.val(txt);
-                }
+                    url: top.rootdir + "/Controls/SelectMember/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
+                    {
+                        $_member.val(txt);
+                    }
                 });
             }
 
@@ -52,7 +52,7 @@
                     var isall = $obj1.attr("all") || "";
 
                     var params = "eid=" + id + "&isunit=" + isunit + "&isdept=" + isdept + "&isstation=" + isstation + "&isuser=" + isuser + "&ismore=" + ismore + "&isall=" + isall + "&isgroup=" + isgroup + "&rootid=" + rootid + "&values=" + val;
-                    new RoadUI.Window().open({ id: "member_" + id, url: "/Content/Controls/Member/Default?" + params, width: 500, height: 470, resize: false, title: "选择组织机构成员", openerid: RoadUI.Core.query("tabid") || "" });
+                    new RoadUI.Window().open({ id: "member_" + id, url: top.rootdir + "Controls/SelectMember/Index?" + params, width: 500, height: 470, resize: false, title: "选择组织机构成员", openerid: RoadUI.Core.query("tabid") || "" });
                 });
             }
 
@@ -73,11 +73,10 @@
     
         if (!$obj || $obj.size() == 0) return;
         var value = $obj.val();
-        $obj.val(value);
         if (value && value.length > 0)
         {
             $.ajax({
-                url: "/Content/Controls/Member/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
+                url: top.rootdir + "/Controls/SelectMember/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
             {
                 $obj.next().val(txt);
             }

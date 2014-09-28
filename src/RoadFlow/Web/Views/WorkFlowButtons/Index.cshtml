@@ -1,0 +1,77 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@model IEnumerable<Data.Model.WorkFlowButtons>
+<form action="" method="post" >
+@Html.AntiForgeryToken()
+<div class="querybar">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td>
+                名称：<input type="text" class="mytext" style="width:190px;" id="Name" name="Name" value="@ViewBag.Name" />
+                <input type="submit" name="Search" value="查询" class="mybutton" />
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="toolbar" style="margin-top:0; border-top:0;">
+    <a href="javascript:void(0);" onclick="add();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_add.png"));">添加按钮</span></a>
+    <span class="toolbarsplit">&nbsp;</span>
+    <input type="submit" style="display:none;" value="d" id="DeleteBut" name="DeleteBut" />
+    <a href="javascript:void(0);" onclick="del();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_remove.png"));">删除所选</span></a>
+</div>
+<table cellpadding="0" cellspacing="1" border="0" class="listtable">
+    <thead>
+        <tr>
+            <th><input type="checkbox" onclick="checkAll(this.checked);" style="vertical-align:middle;" />按钮名称</th>
+            <th>按钮图标</th>
+            <th>按钮说明</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var button in Model.OrderBy(p=>p.Sort))
+    {
+        <tr>
+            <td><input type="checkbox" value="@button.ID" name="checkbox_app" style="vertical-align:middle;" />@button.Title</td>
+            <td align="center">@if(!button.Ico.IsNullOrEmpty()){<img src='@Url.Content("~" + button.Ico)' alt='' />}</td>
+            <td>@button.Note</td>
+            <td>
+                <a class="editlink" href="javascript:edit('@button.ID');">编辑</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script type="text/javascript">
+    var appid = '@Request.QueryString["appid"]';
+    var iframeid = '@Request.QueryString["tabid"]';
+    var dialog = top.mainDialog;
+    function add()
+    {
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "添加按钮", width: 700, height: 420, url: 'WorkFlowButtons/Edit?1=1' + '@ViewBag.Query1', openerid: iframeid });
+    }
+    function edit(id)
+    {
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "编辑按钮", width: 700, height: 420, url: 'WorkFlowButtons/Edit?id=' + id + '@ViewBag.Query1', openerid: iframeid });
+    }
+    function checkAll(checked)
+    {
+        $("input[name='checkbox_app']").prop("checked", checked);
+    }
+    function del()
+    {
+        if ($(":checked[name='checkbox_app']").size() == 0)
+        {
+            alert("您没有选择要删除的项!");
+            return false;
+        }
+        if (!confirm('您真的要删除所选按钮吗?'))
+        {
+            return false;
+        }
+        $("#DeleteBut").click();
+        return true;
+    }
+</script>
+</form>

@@ -23,8 +23,8 @@ namespace Data.MSSQL
         public int Add(Data.Model.Log model)
         {
             string sql = @"INSERT INTO Log
-				(ID,Title,Type,WriteTime,UserID,UserName,IPAddress,URL,Contents,Others) 
-				VALUES(@ID,@Title,@Type,@WriteTime,@UserID,@UserName,@IPAddress,@URL,@Contents,@Others)";
+				(ID,Title,Type,WriteTime,UserID,UserName,IPAddress,URL,Contents,Others,OldXml,NewXml) 
+				VALUES(@ID,@Title,@Type,@WriteTime,@UserID,@UserName,@IPAddress,@URL,@Contents,@Others,@OldXml,@NewXml)";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID },
 				new SqlParameter("@Title", SqlDbType.NVarChar, -1){ Value = model.Title },
@@ -35,7 +35,9 @@ namespace Data.MSSQL
 				model.IPAddress == null ? new SqlParameter("@IPAddress", SqlDbType.VarChar, 50) { Value = DBNull.Value } : new SqlParameter("@IPAddress", SqlDbType.VarChar, 50) { Value = model.IPAddress },
 				model.URL == null ? new SqlParameter("@URL", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@URL", SqlDbType.VarChar, -1) { Value = model.URL },
 				model.Contents == null ? new SqlParameter("@Contents", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Contents", SqlDbType.VarChar, -1) { Value = model.Contents },
-				model.Others == null ? new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = model.Others }
+				model.Others == null ? new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = model.Others },
+				model.OldXml == null ? new SqlParameter("@OldXml", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@OldXml", SqlDbType.VarChar, -1) { Value = model.OldXml },
+				model.NewXml == null ? new SqlParameter("@NewXml", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@NewXml", SqlDbType.VarChar, -1) { Value = model.NewXml }
 			};
             return dbHelper.Execute(sql, parameters);
         }
@@ -46,7 +48,7 @@ namespace Data.MSSQL
         public int Update(Data.Model.Log model)
         {
             string sql = @"UPDATE Log SET 
-				Title=@Title,Type=@Type,WriteTime=@WriteTime,UserID=@UserID,UserName=@UserName,IPAddress=@IPAddress,URL=@URL,Contents=@Contents,Others=@Others
+				Title=@Title,Type=@Type,WriteTime=@WriteTime,UserID=@UserID,UserName=@UserName,IPAddress=@IPAddress,URL=@URL,Contents=@Contents,Others=@Others,OldXml=@OldXml,NewXml=@NewXml
 				WHERE ID=@ID";
             SqlParameter[] parameters = new SqlParameter[]{
 				new SqlParameter("@Title", SqlDbType.NVarChar, -1){ Value = model.Title },
@@ -58,6 +60,8 @@ namespace Data.MSSQL
 				model.URL == null ? new SqlParameter("@URL", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@URL", SqlDbType.VarChar, -1) { Value = model.URL },
 				model.Contents == null ? new SqlParameter("@Contents", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Contents", SqlDbType.VarChar, -1) { Value = model.Contents },
 				model.Others == null ? new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@Others", SqlDbType.VarChar, -1) { Value = model.Others },
+				model.OldXml == null ? new SqlParameter("@OldXml", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@OldXml", SqlDbType.VarChar, -1) { Value = model.OldXml },
+				model.NewXml == null ? new SqlParameter("@NewXml", SqlDbType.VarChar, -1) { Value = DBNull.Value } : new SqlParameter("@NewXml", SqlDbType.VarChar, -1) { Value = model.NewXml },
 				new SqlParameter("@ID", SqlDbType.UniqueIdentifier, -1){ Value = model.ID }
 			};
             return dbHelper.Execute(sql, parameters);
@@ -99,6 +103,10 @@ namespace Data.MSSQL
                     model.Contents = dataReader.GetString(8);
                 if (!dataReader.IsDBNull(9))
                     model.Others = dataReader.GetString(9);
+                if (!dataReader.IsDBNull(10))
+                    model.OldXml = dataReader.GetString(10);
+                if (!dataReader.IsDBNull(11))
+                    model.NewXml = dataReader.GetString(11);
                 List.Add(model);
             }
             return List;

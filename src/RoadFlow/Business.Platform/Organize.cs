@@ -394,8 +394,8 @@ namespace Business.Platform
                 return GetName(id.ToGuid());
             }
             else if (id.StartsWith(Users.PREFIX))//用户
-            { 
-                string uid=Users.RemovePrefix(id);
+            {
+                string uid = Users.RemovePrefix(id);
                 Guid userID;
                 if(!uid.IsGuid(out userID))
                 {
@@ -474,11 +474,10 @@ namespace Business.Platform
                     {
                         bur.Delete(ur.UserID, ur.OrganizeID);
                         user.Delete(ur.UserID);
-                        userInfo.Delete(ur.UserID);
-                        i++;
+                        i += userInfo.Delete(ur.UserID);
+                        
                     }
-                    Delete(child.ID);
-                    i++;
+                    i += Delete(child.ID);
                 }
                 //删除人员及关系
                 var urs1 = bur.GetAllByOrganizeID(orgID);
@@ -486,11 +485,9 @@ namespace Business.Platform
                 {
                     bur.Delete(ur.UserID, ur.OrganizeID);
                     user.Delete(ur.UserID);
-                    userInfo.Delete(ur.UserID);
-                    i++;
+                    i += userInfo.Delete(ur.UserID);
                 }
-                Delete(orgID);
-                i++;
+                i += Delete(orgID);
                 scope.Complete();
             }
             return i;

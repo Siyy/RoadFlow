@@ -1,0 +1,79 @@
+﻿@model Data.Model.AppLibrary
+@{
+    ViewBag.Title = "Edit";
+}
+<form method="post" onsubmit="return new RoadUI.Validate().validateForm(this);">
+@Html.AntiForgeryToken()
+<br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width: 80px;">应用名称：</th>
+        <td><input type="text" name="Title" class="mytext" value="@Model.Title" validate="empty" style="width: 75%"/></td>
+    </tr>
+    <tr>
+        <th>应用地址：</th>
+        <td><input type="text" name="Address" class="mytext" value="@Model.Address" validate="empty" style="width: 75%"/></td>
+    </tr>
+    <tr>
+        <th>应用分类：</th>
+        <td>
+            <select name="Type" id="Type" class="myselect" runat="server" validate="empty">
+            <option value=""></option>
+            @Html.Raw(ViewBag.TypeOptions)
+            </select>
+            <span style="msg"></span>
+        </td>
+    </tr>
+    <tr>
+        <th>打开方式：</th>
+        <td>
+            <select name="OpenModel" id="OpenModel" class="myselect" runat="server" onchange="openModelChange(this.value);">
+            @Html.Raw(ViewBag.OpenOptions)
+            </select>
+        </td>
+    </tr>
+    <tr id="winsizetr" style="display: none;">
+        <th>窗口大小：</th>
+        <td>
+            宽度：<input type="text" name="Width" class="mytext" value="@Model.Width" validate="int,canempty" style="width: 80px;"/>
+            高度：<input type="text" name="Height" class="mytext" value="@Model.Height" validate="int,canempty" style="width: 80px;"/>
+        </td>
+    </tr>
+    <tr>
+        <th>相关参数：</th>
+        <td><input type="text" name="Params" class="mytext" value="@Model.Params" style="width: 95%"/></td>
+    </tr>
+    <tr>
+        <th>备注说明：</th>
+        <td><textarea class="mytext" name="Note" cols="1" rows="1" value="@Model.Note" style="width: 95%; height: 50px;"></textarea></td>
+    </tr>
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="closewin();" />
+    </div>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            @Html.Raw(ViewBag.Script)
+            $("#OpenModel").change();
+        });
+        function openModelChange(value)
+        {
+            if ("0" == value)
+            {
+                $("#winsizetr").hide();
+            }
+            else
+            {
+                $("#winsizetr").show();
+            }
+        }
+        function closewin()
+        {
+            win.close();
+            return false;
+        }
+    </script>
+</form>

@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "InstanceManage";
+    Business.Platform.WorkFlowTask bworkFlowTask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+    string flowid = Request.QueryString["flowid1"];
+    string groupid = Request.QueryString["groupid"];
+    var wfInstall = bworkFlow.GetWorkFlowRunModel(flowid);
+    var tasks = bworkFlowTask.GetTaskList(flowid.ToGuid(), groupid.ToGuid()).OrderBy(p => p.Sort);
+}
+<table cellpadding="0" cellspacing="1" border="0" class="listtable" style="width:99%; margin-top:8px;">
+    <thead>
+        <tr>
+            <th>步骤名称</th>
+            <th>发送人</th>
+            <th>接收时间</th>
+            <th>处理人</th>
+            <th>完成时间</th>
+            <th>状态</th>
+            <th>意见</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var task in tasks)
+    { 
+        <tr>
+            <td>@bworkFlow.GetStepName(task.StepID, wfInstall)</td>
+            <td>@task.SenderName</td>
+            <td>@task.ReceiveTime</td>
+            <td>@task.ReceiveName</td>
+            <td>@task.CompletedTime1</td>
+            <td>@bworkFlowTask.GetStatusTitle(task.Status)</td>
+            <td>@task.Comment</td>
+            <td>
+            @if (task.Status.In(0,1))
+            { 
+                <a style="background:url(@(Url.Content("~/"))Images/ico/arrow_medium_lower_left.png) no-repeat left center; padding-left:16px;" href="javascript:void(0);" onclick="designate('@task.ID');">指派</a>
+            }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script type="text/javascript">
+    var iframeid = '@Request.QueryString["iframeid"]';
+    function back(taskid)
+    {
+        if (confirm("您真的要将该任务退回吗?"))
+        {
+            $.ajax({ url: "Back?taskid=" + taskid, async: false, cache: false, success: function (txt)
+            {
+                alert(txt);
+                window.location = window.location;
+            }
+            });
+        }
+    }
+    function designate(taskid)
+    {
+        new RoadUI.Window().open({
+            url: 'WorkFlowTasks/Designate?taskid=' + taskid,
+            width: 500, height: 200, title: "任务指派", openerid: iframeid
+        });
+    }
+</script>

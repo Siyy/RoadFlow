@@ -24,7 +24,7 @@
             if (value && value.length > 0)
             {
                 $.ajax({
-                    url: "/Content/Controls/Dict/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
+                    url: top.rootdir + "/Controls/SelectDict/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
                 {
                     $_member.val(txt);
                 }
@@ -48,7 +48,7 @@
                     var ischild = $obj1.attr("child") || "";
 
                     var params = "eid=" + id + "&ismore=" + ismore + "&isparent=" + isparent + "&root=" + root + "&ischild=" + ischild + "&values=" + val;
-                    new RoadUI.Window().open({ id: "dict_" + id, url: "/Content/Controls/Dict/Default?" + params, width: 500, height: 470, resize: false, title: "选择数据字典", openerid: RoadUI.Core.query("tabid") || "" });
+                    new RoadUI.Window().open({ id: "dict_" + id, url: top.rootdir + "/Controls/SelectDict/Index?" + params, width: 500, height: 470, resize: false, title: "选择数据字典", openerid: RoadUI.Core.query("tabid") || "" });
                 });
             }
 
@@ -72,7 +72,7 @@
         if (value && value.length > 0)
         {
             $.ajax({
-                url: "/Content/Controls/Dict/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
+                url: top.rootdir + "/Controls/SelectDict/GetNames?values=" + value, type: "get", async: false, cache: false, success: function (txt)
             {
                 $obj.next().val(txt);
             }

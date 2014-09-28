@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<form id="form1" method="post" enctype="multipart/form-data">
+<div style="margin:0 auto; text-align:center; padding-top:100px;">
+     <div>
+        <input id="file1" name="file1" type="file" style="height:25px; margin-right:5px;" />
+        <input id="Button1" type="submit" class="mybutton" value=" 上 传 " />
+        <input type="submit" name="reset" class="mybutton" value="恢复默认" />
+    </div>
+    <div style="margin-top:80px;">您的签名：
+        @{string signFile = string.Concat(Server.MapPath(Url.Content("~/Content/UserSigns/")), Business.Platform.Users.CurrentUserID, ".gif");
+          string signSrc = string.Concat(Url.Content("~/Content/UserSigns/"), Business.Platform.Users.CurrentUserID, ".gif");
+          if (!System.IO.File.Exists(signFile))
+          {
+              System.Drawing.Bitmap img = new Business.Platform.WorkFlow().CreateSignImage(Business.Platform.Users.CurrentUserName);
+              if (img != null)
+              {
+                  img.Save(signFile, System.Drawing.Imaging.ImageFormat.Gif);
+              }
+          }
+            <img alt="" src="@signSrc" id="signimg" style="vertical-align:middle;" />
+         }
+            
+    </div>
+</div>
+</form>
+<script type="text/javascript">
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+    });
+</script>

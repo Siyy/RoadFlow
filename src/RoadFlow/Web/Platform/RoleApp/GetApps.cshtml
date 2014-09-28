@@ -1,5 +1,0 @@
-﻿@{
-    string type = Request.Form["type"];
-    string appid = Request.Form["value"];
-    Response.Write(new Business.Platform.AppLibrary().GetAppsOptions(type.ToGuid(), appid));
-}

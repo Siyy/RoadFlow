@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Show";
+}
+@model Data.Model.WorkFlowArchives
+
+<div>
+    @Html.Raw(Model.Contents.Trim())
+</div>
+<div style="margin-top:15px;">
+    @Html.Raw(Model.Comments.Trim())
+</div>

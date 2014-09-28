@@ -1,5 +1,0 @@
-﻿@{
-    string name = Request.Form["name"];
-    string account = name.ToChineseSpell();
-    Response.Write(account.IsNullOrEmpty() ? "" : new Business.Platform.Users().GetAccount(account.Trim()));
-}

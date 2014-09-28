@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "SortUsers";
+}
+@model IEnumerable<Data.Model.Users>
+<form method="post">
+@Html.AntiForgeryToken()
+<div style="width:82%; margin:0 auto; height:auto;" id="sortdiv">
+    @foreach(var user in Model)
+    {
+    <ul class="sortul">
+        <input type="hidden" value="@user.ID" name="sort" />
+        @user.Name
+    </ul>
+    }
+</div>
+<div style="width:90%; text-align:center; margin:0 auto; margin-top:10px;">
+    <input type="submit" class="mybutton" value="保存排序" onclick="" />
+    <input type="button" class="mybutton" value="返回" onclick="re();" />
+</div>
+</form>
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+        new RoadUI.DragSort($("#sortdiv"));
+    });
+    function re()
+    {
+        window.location = "User" + '@Html.Raw(Request.Url.Query)';
+    }
+</script>

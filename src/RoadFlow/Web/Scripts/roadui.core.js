@@ -1,5 +1,20 @@
 ﻿RoadUI = function () { };
 RoadUI.Core = {
+    allFrames: [],
+    getAllFrames: function (frame)
+    {
+        if (!frame)
+        {
+            frame = top;
+            this.allFrames.push(frame);
+        }
+        var frames = frame.frames;
+        for (var i = 0; i < frames.length; i++)
+        {
+            this.allFrames.push(frames[i]);
+            this.getAllFrames(frames[i]);
+        }
+    },
     newid: function (isMiddline)
     {
         var guid = "";
@@ -12,18 +27,18 @@ RoadUI.Core = {
             {
                 guid += "-";
             }
-        }
-        //$.ajax({
-        //    url: "/Platform/System/GetGuid", async: false, cache: false, success: function (txt)
-        //    {
-        //        guid = txt;
-        //    }
-        //});
-        //if (!isMiddline)
-        //{
-        //    guid = guid.replaceAll('-', '');
-        //}
+        }        
         return guid;
+    },
+    rooturl: function ()
+    {
+        var curWwwPath = window.document.location.href;
+        var pathName = window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0, pos);  
+        var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+        //alert(projectName);
+        return projectName + "/";
     },
     query: function (name)
     {

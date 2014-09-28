@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = "Sort";
+}
+@model IEnumerable<Data.Model.RoleApp>
+<form method="post" >
+    @Html.AntiForgeryToken()
+    <br />
+    <div style="padding-left:7px; width:83%; margin:0 auto; height:auto;" id="sortdiv">
+        @foreach (var app in Model)
+        { 
+            
+        <ul class="sortul">
+            <input type="hidden" value="@app.ID" name="sortapp" />
+            @app.Title
+        </ul>
+        }
+    </div>
+    <div class="buttondiv">
+        <input type="submit" class="mybutton" value="保存排序" onclick="re();" />
+        <input type="button" class="mybutton" value="返回" onclick="re();" />
+    </div>
+</form>
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+        new RoadUI.DragSort($("#sortdiv"));
+    });
+    function re()
+    {
+        window.location = "Body" + "@Request.Url.Query";
+    }
+</script>

@@ -37,7 +37,7 @@
         {
             new RoadUI.Window().open({
                 id: "ico_" + id, title: title, width: 600, height: 406,
-                url: '/Content/Controls/SelectIco/Default?more=' + more + '&id=' + id + '&source=' + source + '&values=' + val, openerid: RoadUI.Core.query("tabid")
+                url: top.rootdir + '/Controls/SelectIco/Index?more=' + more + '&id=' + id + '&source=' + source + '&values=' + val, openerid: RoadUI.Core.query("tabid")
             });
         });
     }

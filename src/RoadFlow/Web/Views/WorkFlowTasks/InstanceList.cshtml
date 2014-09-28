@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "InstanceList";
+    Business.Platform.WorkFlowTask bworkFlowTask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+}
+@model IEnumerable<Data.Model.WorkFlowTask>
+<form method="post" >
+@Html.AntiForgeryToken()
+<div class="querybar">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td>
+                标题：<input type="text" class="mytext" id="Title" style="width:120px;" name="Title" value="@ViewBag.Title1" />
+                流程：<select class="myselect" style="width:120px;" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(ViewBag.FlowOptions)</select>
+                发送人：<input type="text" style="width:80px;"  class="mymember" id="SenderID" unit="0" dept="0" station="0" user="1" group="0" more="0" name="SenderID" value="@ViewBag.Sender"  />
+                发送时间：<input type="text" class="mycalendar" value="@ViewBag.Date1" style="width:80px;" name="Date1" /> 至 <input type="text" style="width:80px;" value="@ViewBag.Date2" class="mycalendar" name="Date2" />
+                状态：@Html.DropDownList("Status", (List<SelectListItem>)ViewBag.StatusItems, new {@class="myselect", style="width:80px;"})
+                <input type="submit" name="Search" value="查询" class="mybutton" />
+            </td>
+        </tr>
+    </table>
+</div>
+<table cellpadding="0" cellspacing="1" border="0" class="listtable">
+    <thead>
+        <tr>
+            <th>标题</th>
+            <th>所属流程</th>
+            <th>所在步骤</th>
+            <th>处理者</th>
+            <th>接收时间</th>
+            <th>当前状态</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+   @foreach (var task in Model)
+    {
+        string flowName;
+        string stepName = bworkFlow.GetStepName(task.StepID, task.FlowID, out flowName);
+        string query1 = string.Format("flowid={0}&stepid={1}&instanceid={2}&taskid={3}&groupid={4}&appid={5}&display=1",
+             task.FlowID, task.StepID, task.InstanceID, task.ID, task.GroupID, Request.QueryString["appid"]
+             );
+        string timeout = string.Empty;// task.CompletedTime.HasValue && task.CompletedTime.Value < Utility.DateTimeNew.Now ? "<span style='color:red;'>(已超时)<span>" : "";
+        <tr>
+            <td><a href="javascript:void(0);" onclick="openTask('WorkFlowRun/Index?@Html.Raw(query1)','@task.Title','@task.ID');return false;" class="blue">@task.Title</a></td>
+            <td>@flowName</td>
+            <td>@stepName</td>
+            <td>@task.ReceiveName</td>
+            <td>@task.ReceiveTime</td>
+            <td>@bworkFlowTask.GetStatusTitle(task.Status)@Html.Raw(timeout)</td>
+            <td>
+                <a style="margin-right:3px; background:url(@(Url.Content("~/"))Images/ico/Properties.png) no-repeat left center; padding-left:18px;" href="javascript:void(0);" onclick="manage('@task.FlowID','@task.GroupID');">管理</a>
+                @{
+                    if(task.Status.In(0,1)){
+                <a style="margin-right:3px; background:url(@(Url.Content("~/"))Images/ico/trash.gif) no-repeat left center; padding-left:18px;" href="javascript:void(0);" onclick="delete1('@task.FlowID','@task.GroupID');">删除</a>
+                }
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<div class="buttondiv">@Html.Raw(ViewBag.Pager)</div>
+</form>
+<script type="text/javascript">
+    function openTask(url, title, id)
+    {
+        top.openApp(url, 0, title, id, 0, 0, false);
+    }
+    function manage(flowid, groupid)
+    {
+        top.mainDialog.open({
+            url: 'WorkFlowTasks/InstanceManage?flowid1=' + flowid + "&groupid=" + groupid + '@Html.Raw(ViewBag.Query)',
+            width: 800, height: 400, title: "管理流程实例"
+        });
+    }
+    function delete1(flowid, groupid)
+    {
+        if (confirm("您真的要删除该流程实例吗?"))
+        {
+            $.ajax({
+                url: "Delete?flowid1=" + flowid + "&groupid=" + groupid, async: false, cache: false, success: function (txt)
+            {
+                alert(txt);
+                window.location = window.location;
+            }
+            });
+        }
+    }
+</script>

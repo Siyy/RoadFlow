@@ -14,51 +14,51 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// Title
+        /// 标题
         /// </summary>
-        [DisplayName("Title")]
+        [DisplayName("标题")]
         public string Title { get; set; }
 
         /// <summary>
-        /// Type
+        /// 类型
         /// </summary>
-        [DisplayName("Type")]
+        [DisplayName("类型")]
         public string Type { get; set; }
 
         /// <summary>
-        /// WriteTime
+        /// 写入时间
         /// </summary>
-        [DisplayName("WriteTime")]
+        [DisplayName("写入时间")]
         public DateTime WriteTime { get; set; }
 
         /// <summary>
-        /// UserID
+        /// 用户ID
         /// </summary>
-        [DisplayName("UserID")]
+        [DisplayName("用户ID")]
         public Guid? UserID { get; set; }
 
         /// <summary>
-        /// UserName
+        /// 用户姓名
         /// </summary>
-        [DisplayName("UserName")]
+        [DisplayName("用户姓名")]
         public string UserName { get; set; }
 
         /// <summary>
-        /// IPAddress
+        /// IP
         /// </summary>
-        [DisplayName("IPAddress")]
+        [DisplayName("IP")]
         public string IPAddress { get; set; }
 
         /// <summary>
-        /// 发生地址
+        /// 发生URL
         /// </summary>
-        [DisplayName("发生地址")]
+        [DisplayName("发生URL")]
         public string URL { get; set; }
 
         /// <summary>
-        /// Contents
+        /// 内容
         /// </summary>
-        [DisplayName("Contents")]
+        [DisplayName("内容")]
         public string Contents { get; set; }
 
         /// <summary>
@@ -66,6 +66,18 @@ namespace Data.Model
         /// </summary>
         [DisplayName("Others")]
         public string Others { get; set; }
+
+        /// <summary>
+        /// 更改前
+        /// </summary>
+        [DisplayName("更改前")]
+        public string OldXml { get; set; }
+
+        /// <summary>
+        /// 更改后
+        /// </summary>
+        [DisplayName("更改后")]
+        public string NewXml { get; set; }
 
     }
 }

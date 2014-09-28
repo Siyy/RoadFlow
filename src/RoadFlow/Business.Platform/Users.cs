@@ -295,6 +295,28 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 当前用户的所有角色
+        /// </summary>
+        public static List<Guid> CurrentUserRoles
+        {
+            get
+            {
+                Guid userID = CurrentUserID;
+                if (userID.IsEmptyGuid())
+                {
+                    return new List<Guid>();
+                }
+                List<Guid> list = new List<Guid>();
+                var userRoles = new UsersRole().GetByUserIDFromCache(userID);
+                foreach (var userRole in userRoles)
+                {
+                    list.Add(userRole.RoleID);
+                }
+                return list;
+            }
+        }
+
+        /// <summary>
         /// 得到一个不重复的帐号
         /// </summary>
         /// <param name="account"></param>

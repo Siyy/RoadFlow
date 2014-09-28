@@ -1,5 +1,0 @@
-﻿@{
-    string account = Request.Form["value"];
-    string id = Request["id"];
-    Response.Write(new Business.Platform.Users().HasAccount(account, id) ? "帐号已经被使用了" : "1");
-}

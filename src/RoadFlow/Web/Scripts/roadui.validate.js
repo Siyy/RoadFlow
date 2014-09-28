@@ -63,6 +63,7 @@
         {
             return;
         }
+
         var flag = true;
         $("[validate]", $f).each(function ()
         {
@@ -77,6 +78,28 @@
                 flag = flag1;
             }
         });
+
+        if (flag && event && event.srcElement)
+        {
+            var $submits = $("input[type='submit']", $f);
+            $submits.prop("disabled", true);
+            var eventElement = event.srcElement;
+            if (eventElement)
+            {
+                $submits.each(function ()
+                {
+                    if ($(this).get(0) === event.srcElement)
+                    {
+                        $f.append('<input type="hidden" name="' + $(this).attr("name") + '" value="' + $(this).val() + '" />');
+                    }
+                });
+                if ("INPUT" == event.srcElement.tagName)
+                {
+                    $f.submit();
+                }
+            }
+        }
+       
         return flag;
     };
     this.validateElement = function ($element, promptType)

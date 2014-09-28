@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Edit";
+}
+@model Data.Model.DBConnection 
+<form method="post" onsubmit="return new RoadUI.Validate().validateForm(this);">
+    @Html.AntiForgeryToken()
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width: 80px;">
+            连接名称：
+        </th>
+        <td>
+            <input type="text" name="Name" id="Name" class="mytext" value="@Model.Name" validate="empty" style="width: 75%" />
+        </td>
+    </tr>
+    <tr>
+        <th>
+            连接类型：
+        </th>
+        <td>
+            <select id="LinkType" class="myselect" name="LinkType"><option value=""></option>@Html.Raw(ViewBag.TypeOptions)</select>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            连接字符串：
+        </th>
+        <td>
+            <textarea class="mytext" name="ConnStr" cols="1" rows="1" style="width: 95%; height: 50px;">@Model.ConnectionString</textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            备注：
+        </th>
+        <td>
+            <textarea class="mytext" name="Note" cols="1" rows="1" style="width: 95%; height: 50px;">@Model.Note</textarea>
+        </td>
+    </tr>
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="closewin();" />
+    </div>
+    <script type="text/javascript">
+        var win = new RoadUI.Window();
+        $(function ()
+        {
+            @Html.Raw(ViewBag.Script)
+        });
+        function closewin()
+        {
+            win.close();
+            return false;
+        }
+    </script>
+</form>

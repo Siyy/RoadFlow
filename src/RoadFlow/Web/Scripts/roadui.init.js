@@ -19,25 +19,6 @@
 
 ;RoadUI.Init = function ()
 {
-    this.theme = function (themeName)
-    {
-        if (!themeName || themeName.toString().trim().length == 0)
-        {
-            themeName = $.cookies.get("theme_platform")
-        }
-
-        $("#style_style").attr("href", "/Content/Theme/" + themeName + "/Style/style.css");
-        $("#style_ui").attr("href", "/Content/Theme/" + themeName + "/Style/ui.css");
-        var iframes = top.frames;
-        for (var i = 0; i < iframes.length; i++)
-        {
-            $("#style_style", iframes[i].document).attr("href", "/Content/Theme/" + themeName + "/Style/style.css");
-            $("#style_ui", iframes[i].document).attr("href", "/Content/Theme/" + themeName + "/Style/ui.css");
-            $("#style_form", iframes[i].document).attr("href", "/Platform/WorkFlow/FormDesigner/Forms/Public/flowform_" + themeName + ".css");
-        }
-        $.cookies.set("theme_platform", themeName, { expiresAt: new Date(2099, 1, 1) });
-    };
-
     this.validate = function ()
     {
         new RoadUI.Validate().bind($("[validate]"));

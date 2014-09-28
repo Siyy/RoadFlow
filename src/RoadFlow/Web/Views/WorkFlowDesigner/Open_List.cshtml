@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "Open_List";
+    Business.Platform.Users busers = new Business.Platform.Users();
+    Business.Platform.Organize borg = new Business.Platform.Organize();
+    Business.Platform.WorkFlow bwf = new Business.Platform.WorkFlow();
+    string type = Request.QueryString["typeid"];
+}
+@model IEnumerable<Data.Model.WorkFlow>
+<form action="" method="post">
+@Html.AntiForgeryToken()
+<table cellpadding="0" cellspacing="0" border="0" width="99%" align="center">
+    <tr>
+        <td align="left" height="35">
+            名称：<input type="text" class="mytext" style="width:160px;" id="flow_name" value="@ViewBag.Name" name="flow_name" />
+            <input type="submit" class="mybutton" value=" 查询 "/>
+        </td>
+    </tr>
+</table>
+<div style="height:350px; overflow:auto; width:99%; margin:0 auto;">
+<table cellpadding="0" cellspacing="1" border="0" width="100%" style="width:100%; margin:0 auto;" class="listtable" id="data_table">
+    <thead>
+    <tr>
+        <th>流程名称</th>
+        <th>创建时间</th>
+        <th>创建人</th>
+        <th>状态</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var flow in Model.OrderBy(p => p.Name))
+    {
+        if (!borg.GetAllUsers(flow.Manager).Exists(p => p.ID == Business.Platform.Users.CurrentUserID))
+        {
+            continue;
+        }
+        if (type.IsGuid() && !bwf.GetAllChildsIDString(type.ToGuid()).Contains(flow.Type.ToString(),  StringComparison.CurrentCultureIgnoreCase))
+        {
+            continue;
+        }
+        <tr>
+            <td>@flow.Name</td>
+            <td>@flow.CreateDate</td>
+            <td>@busers.GetName(flow.CreateUserID)</td>
+            <td>@bwf.GetStatusTitle(flow.Status)</td>
+            <td>
+                <a href="javascript:void(0);" onclick="openflow('@flow.ID');return false;">
+                <img src="@Url.Content("~/Images/ico/folder_classic_opened.png")" alt="" style="vertical-align:middle; border:0;" />
+                <span style="vertical-align:middle;">打开</span>
+                </a>
+            </td>
+        </tr>
+    }       
+    </tbody>
+</table> 
+</div> 
+</form>   
+<script type="text/javascript">
+    var frame = null;
+    var openerid = '@Request.QueryString["openerid"]';
+    $(function ()
+    {
+        var iframes = top.frames;
+        for (var i = 0; i < iframes.length; i++)
+        {
+            if (iframes[i].name == openerid + "_iframe")
+            {
+                frame = iframes[i]; break;
+            }
+        }
+        if (frame == null) return;
+
+    });
+    function typechange(type)
+    {
+
+    }
+    function openflow(id)
+    {
+        frame.openFlow1(id);
+        new RoadUI.Window().close();
+    }
+</script>

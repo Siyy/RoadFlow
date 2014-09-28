@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Tree";
+
+    string rootid = new Business.Platform.Dictionary().GetIDByCode("AppLibraryTypes").ToString();
+}
+
+<form id="form1" runat="server">
+    <div id="tree"></div>
+</form>
+<script type="text/javascript">
+    var AppID = '@Request.QueryString["appid"]';
+    var TabID = '@Request.QueryString["tabid"]';
+    var roadTree = null;
+    var rootdir = '@Url.Content("~/")';
+    $(function ()
+    {
+        roadTree = new RoadUI.Tree({ id: "tree", path: rootdir + "Dict/Tree1?root=@rootid", refreshpath: rootdir + "Dict/TreeRefresh", onclick: openUrl });
+    });
+    function openUrl(json)
+    {
+        parent.frames[1].location = rootdir + "AppLibrary/List?typeid=" + json.id + "&appid=" + AppID + "&tabid=" + TabID;
+    }
+    function reLoad(id)
+    {
+        roadTree.refresh(id);
+    }
+</script>

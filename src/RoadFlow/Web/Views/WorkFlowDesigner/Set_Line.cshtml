@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Set_Line";
+    string lineID = Request.QueryString["id"];
+    string fromID = Request.QueryString["from"];
+    string toID = Request.QueryString["to"];
+}
+<form method="post">
+<div class="mytab">
+	<ul>
+		<li class="mytabli2" for="div_sql">SQL条件</li>
+		<li class="mytabli1" for="div_custom">自定义方法</li>
+	</ul>
+    <div style="clear:both;"></div>
+</div>
+<div id="div_sql" style="width:96%; margin:8px auto 0 auto; display:block;">
+    <div>SQL条件：</div>
+    <div style="margin-top:8px;">
+        <textarea id="div_sql_value" style="width:98%; height:100px; font-family:Verdana;" rows="1" cols="1" class="mytextarea"></textarea>
+    </div>
+    <table border="0" style="width:99%;" align="center">
+        <tr>
+            <td>
+                <div style="margin-top:8px; line-height:21px;">
+                    <div>1.条件对应的表为流程对应的主表</div>
+                    <div>2.条件对应的字段为流程主表字段</div>
+                    <div>3.示例：a=1 and b='1'</div>
+                </div>
+            </td>
+            <td style="text-align:right; padding:15px 4px 0 0; vertical-align:top;"><input type="button" class="mybutton" value="测试SQL条件" onclick="test();" /></td>
+        </tr>
+    </table>
+</div>
+<div id="div_custom" style="width:96%; margin:8px auto 0 auto; display:none;">
+    <div>
+        <div>方法名称：</div><div style="margin-top:8px;"><input type="text" class="mytext" id="custom_method" style="width:90%;" /></div>
+    </div>
+    <div style="height:10px;"></div>
+    <!--
+    <div>
+        <div>条件不满足提示信息：</div><div style="margin-top:8px;"><input type="text" class="mytext" id="custom_msg" style="width:90%;" /></div>
+    </div>
+    -->
+    <div style="margin-top:10px; font-weight:bold;">方法说明：</div>
+    <div style="line-height:21px; padding-left:12px;">
+        <div>1.方法名称格式为：命名空间.类名.方法名（例：WebMvc.Common.CustomFormSave.Test）</div>
+        <div>2.方法返回类型为 bool 类型的 True 时条件满足,返回其它类型且字符串值不为 "1" 时条件不满足</div>
+        <div>3.方法返回类型为 bool 类型时提示信息为上面输入的信息，否则提示返回的值</div>
+        <div>4.方法访问限定符为 Public</div>
+    </div>
+</div>
+
+<div style="width:100%; margin:30px auto 10px auto; text-align:center;">
+    <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
+    <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
+</div>
+</form>
+
+<script type="text/javascript">
+    var fieldsOptions = '';
+    var frame=null;
+    var openerid = "@Request.QueryString["openerid"]";
+    var lineid="@lineID";
+    var fromid="@fromID";
+    var toid = "@toID";
+    var table = "";
+    var dbconnid = "";
+    var dbtable = "";
+    var dbtablepk = "";
+    $(function(){
+        var iframes = top.frames;
+        for (var i = 0; i < iframes.length; i++)
+        {
+            if (iframes[i].name == openerid + "_iframe")
+            {
+                frame = iframes[i]; break;
+            }
+        }
+        if (frame == null) return;
+
+        var json=frame.wf_json;
+        var line=null;
+        if(json)
+        {
+            var lines=json.lines;
+            if(lines && lines.length>0)
+            {
+                for(var i=0;i<json.lines.length;i++)
+                {
+                    if(json.lines[i].id==lineid)
+                    {
+                        line=json.lines[i];
+                        break;
+                    }
+                }
+            }
+            var databases = json.databases;
+            if (databases && databases.length>0)
+            {
+                dbconnid = databases[0].link;
+                dbtable = databases[0].table;
+                dbtablepk = databases[0].primaryKey;
+            }
+        }
+        if(line)
+        {
+            $("#custom_method").val(line.customMethod);
+            //$("#custom_msg").val(line.noaccordMsg);
+            $("#div_sql_value").val(line.sql);
+        }
+    });
+        
+    function confirm1()
+    {
+        var line={};
+        line.id=lineid;
+        line.from=fromid;
+        line.to=toid;
+        line.customMethod=$("#custom_method").val()||"";
+        //line.noaccordMsg=$("#custom_msg").val()||"";
+        line.sql = $("#div_sql_value").val() || "";;
+
+        frame.addLine(line);
+
+        new RoadUI.Window().close();
+    }
+
+    function test()
+    {
+        var where = $("#div_sql_value").val();
+        if ($.trim(where).length == 0)
+        {
+            alert("条件为空!");
+            return;
+        }
+        $.ajax({
+            url: "TestLineSqlWhere", method: "POST",
+            data: { "connid": dbconnid, "table": dbtable, "tablepk": dbtablepk, "where": where },
+            async: false, cache: false, success: function (txt)
+            {
+                alert(txt);
+            }
+        });
+    }
+</script>

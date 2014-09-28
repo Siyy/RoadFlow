@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Edit";
+}
+@model Data.Model.WorkFlowButtons
+<form method="post">
+    @Html.AntiForgeryToken()
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width: 80px;">
+            按钮名称：
+        </th>
+        <td>
+            <input type="text" name="Title" id="Title" class="mytext" value="@Model.Title" validate="empty" style="width: 75%" />
+        </td>
+    </tr>
+    <tr>
+        <th>
+            按钮图标：
+        </th>
+        <td>
+            <input type="text" name="Ico" id="Ico" class="myico" source="/Images/ico" value="@Model.Ico" style="width: 75%"/>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            执行脚本：
+        </th>
+        <td>
+            <textarea class="mytext" name="Script" rows="1" cols="1" style="width:90%; height:180px; line-height:16px; color:Blue; font-family:Courier New; padding:5px;">@Html.Raw(Model.Script)</textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            按钮说明：
+        </th>
+        <td>
+            <textarea class="mytext" name="Note" rows="1" cols="1" style="width:90%; height:50px;">@Html.Raw(Model.Note)</textarea>
+        </td>
+    </tr>
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="new RoadUI.Window().close();" />
+    </div>
+</form>
+<script type="text/javascript">
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+    });
+</script>

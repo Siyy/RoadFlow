@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "Edit";
+    bool isOneSelf = "1" == Request.QueryString["isoneself"];
+}
+@model Data.Model.WorkFlowDelegation
+<form method="post">
+    @Html.AntiForgeryToken()
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+    <tr>
+        <th style="width:100px;">委托人：</th>
+        <td><input type="text" name="UserID" @(isOneSelf?"disabled='disabled'":"") dept="0" station="0" unit="0" user="1" group="0" id="UserID" class="mymember" validate="empty" value="@(Model.UserID.IsEmptyGuid() ? "" : "u_"+Model.UserID)" /></td>
+    </tr>
+    <tr>
+        <th>被委托人：</th>
+        <td><input type="text" name="ToUserID" dept="0" station="0" unit="0" user="1" group="0" id="ToUserID" class="mymember" validate="empty" value="@(Model.ToUserID.IsEmptyGuid() ? "" : "u_"+Model.ToUserID)" /></td>
+    </tr>
+    <tr>
+        <th>开始时间：</th>
+        <td><input type="text" name="StartTime" id="StartTime" class="mycalendar" istime="1" validate="empty" value="@(Model.StartTime!=DateTime.MinValue ? Model.StartTime.ToString("yyyy/MM/dd HH:mm") : "")" /></td>
+    </tr>
+    <tr>
+        <th>结束时间：</th>
+        <td><input type="text" name="EndTime" id="EndTime" class="mycalendar" istime="1" validate="empty" value="@(Model.EndTime!=DateTime.MinValue ? Model.EndTime.ToString("yyyy/MM/dd HH:mm") : "")" /></td>
+    </tr>
+    <tr>
+        <th>委托流程：</th>
+        <td><select class="myselect" style="width:120px;" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(ViewBag.FlowOptions)</select></td>
+    </tr>
+    <tr>
+        <th>备注说明：</th>
+        <td><textarea class="mytextarea" id="Note" name="Note" cols="1" rows="1" style="width:95%;height:50px;">@Model.Note</textarea></td>
+    </tr>
+    
+    </table>
+    <div class="buttondiv">
+        <input type="submit" value="确定保存" class="mybutton" onclick="return new RoadUI.Validate().validateForm(document.forms[0]);" />
+        <input type="button" class="mybutton" value="取消关闭" style="margin-left: 5px;" onclick="new RoadUI.Window().close();" />
+    </div>
+</form>
+<script type="text/javascript">
+    $(function ()
+    {
+        @Html.Raw(ViewBag.Script)
+    });
+</script>

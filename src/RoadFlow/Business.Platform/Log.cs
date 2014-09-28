@@ -13,7 +13,7 @@ namespace Business.Platform
         {
             this.dataLog = Data.Factory.Platform.GetLogInstance();
         }
-        
+
         /// <summary>
         /// 更新
         /// </summary>
@@ -51,7 +51,7 @@ namespace Business.Platform
         }
 
         public enum Types
-        { 
+        {
             组织机构,
             用户登录,
             角色应用,
@@ -61,7 +61,7 @@ namespace Business.Platform
             其它分类
         }
 
-        
+
         /// <summary>
         /// 新增
         /// </summary>
@@ -78,11 +78,12 @@ namespace Business.Platform
             dgWriteLog wl = new dgWriteLog(add);
             wl.BeginInvoke(model, null, null);
         }
+
         /// <summary>
         /// 记录日志
         /// </summary>
         /// <param name="err"></param>
-        public static void Add(string title, string contents, Types type = Types.其它分类, Data.Model.Users user = null)
+        public static void Add(string title, string contents, Types type = Types.其它分类, string oldXML = "", string newXML = "", Data.Model.Users user = null)
         {
             if (user == null)
             {
@@ -94,6 +95,8 @@ namespace Business.Platform
             log.IPAddress = Utility.Tools.GetIPAddress();
             log.Others = string.Format("操作系统：{0} 浏览器：{1}", Utility.Tools.GetOSName(), Utility.Tools.GetBrowse());
             log.Title = title;
+            log.OldXml = oldXML.IsNullOrEmpty() ? null : oldXML;
+            log.NewXml = newXML.IsNullOrEmpty() ? null : newXML;
             log.Type = type.ToString();
             log.URL = System.Web.HttpContext.Current.Request.Url.ToString();
             if (user != null)
@@ -114,7 +117,7 @@ namespace Business.Platform
         /// 得到类别下接选择
         /// </summary>
         /// <returns></returns>
-        public string GetTypeOptions(string value="")
+        public string GetTypeOptions(string value = "")
         {
             StringBuilder options = new StringBuilder();
             var array = Enum.GetValues(typeof(Types));

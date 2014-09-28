@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "BodyAdd";
+}
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    var validate = new RoadUI.Validate();
+</script>
+<form method="post">
+@Html.AntiForgeryToken()
+<br />
+<table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+    <tr>
+        <th style="width:80px;">名称：</th>
+        <td><input type="text" id="Name" name="Name" class="mytext" validate="empty,minmax" value="" max="100" style="width:75%" /></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">类型：</th>
+        <td>@Html.Raw(ViewBag.TypeRadios)</td>
+    </tr>
+    <tr>
+        <th style="width:80px;">状态：</th>
+        <td>@Html.Raw(ViewBag.StatusRadios)</td>
+    </tr>
+    <tr>
+        <th style="width:80px;">备注：</th>
+        <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;"></textarea></td>
+    </tr>
+
+    <tr id="deptmove_tr" style="display:none;">
+        <th style="width:80px;">移动到：</th>
+        <td>
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td><input type="text" style="width:220px;" class="mymember" id="deptmove" more="false" user="false" station="true" dept="true" unit="true"/></td>
+                    <td><input type="submit" class="mybutton" name="Move" value="确定移动" /></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+</table>
+<div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+    <input type="submit" class="mybutton" onclick="return validate.validateForm(document.forms[0]);" name="Save" value="保存" />
+    <input type="button" class="mybutton" value="返回" onclick="window.location='Body'+'@Html.Raw(Request.Url.Query)';" />
+</div>
+</form>
+<script type="text/javascript">
+    $(function(){
+        @Html.Raw(ViewBag.Script);
+    });
+</script>

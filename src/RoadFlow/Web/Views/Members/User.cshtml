@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "User";
+    string id = Request.QueryString["id"];
+    string parentID = Request.QueryString["parentid"];
+}
+@model Data.Model.Users
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    var validate = new RoadUI.Validate();
+</script>
+<form action="" method="post">
+@Html.AntiForgeryToken()
+<br />
+<table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+    <tr>
+        <th style="width:80px;">姓名：</th>
+        <td><input type="text" id="Name" name="Name" class="mytext" value="@Model.Name" validate="empty,min,max" max="50" style="width:160px;" /></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">帐号：</th>
+        <td><input type="text" id="Account" name="Account" class="mytext" value="@Model.Account" validate="empty,max,ajax" validate_url="CheckAccount?id=@id" max="20" style="width:160px;" /></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">状态：</th>
+        <td>@Html.Raw(ViewBag.StatusRadios)</td>
+    </tr>
+    <tr>
+        <th style="width:80px;">备注：</th>
+        <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;" >@Model.Note</textarea></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">所在组织：</th>
+        <td>@Html.Raw(ViewBag.ParentString)</td>
+    </tr>
+    <tr id="StationMove_tr" style="display:none;">
+        <th style="width:80px;">调往组织：</th>
+        <td>
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td><input type="text" style="width:180px;" title="选择要调往的组织：" class="mymember" id="movetostation" name="movetostation" more="false" user="false" station="true" dept="true" unit="true" />
+                <input type="checkbox" name="movetostationjz" id="movetostationjz" style="vertical-align:middle;" value="1" /><label for="movetostationjz" style="vertical-align:middle;">兼职</label>
+            </td>
+            <td><input type="submit" class="mybutton" name="Move1" onclick="return stationMove1();" value="确定调动" /></td>
+        </tr></table>
+        </td>
+    </tr>
+        
+</table>
+<div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+    <input type="button" value="调动" class="mybutton" onclick="stationMove();" />
+    <input type="button" class="mybutton" value="排序" id="sort" onclick="sort1('@id');" runat="server" />
+    <input type="submit" class="mybutton" onclick="return confirm('您真的要初始化密码吗?');" name="InitPass" value="初始密码" />
+    <input type="button" class="mybutton" value="设置应用" onclick="setUserApp();"/>
+    <input type="submit" class="mybutton" name="Save" onclick="return validate.validateForm(document.forms[0]);" value="保存" />
+    <input type="submit" class="mybutton" onclick="return confirm('您真的要删除该用户吗?');" name="DeleteBut" value="删除" />
+</div>
+</form>
+<script type="text/javascript">
+    $(function(){
+        @Html.Raw(ViewBag.Script)
+    });
+    function stationMove()
+    {
+        $('#StationMove_tr').toggle();
+    }
+
+    function stationMove1()
+    {
+        if ($.trim($("#movetostation").val()).length == 0)
+        {
+            alert("请选择要调往的组织!");
+            return false;
+        }
+        return true;
+    }
+        
+    function sort1()
+    {
+        window.location = 'SortUsers' + '@Html.Raw(Request.Url.Query)';
+    }
+
+    function setUserApp()
+    {
+        top.mainDialog.open({url: top.rootdir + "/UserApp"+"@Html.Raw(Request.Url.Query)",width:760,height:530,title:"设置人员应用"});
+        return false;
+    }
+</script>

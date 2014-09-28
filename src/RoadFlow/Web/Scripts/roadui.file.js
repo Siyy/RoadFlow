@@ -29,7 +29,7 @@
             $but.bind("click", function ()
             {
                 var val = $(this).prev().prev().val();
-                new RoadUI.Window().open({ id: "file_" + id, url: "/Content/Controls/Files/Default?eid=" + id + "&files=" + val, width: 500, height: 400, title: "附件管理", showclose: false });
+                new RoadUI.Window().open({ id: "file_" + id, url: top.rootdir + "/Controls/UploadFiles/Index?eid=" + id + "&files=" + val, width: 500, height: 400, title: "附件管理", showclose: false });
             });
             $file.after($but).before($hide);
 

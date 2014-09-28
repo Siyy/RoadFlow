@@ -1,0 +1,59 @@
+﻿@model Data.Model.Log
+@{
+    ViewBag.Title = "Detail";
+}
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+        <tr>
+            <th style="width:100px;">日志标题：</th>
+            <td style="word-break:break-all;">@Model.Title</td>
+        </tr>
+        <tr>
+            <th>日志类型：</th>
+            <td>@Model.Type</td>
+        </tr>
+        <tr>
+            <th>发生时间：</th>
+            <td>@Model.WriteTime</td>
+        </tr>
+        <tr>
+            <th>操作人员：</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>发生IP：</th>
+            <td>@Model.IPAddress</td>
+        </tr>
+        <tr>
+            <th>操作地址：</th>
+            <td style="word-break:break-all;">@Model.URL</td>
+        </tr>
+        <tr>
+            <th>客户端信息：</th>
+            <td>@Model.Others</td>
+        </tr>
+        @if(!Model.Contents.IsNullOrEmpty())
+        {
+        <tr>
+            <th>日志内容：</th>
+            <td><pre style="word-break:break-all; font-family:'Courier New'; white-space:pre-wrap;">@Model.Contents</pre></td>
+        </tr>
+        }
+        @if(!Model.OldXml.IsNullOrEmpty())
+        {
+        <tr>
+            <th>修改前：</th>
+            <td><pre style="word-break:break-all; font-family:'Courier New'; white-space:pre-wrap;">@Model.OldXml</pre></td>
+        </tr>
+        }
+        @if(!Model.NewXml.IsNullOrEmpty())
+        {
+        <tr>
+            <th>修改后：</th>
+            <td><pre style="word-break:break-all; font-family:'Courier New'; white-space:pre-wrap;">@Model.NewXml</pre></td>
+        </tr>
+        }
+    </table>
+    <div class="buttondiv">
+        <input type="button" class="mybutton" value="关闭窗口" style="margin-left:5px;" onclick="new RoadUI.Window().close();" />
+    </div>

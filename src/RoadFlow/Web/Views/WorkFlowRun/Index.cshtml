@@ -1,0 +1,225 @@
+﻿@{
+    Page.BodyStyle = "onload=\"$('#mainform').show();\"";
+    string flowid=Request.QueryString["flowid"];
+    string instanceid = Request.QueryString["instanceid"];
+    string taskid = Request.QueryString["taskid"];
+    string stepid = Request.QueryString["stepid"];
+    string groupid = Request.QueryString["groupid"];
+    string display = Request.QueryString["display"] ?? "0";
+
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+    Business.Platform.WorkFlowTask btask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlowButtons bworkFlowButtons = new Business.Platform.WorkFlowButtons();
+    Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
+    Guid flowID;
+    if(!flowid.IsGuid(out flowID))
+    {
+        Response.Write("流程ID为空!");
+        Response.End();
+    }
+    var wfInstalled = bworkFlow.GetWorkFlowRunModel(flowID);
+    if(wfInstalled==null)
+    {
+        Response.Write("未找到流程运行时!");
+        Response.End();
+    }
+    else if(wfInstalled.Status==3)
+    {
+        Response.Write("该流程已被卸载,不能发起新的流程实例!");
+        Response.End();
+    }
+    else if (wfInstalled.Status == 4)
+    {
+        Response.Write("该流程已被删除,不能发起新的实例!");
+        Response.End();
+    }
+
+    Guid stepID;
+    if(!stepid.IsGuid(out stepID))
+    {
+        stepID = wfInstalled.FirstStepID;
+    }
+
+    Data.Model.WorkFlowInstalledSub.Step currentStep = wfInstalled.Steps.ToList().Find(p => p.ID == stepID);
+
+    if (currentStep == null)
+    {
+        Response.Write("未找到流程步骤!");
+        Response.End();
+    }
+    int isArchives = currentStep.Archives;//是否要归档
+    string query = string.Format("flowid={0}&instanceid={1}&taskid={2}&stepid={3}&groupid={4}&appid={5}&tabid={6}",
+        flowID, instanceid, taskid, stepID, groupid, Request.QueryString["appid"], Request.QueryString["tabid"]);
+    
+    //更新打开时间
+    Guid taskgid;
+    
+    //如果是执行，并且任务ID为GUID,则更新打开时间和状态，检查当前任务是否可以执行。
+    if("0" == display && taskid.IsGuid(out taskgid))
+    {
+       
+        btask.UpdateOpenTime(taskgid, Utility.DateTimeNew.Now, true);
+        
+        var task=btask.Get(taskgid);
+        if(task!=null)
+        {
+            if ("1" != display && task.Status.In(2,3,4,5))
+            {
+                Response.Write("<script type='text/javascript'>alert('该任务已处理,请刷新您的待办列表!');top.mainTab.closeTab();</script>");
+                Response.End();
+            }
+            else if("1" != display && task.ReceiveID!=Business.Platform.Users.CurrentUserID)
+            {
+                Response.Write("<script type='text/javascript'>alert('您不能处理当前任务,请刷新您的待办列表!');top.mainTab.closeTab();</script>");
+                Response.End();
+            }
+        }
+    }
+    
+    var form = currentStep.Forms.First();//目前只显示一个表单
+    var appLibrary = bappLibrary.Get(form.ID, true);
+    string src = appLibrary == null ? "" : appLibrary.Address; //bappLibrary.GetFlowRunAddress(appLibrary, query);
+    if(src.StartsWith("/"))
+    {
+        src = Url.Content("~" + src);
+    }
+
+    int debugType = wfInstalled.Debug;
+    wfInstalled.DebugUsers.RemoveAll(p=>p==null);
+    bool isDebug = (debugType == 1 || debugType == 2) && wfInstalled.DebugUsers.Exists(p => p.ID == Business.Platform.Users.CurrentUserID);
+    bool isSign = currentStep.SignatureType == 1 || currentStep.SignatureType == 2;//是否有意见
+    
+    int signType = currentStep.SignatureType;
+}
+<form id="mainform" name="mainform" method="post" target="submiter" style="display:none;">
+@if ("0" == display)//display为0表示执行，1表示查看
+{
+    <div class="toolbar" style="margin-top:0; border-top:none 0; position:fixed; top:0; left:0; right:0; margin-left:auto; z-index:99999999; width:100%; margin-right:auto; height:26px;">
+        <div>
+        @foreach (var button in currentStep.Buttons)
+        {
+            Guid buttonID;
+            if (button.ID.IsGuid(out buttonID))
+            {
+                var button1 = bworkFlowButtons.Get(buttonID, true);
+                if (button1 == null)
+                {
+                    continue;
+                }
+                var funName = string.Concat("fun_", button1.ID.ToString("N"), "()");
+            <a href="#" onclick="@funName;return false;">
+                <span style="background:url(@Url.Content("~"+button1.Ico)) no-repeat left center;">@button1.Title</span>
+            </a>
+            <script type="text/javascript">
+                function @funName {@Html.Raw(button1.Script)}
+            </script>
+            }
+            else if (string.Compare(button.ID, "other_splitline", true) == 0)//显示其它特定按钮如分隔线|
+            { 
+            <span class="toolbarsplit">&nbsp;</span>
+            }
+        }
+        </div>
+       
+    </div>
+    
+    <input type="hidden" name="params" id="params" value="" />
+        if (isDebug && debugType == 1)
+        {
+    <br /><br />
+    <iframe name="submiter" style="width:99%; height:100px; border:1px solid #666666; margin-left:4px; overflow:auto;"></iframe>
+        }
+        else
+        {
+    <iframe name="submiter" style="width:99%; height:100px; margin:0; display:none;"></iframe>    
+        }
+}
+    <!--显示流程名称和当前步骤-->
+    <div style="margin:0px;">
+        @*@{
+            string flowname;
+            string stepname = bworkFlow.GetStepName(stepID, flowID, out flowname, true);
+            string showstr = "<span style='display:inline-block; height:20px; line-height:20px; padding:1px 8px; border:1px solid #d9efed; background:#edf7f6;'><span style='margin-right:4px;'>" + flowname + "</span>--<span style='margin-left:4px;'>" + stepname + "</span></span>";
+            @Html.Raw(showstr)
+         }*@
+    </div>
+    <!--显示流程名称和当前步骤-->
+
+    <!--表单主体--> 
+    <div style="margin:8px;" id="form_body_div">
+    @{
+        if (!src.IsNullOrEmpty())
+        {
+            try
+            {
+                @RenderPage(src)
+            }
+            catch(Exception err)
+            {
+                @err.Message
+            }
+        }
+    }
+    </div>
+    <!--表单主体--> 
+
+    <!--意见处理栏-->   
+    @if (isSign && "0" == display)
+    {
+        string commentsOptions = new Business.Platform.WorkFlowComment().GetOptionsStringByUserID(Business.Platform.Users.CurrentUserID);
+    <div style="height:12px; margin:16px 8px 8px 8px; border-bottom:1px dashed #ccc;"></div>
+    <div style="height:30px; margin:15px auto 8px auto; text-align:left; width:96%;">
+        处理意见：<select class="myselect" id="mycomment" style="margin-right:6px; width:100px;" onchange="$('#comment').val(this.value);"><option value=""></option>@Html.Raw(commentsOptions)</select>&nbsp;<input type="text" class="mytext" id="comment" name="comment" value="" style="width:70%; margin-right:6px;" />
+        @if (signType == 2)
+        {
+        <input type="hidden" value="" id="issign" name="issign" />
+        <input type="button" class="mybutton" id="signbutton" onclick="sign();" value="&nbsp;&nbsp;签&nbsp;&nbsp;章&nbsp;&nbsp;"/>
+            string signFile = string.Concat(Server.MapPath(Url.Content("~/Content/UserSigns/")), Business.Platform.Users.CurrentUserID, ".gif");
+            string signSrc = string.Concat(Url.Content("~/Content/UserSigns/"), Business.Platform.Users.CurrentUserID, ".gif");
+            if (!System.IO.File.Exists(signFile))
+            {
+                System.Drawing.Bitmap img = new Business.Platform.WorkFlow().CreateSignImage(Business.Platform.Users.CurrentUserName);
+                if (img != null)
+                {
+                    img.Save(signFile, System.Drawing.Imaging.ImageFormat.Gif);
+                }
+            }
+            <img alt="" src="@signSrc" id="signimg" style="vertical-align:middle; display:none;" />
+        }
+    </div>
+    
+    }
+    <!--意见处理栏--> 
+
+    <!--历史意见显示-->
+    <div id="form_commentlist_div">
+    @if (currentStep.OpinionDisplay == 1)//如果步骤设置为要显示意见
+    {
+        @RenderPage("ShowComment.cshtml")
+    }
+    </div>
+    <!--历史意见显示-->
+
+    <!--归档内容-->
+    <textarea id="form_body_div_textarea" name="form_body_div_textarea" style="display:none;"></textarea>
+    <textarea id="form_commentlist_div_textarea" name="form_commentlist_div_textarea" style="display:none;"></textarea>
+    <!--归档内容-->
+</form>
+<script type="text/javascript">
+    var isDebug = '@isDebug' == 'True' && '1' == '@debugType';
+    var isSign = '@isSign' == 'True';
+    var signType = '@signType';
+    var iframeid = '@Request.QueryString["tabid"]';
+    var isShow = "0" != "@display";//是否是查看模式
+    var appid = '@Request.QueryString["appid"]';
+    var query = '@Html.Raw(query)';
+    var instanceid='@instanceid';
+    $(function(){
+        if("1" == "@isArchives")
+        {
+            $("#form_body_div_textarea").val($("#form_body_div").html());
+            $("#form_commentlist_div_textarea").val($("#form_commentlist_div").html());
+        }
+    });
+</script>
+<script type="text/javascript" src="~/Scripts/FlowRun/common.js" ></script>

@@ -80,6 +80,16 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 查询单条记录
+        /// </summary>
+        public System.Data.DataRow GetFromCache(string id)
+        {
+            var dt = GetAllDataTableFromCache();
+            var rows = dt.Select("ID='" + id.ToString() + "'");
+            return rows.Length > 0 ? rows[0] : null;
+        }
+
+        /// <summary>
         /// 查询所有记录(缓存)
         /// </summary>
         public System.Data.DataTable GetAllDataTableFromCache()
@@ -213,7 +223,7 @@ namespace Business.Platform
         /// </summary>
         /// <param name="roleID"></param>
         /// <returns></returns>
-        public string GetRoleAppJsonString(Guid roleID, Guid userID)
+        public string GetRoleAppJsonString(Guid roleID, Guid userID, string rootDir="")
         {
             Business.Platform.RoleApp RoleApp = new Business.Platform.RoleApp();
             Business.Platform.UsersApp UsersApp = new Platform.UsersApp();
@@ -237,7 +247,7 @@ namespace Business.Platform
             json.Append("{");
             json.AppendFormat("\"id\":\"{0}\",", rootDr["ID"]);
             json.AppendFormat("\"title\":\"{0}\",", rootDr["Title"].ToString().Trim());
-            json.AppendFormat("\"ico\":\"{0}\",", rootDr["Ico"]);
+            json.AppendFormat("\"ico\":\"{0}\",", rootDr["Ico"].ToString().IsNullOrEmpty() ? "" : rootDir + rootDr["Ico"]);
             json.AppendFormat("\"link\":\"{0}\",", getAddress(rootDr));
             json.AppendFormat("\"model\":\"{0}\",", rootDr["OpenMode"]);
             json.AppendFormat("\"width\":\"{0}\",", rootDr["Width"]);
@@ -252,7 +262,7 @@ namespace Business.Platform
                 json.Append("{");
                 json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
                 json.AppendFormat("\"title\":\"{0}\",", dr["Title"]);
-                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"]);
+                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"].ToString().IsNullOrEmpty() ? "" : rootDir + dr["Ico"]);
                 json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
                 json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
                 json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);
@@ -268,7 +278,7 @@ namespace Business.Platform
                     json.Append("{");
                     json.AppendFormat("\"id\":\"{0}\",", dr1["ID"]);
                     json.AppendFormat("\"title\":\"{0}\",", dr1["Title"]);
-                    json.AppendFormat("\"ico\":\"{0}\",", dr1["Ico"]);
+                    json.AppendFormat("\"ico\":\"{0}\",", dr1["Ico"].ToString().IsNullOrEmpty() ? "" : rootDir + dr1["Ico"]);
                     json.AppendFormat("\"link\":\"{0}\",", getAddress(dr1));
                     json.AppendFormat("\"model\":\"{0}\",", dr1["OpenMode"]);
                     json.AppendFormat("\"width\":\"{0}\",", dr1["Width"]);
@@ -300,7 +310,7 @@ namespace Business.Platform
         /// 得到角色应用刷新JSON
         /// </summary>
         /// <returns></returns>
-        public string GetRoleAppRefreshJsonString(Guid roleID, Guid userID, Guid refreshID)
+        public string GetRoleAppRefreshJsonString(Guid roleID, Guid userID, Guid refreshID, string rootDir = "")
         {
             Business.Platform.RoleApp roleApp = new Business.Platform.RoleApp();
             Business.Platform.UsersApp UsersApp = new Platform.UsersApp();
@@ -323,7 +333,7 @@ namespace Business.Platform
                 json.Append("{");
                 json.AppendFormat("\"id\":\"{0}\",", dr["ID"]);
                 json.AppendFormat("\"title\":\"{0}\",", dr["Title"].ToString().Trim());
-                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"]);
+                json.AppendFormat("\"ico\":\"{0}\",", dr["Ico"].ToString().IsNullOrEmpty() ? "" : rootDir + dr["Ico"]);
                 json.AppendFormat("\"link\":\"{0}\",", getAddress(dr));
                 json.AppendFormat("\"model\":\"{0}\",", dr["OpenMode"]);
                 json.AppendFormat("\"width\":\"{0}\",", dr["Width"]);

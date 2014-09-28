@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Theme/Common.css" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="~/Content/Theme/@Utility.Config.Theme/Style/style.css" id="style_style" rel="stylesheet" type="text/css" media="screen"/>
+    <link href="~/Content/Theme/@Utility.Config.Theme/Style/ui.css" id="style_ui" rel="stylesheet" type="text/css" media="screen"/> 
+    <script type="text/javascript" src="~/Scripts/My97DatePicker/WdatePicker.js"></script>
+    @Scripts.Render("~/bundles/script")
+</head>
+
+<body @Html.Raw(Page.BodyStyle)>
+    @{
+        string checkAppMsg = string.Empty;
+        if ((Page.CheckApp == null || Page.CheckApp == true) && !WebMvc.Common.Tools.CheckApp(out checkAppMsg, Request.QueryString["appid"]))
+        {
+            Response.Write(checkAppMsg.IsNullOrEmpty() ? "应用程序权限检查错误!" : checkAppMsg);
+            Response.End();
+        }
+    }
+    @RenderBody()
+</body>
+</html>

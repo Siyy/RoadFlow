@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Business.Platform
 {
     public class UsersRole
     {
+        private static string cacheKey = Utility.Keys.CacheKeys.UserRoles.ToString();
         private Data.Interface.IUsersRole dataUsersRole;
         public UsersRole()
         {
@@ -16,14 +18,18 @@ namespace Business.Platform
         /// </summary>
         public int Add(Data.Model.UsersRole model)
         {
-            return dataUsersRole.Add(model);
+            int i = dataUsersRole.Add(model);
+            ClearCache();
+            return i;
         }
         /// <summary>
         /// 更新
         /// </summary>
         public int Update(Data.Model.UsersRole model)
         {
-            return dataUsersRole.Update(model);
+            int i = dataUsersRole.Update(model);
+            ClearCache();
+            return i;
         }
         /// <summary>
         /// 查询所有记录
@@ -44,7 +50,9 @@ namespace Business.Platform
         /// </summary>
         public int Delete(Guid userid, Guid roleid)
         {
-            return dataUsersRole.Delete(userid, roleid);
+            int i = dataUsersRole.Delete(userid, roleid);
+            ClearCache();
+            return i;
         }
         /// <summary>
         /// 查询记录条数
@@ -59,7 +67,9 @@ namespace Business.Platform
         /// </summary>
         public int DeleteByUserID(Guid memberID)
         {
-            return dataUsersRole.DeleteByUserID(memberID);
+            int i = dataUsersRole.DeleteByUserID(memberID);
+            ClearCache();
+            return i;
         }
 
         /// <summary>
@@ -67,11 +77,13 @@ namespace Business.Platform
         /// </summary>
         public int DeleteByRoleID(Guid roleid)
         {
-            return dataUsersRole.DeleteByRoleID(roleid);
+            int i = dataUsersRole.DeleteByRoleID(roleid);
+            ClearCache();
+            return i;
         }
 
         /// <summary>
-        /// 根据一组机构ID查询记录
+        /// 根据一组用户ID查询记录
         /// </summary>
         public List<Data.Model.UsersRole> GetByUserIDArray(Guid[] memberIDArray)
         {
@@ -79,11 +91,22 @@ namespace Business.Platform
         }
 
         /// <summary>
-        /// 根据机构ID查询记录
+        /// 根据用户ID查询记录
         /// </summary>
         public List<Data.Model.UsersRole> GetByUserID(Guid memberID)
         {
             return dataUsersRole.GetByUserID(memberID);
+        }
+
+        /// <summary>
+        /// 得到一个用户的所有角色
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public List<Data.Model.UsersRole> GetByUserIDFromCache(Guid userID)
+        {
+            var list = GetAllFromCache();
+            return list.FindAll(p => p.MemberID == userID);
         }
 
         /// <summary>
@@ -114,7 +137,34 @@ namespace Business.Platform
                     });
                 }
             }
-               
+            ClearCache(); 
+        }
+
+        /// <summary>
+        /// 从缓存得到所有记录
+        /// </summary>
+        /// <returns></returns>
+        public List<Data.Model.UsersRole> GetAllFromCache()
+        {
+            var obj = MyCache.IO.Opation.Get(cacheKey);
+            if (obj == null || !(obj is List<Data.Model.UsersRole>))
+            {
+                var list = GetAll();
+                MyCache.IO.Opation.Set(cacheKey, list);
+                return list;
+            }
+            else
+            {
+                return obj as List<Data.Model.UsersRole>;
+            }
+        }
+
+        /// <summary>
+        /// 清除缓存记录
+        /// </summary>
+        public void ClearCache()
+        {
+            MyCache.IO.Opation.Remove(cacheKey);
         }
     }
 }

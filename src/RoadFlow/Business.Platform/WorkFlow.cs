@@ -213,9 +213,8 @@ namespace Business.Platform
                             isAdd = true;
                             app = new Data.Model.AppLibrary();
                             app.ID = Guid.NewGuid();
-                            
                         }
-                        app.Address = "/Platform/WorkFlow/Run/Default";
+                        app.Address = "WorkFlowRun/Index";
                         app.Code = wfInstalled.ID.ToString();
                         app.Note = "流程应用";
                         app.OpenMode = 0;
@@ -230,6 +229,8 @@ namespace Business.Platform
                         {
                             bappLibrary.Update(app);
                         }
+                        bappLibrary.ClearCache();
+                        new Business.Platform.RoleApp().ClearAllDataTableCache();
                         #endregion
                         MyCache.IO.Opation.Set(getCacheKey(wfInstalled.ID), wfInstalled);
                         scope.Complete();
@@ -1414,7 +1415,7 @@ namespace Business.Platform
         /// <param name="pk"></param>
         /// <param name="instanceid"></param>
         /// <returns></returns>
-        public LitJson.JsonData GetFormData(string connid, string table, string pk, string instanceid)
+        public LitJson.JsonData GetFormData(string connid, string table, string pk, string instanceid, string filedStatus = "")
         {
             LitJson.JsonData jsonData = new LitJson.JsonData();
             if (instanceid.IsNullOrEmpty())
@@ -1455,12 +1456,31 @@ namespace Business.Platform
                 System.Data.DataSet ds = new System.Data.DataSet();
                 dataAdapter.Fill(ds);
                 System.Data.DataTable dt = ds.Tables[0];
+                LitJson.JsonData json = null;
+                if (!filedStatus.IsNullOrEmpty())
+                {
+                    json = LitJson.JsonMapper.ToObject(filedStatus);
+                }
                 if (dt.Rows.Count > 0)
                 {
                     System.Data.DataRow dr = dt.Rows[0];
                     for (int i = 0; i < dt.Columns.Count; i++)
                     {
-                        jsonData[table + "_" + dt.Columns[i].ColumnName] = dr[dt.Columns[i].ColumnName].ToString();
+                        bool isShow = true;
+                        string fileName=table + "_" + dt.Columns[i].ColumnName;
+                        if (json != null && json.ContainsKey(fileName))
+                        {
+                            string status = json[fileName].ToString();
+                            if (!status.IsNullOrEmpty())
+                            {
+                                string[] statusArray = status.Split('_');
+                                if (statusArray.Length == 2 && "2" == statusArray[0])
+                                {
+                                    isShow = false;
+                                }
+                            }
+                        }
+                        jsonData[fileName] = isShow ? dr[dt.Columns[i].ColumnName].ToString() : "";
                     }
                 }
 

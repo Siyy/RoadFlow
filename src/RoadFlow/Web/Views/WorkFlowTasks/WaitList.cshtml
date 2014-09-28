@@ -1,0 +1,73 @@
+﻿@{
+    Business.Platform.WorkFlowTask bworkFlowTask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+}
+@model IEnumerable<Data.Model.WorkFlowTask>
+<form action="" method="post" >
+@Html.AntiForgeryToken()
+<div class="querybar">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td>
+                名称：<input type="text" class="mytext" id="Title" name="Title" value="@ViewBag.title" />
+                所属流程：<select class="myselect" id="FlowID" name="FlowID"><option value="">==全部==</option>@Html.Raw(ViewBag.flowOptions)</select>
+                发送人：<input type="text" class="mymember" id="SenderID" unit="0" dept="0" station="0" user="1" group="0" more="0" name="SenderID" value="@ViewBag.sender"  />
+                接收时间：<input type="text" class="mycalendar" style="width:90px;" value="@ViewBag.date1" name="Date1" /> 至 <input type="text" value="@ViewBag.date2" style="width:90px;" class="mycalendar" name="Date2" />
+                <input type="submit" name="Search" value="查询" class="mybutton" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table cellpadding="0" cellspacing="1" border="0" class="listtable">
+    <thead>
+        <tr>
+            <th>任务标题</th>
+            <th>流程</th>
+            <th>步骤</th>
+            <th>发送人</th>
+            <th>接收时间</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var task in Model)
+    {
+        string flowName;
+        string stepName = bworkFlow.GetStepName(task.StepID, task.FlowID, out flowName);
+        string query1 = string.Format("flowid={0}&stepid={1}&instanceid={2}&taskid={3}&groupid={4}&appid={5}",
+            task.FlowID, task.StepID, task.InstanceID, task.ID, task.GroupID, Request.QueryString["appid"]
+            );
+        <tr>
+            <td><a href="javascript:void(0);" onclick="openTask('WorkFlowRun/Index?@Html.Raw(query1)','@task.Title','@task.ID');return false;" class="blue">@task.Title</a></td>
+            <td>@flowName</td>
+            <td>@stepName</td>
+            <td>@task.SenderName</td>
+            <td>@task.ReceiveTime</td>
+            <td>@bworkFlowTask.GetStatusTitle(task.Status)</td>
+            <td>@task.Note</td>
+            <td>
+                <a class="viewlink" href="javascript:void(0);" onclick="detail('@task.FlowID','@task.GroupID');">查看</a>
+
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<div class="buttondiv">@Html.Raw(ViewBag.pager)</div>
+</form>
+<script type="text/javascript">
+    function openTask(url, title, id)
+    {
+        top.openApp(url, 0, title, "tab_" + id, 0, 0, false);
+    }
+    function detail(flowid, groupid)
+    {
+        top.mainDialog.open({
+            url: 'WorkFlowTasks/Detail?flowid1=' + flowid + "&groupid=" + groupid + '@Html.Raw(ViewBag.query)',
+            width: 980, height: 530, title: "查看流程处理过程"
+        });
+    }
+</script>

@@ -336,7 +336,7 @@ namespace Data.MSSQL
             }
             if (!title.IsNullOrEmpty())
             {
-                sql.Append(" AND a.CHARINDEX(@Title,Title)>0");
+                sql.Append(" AND CHARINDEX(@Title,a.Title)>0");
                 parList.Add(new SqlParameter("@Title", SqlDbType.NVarChar, 2000) { Value = title });
             }
             if (flowid.IsGuid())
@@ -364,7 +364,7 @@ namespace Data.MSSQL
             int number = Utility.Tools.GetPageNumber();
             string sql1 = dbHelper.GetPaerSql(sql.ToString(), size, number, out count, parList.ToArray());
             pager = Utility.Tools.GetPagerHtml(count, size, number, query);
-
+          
             SqlDataReader dataReader = dbHelper.GetDataReader(sql1, parList.ToArray());
             List<Data.Model.WorkFlowTask> List = DataReaderToList(dataReader);
             dataReader.Close();

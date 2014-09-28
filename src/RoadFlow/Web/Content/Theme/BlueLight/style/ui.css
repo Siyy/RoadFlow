@@ -1,8 +1,8 @@
 ﻿/*tab*/
-.tab {border:1px solid #95b8e7; }
+.tab {border:1px solid #bed5f3; }
 .tab_title {width:100%; height:26px; background:url(../images/tab/bg.gif) repeat-x; position:relative; overflow:hidden;}
 .tab_title_ul {  float:left; width:99999px; list-style:none; margin:0; padding:2px 0 0 2px; position:absolute; z-index:10; overflow:hidden;}
-.tab_title_ul_li { float:left; height:23px; margin:0 1px; background:url(../images/tab/right.gif) no-repeat right top; cursor:pointer; border-bottom:1px solid #95b8e7;}
+.tab_title_ul_li { float:left; height:23px; margin:0 1px; background:url(../images/tab/right.gif) no-repeat right top; cursor:pointer; border-bottom:1px solid #b8d0d6;}
 .tab_title_ul_li_txt { float:left; height:23px; white-space:nowrap; line-height:25px!important; line-height:23px; padding:0 8px; background:url(../images/tab/left.gif) no-repeat left top; }
 .tab_title_ul_li_over { float:left; height:24px; margin:0 1px; background:url(../images/tab/right1.gif) no-repeat right top; cursor:pointer;}
 .tab_title_ul_li_txt_over { float:left; height:24px; white-space:nowrap; line-height:25px!important; line-height:24px; padding:0 8px; background:url(../images/tab/left1.gif) no-repeat left top;}
@@ -33,9 +33,9 @@
 .tree_title { display:inline-block; height:20px; vertical-align:baseline; cursor:pointer;}
 .tree_empty { width:19px; height:20px; display:inline-block; vertical-align:top; }
 .tree_root { width:19px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/root.gif) no-repeat 0px 2px;}
-.tree_loading { width:16px; height:20px; display:inline-block; vertical-align:top; background:url(../images/tree/loading.gif) no-repeat -1px 2px;}
-.tree_close { width:16px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat -10px -571px;}
-.tree_open { width:16px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat  -10px -534px;}
+.tree_loading { width:17px; height:20px; display:inline-block; vertical-align:top; background:url(../images/tree/loading.gif) no-repeat -1px 2px;}
+.tree_close { width:17px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat -10px -571px;}
+.tree_open { width:17px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat  -10px -534px;}
 .tree_leaf { width:16px; height:20px; display:inline-block; vertical-align:top; background:url(../images/tree/tree.gif) no-repeat -11px -606px;}
 .tree_minus_top { width:19px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat -8px -265px;}
 .tree_minus_top_noprev { width:19px; height:20px; display:inline-block; vertical-align:top; cursor:pointer; background:url(../images/tree/tree.gif) no-repeat -8px -246px;}
@@ -56,7 +56,7 @@
 
 /*window*/
 .window_maskdiv{width:1px;height:1px;background-color:#000000;position:absolute; filter:alpha(opacity=5);-khtml-opacity:0.1;-moz-opacity:0.1; opacity:0.1;left:0;top:0;right:0;bottom:0;}
-.window_maindiv{position:absolute;background:#ffffff; overflow:hidden; border:1px solid #83a9dc; box-shadow:0px 0px 7px #cccccc; filter:progid:DXImageTransform.Microsoft.Shadow(color='#cccccc', Direction=120, Strength=3);-moz-box-shadow:0px 0px 7px #cccccc;-webkit-box-shadow:0px 0px 7px #cccccc;}
+.window_maindiv{position:absolute;background:#ffffff; overflow:hidden; border:1px solid #48a2e6; box-shadow:0px 0px 7px #cccccc; filter:progid:DXImageTransform.Microsoft.Shadow(color='#cccccc', Direction=120, Strength=3);-moz-box-shadow:0px 0px 7px #cccccc;-webkit-box-shadow:0px 0px 7px #cccccc;}
 .window_title{height:26px; padding-left:5px; padding-right:5px; background:url(../images/window/bg.gif) repeat-x;}
 .window_title_title{font-weight:bold; float:left; overflow:hidden; height:26px; line-height:28px;}
 .window_title_title_ico{font-weight:bold; float:left; padding-left:16px; height:26px; line-height:28px; overflow:hidden; background:url(../images/window/ico.gif) no-repeat left center;}
@@ -94,11 +94,11 @@
 
 /*tab1*/
 .mytab{height: 26px;line-height: 26px;background-color: #f0f6ff;background:transparent url(../Images/tab/bg1.gif) repeat-x;
-  overflow: hidden;white-space: nowrap; padding-top:2px; position: relative; padding-left:2px; border-bottom:1px solid #95b8e7;}
+  overflow: hidden;white-space: nowrap; padding-top:2px; position: relative; padding-left:2px; border-bottom:1px solid #bed5f3;}
 .mytab ul{margin: 0;padding: 0;position: relative;}
-.mytabli1{background:url(../Images/tab/tab1.gif) repeat-x; padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px; border: solid 1px #95b8e7;
+.mytabli1{background:url(../Images/tab/tab1.gif) repeat-x; padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px; border: solid 1px #bed5f3;
                     margin:2px 2px 0 0;background-color: #95b8e7;float: left;position: relative;list-style-type: none;cursor: pointer;}
-.mytabli2{background:url(../Images/tab/tab2.gif) repeat-x;padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px;border: solid 1px #95b8e7;
+.mytabli2{background:url(../Images/tab/tab2.gif) repeat-x;padding:0 4px; text-align:center; min-width:60px;height: 23px;line-height: 23px;border: solid 1px #bed5f3;
                     margin:2px 2px 0 0;background-color: #95b8e7;float: left;position: relative; font-weight:normal; list-style-type: none;cursor: pointer;}
 .mytab_div{display:none; padding-top:8px; margin:0 auto;}
 /*tab1*/

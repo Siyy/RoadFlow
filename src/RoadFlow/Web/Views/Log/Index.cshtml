@@ -1,0 +1,55 @@
+﻿@model System.Data.DataTable 
+@{
+    ViewBag.Title = "Index";
+}
+<form method="post" >
+@Html.AntiForgeryToken()
+<div class="querybar">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td>
+                标题：<input type="text" class="mytext" id="Title" name="Title" value="@ViewBag.Title1" />
+                分类：<select class="myselect" id="Type" name="Type"><option value="">==全部==</option>@Html.Raw(ViewBag.TypeOptions)</select>
+                人员：<input type="text" user="true" dept="false" value="@ViewBag.UserID" station="false" unit="false" more="false" group="false" id="UserID" name="UserID" class="mymember" />
+                发生日期：<input type="text" class="mycalendar" name="Date1" style="width:90px;" value="@ViewBag.Date1" /> 至 <input type="text" class="mycalendar" name="Date2" style="width:90px;" value="@ViewBag.Date2" />
+                <input type="submit" name="Search" value="查询" class="mybutton" />
+            </td>
+        </tr>
+    </table>
+</div>
+<table cellpadding="0" cellspacing="1" border="0" width="100%" class="listtable">
+    <thead>
+        <tr>
+            <th>标题</th>
+            <th>分类</th>
+            <th>发生时间</th>
+            <th>操作员</th>
+            <th>IP</th>
+            <th>详细</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (System.Data.DataRow dr in Model.Rows)
+    {
+        <tr>
+            <td title="@dr["Title"]">@dr["Title"].ToString().CutString(100)</td>
+            <td>@dr["Type"]</td>
+            <td>@dr["WriteTime"]</td>
+            <td>@dr["UserName"]</td>
+            <td>@dr["IPAddress"]</td>
+            <td><a class="viewlink" href="javascript:void(0);" onclick="detail('@dr["ID"]');return false;">查看</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+<div class="buttondiv">@Html.Raw(ViewBag.Pager)</div>
+</form>
+<script type="text/javascript">
+    var appid = '@Request.QueryString["appid"]';
+    var iframeid = '@Request.QueryString["tabid"]';
+    var dialog = top.mainDialog;
+    function detail(id)
+    {
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "查看日志详细信息", width: 850, height: 450, url: top.rootdir + "/Log/Detail?id=" + id + '@ViewBag.Query', openerid: iframeid });
+    }
+</script>

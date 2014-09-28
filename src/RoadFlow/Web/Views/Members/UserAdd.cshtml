@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "UserAdd";
+}
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    var validate = new RoadUI.Validate();
+</script>
+<form method="post">
+@Html.AntiForgeryToken()
+<br />
+<table cellpadding="0" cellspacing="1" border="0" width="95%" class="formtable">
+    <tr>
+        <th style="width:80px;">姓名：</th>
+        <td><input type="text" id="Name" name="Name" class="mytext" value="" onchange="getPy(this.value);" validate="empty,min,max" max="50" style="width:160px;" /></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">帐号：</th>
+        <td><input type="text" id="Account" name="Account" class="mytext" value="" validate="empty,max,ajax" validate_url="CheckAccount" max="20" style="width:160px;" /></td>
+    </tr>
+    <tr>
+        <th style="width:80px;">状态：</th>
+        <td>@Html.Raw(ViewBag.StatusRadios)</td>
+    </tr>
+    <tr>
+        <th style="width:80px;">备注：</th>
+        <td><textarea id="Note" name="Note" class="mytext" style="width:90%; height:50px;" ></textarea></td>
+    </tr>
+        
+</table>
+<div style="width:95%; margin:10px auto 10px auto; text-align:center;">
+    <input type="submit" class="mybutton" name="Save" value="保存" onclick="return validate.validateForm(document.forms[0]);" />
+    <input type="button" class="mybutton" onclick="window.location='Body'+'@Html.Raw(Request.Url.Query)';" value="返回" />
+</div>
+</form>
+<script type="text/javascript">
+    $(function(){
+        @Html.Raw(ViewBag.Script)
+    });
+    function getPy(v)
+    {
+        $.ajax({ url: 'GetPy', data: { 'name': v }, dataType: 'text', type: 'post', cache: false, success: function (txt)
+        {
+            $('#Account').val(txt);
+        }
+        });
+    }
+</script>

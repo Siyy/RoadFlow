@@ -126,12 +126,13 @@
 
         try
         {
+            var baseurl = top.rootdir;
             contextMenu = new RoadUI.Menu({ srcElement: $tabTitleUL });
-            contextMenu.addItem({ ico: "/images/ico/cross.png", title: "关闭", onclick: function () { instance.closeCurrent() } });
+            contextMenu.addItem({ ico: baseurl + "images/ico/cross.png", title: "关闭", onclick: function () { instance.closeCurrent() } });
             contextMenu.addItem({ ico: "", title: "除此之外全部关闭", onclick: function () { instance.closeOther(); } });
-            contextMenu.addItem({ ico: "/images/ico/clear.gif", title: "全部关闭", onclick: function () { instance.closeAll(); } });
+            contextMenu.addItem({ ico: "", title: "全部关闭", onclick: function () { instance.closeAll(); } });
             contextMenu.addItem({ type: 1 });
-            contextMenu.addItem({ ico: "/images/ico/refresh.gif", title: "刷新", onclick: function () { instance.refresh(); } });
+            contextMenu.addItem({ ico: baseurl + "images/ico/Refresh.png", title: "刷新", onclick: function () { instance.refresh(); } });
         }
         catch (e) { }
         this.checkMore(true, false, false, false);

@@ -1,5 +1,0 @@
-﻿@{
-    string code = Request.Form["value"];
-    string id = Request["id"];
-    Response.Write(new Business.Platform.Dictionary().HasCode(code, id) ? "唯一代码重复" : "1");
-}

@@ -1,0 +1,43 @@
+﻿@{
+    Layout = null;
+   
+    string id = Request.Form["id"];
+    string type = Request.Form["type"];
+
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+    var flow = bworkFlow.Get(id.ToGuid());
+    if (flow == null)
+    {
+        Response.Write("该流程还未保存!");
+        Response.End();
+    }
+    else
+    {
+        if ("0" == type)
+        {
+            flow.Status = 3;
+            bworkFlow.Update(flow);
+            bworkFlow.RefreshWrokFlowCache(flow.ID);
+            Business.Platform.Log.Add("卸载了流程", flow.Serialize(), Business.Platform.Log.Types.流程相关);
+            Response.Write("1");
+            Response.End();
+        }
+        else if ("1" == type)
+        {
+            flow.Status = 4;
+            bworkFlow.Update(flow);
+            //bworkFlow.ClearWorkFlowCache(flow.ID);
+            Business.Platform.AppLibrary APP = new Business.Platform.AppLibrary();
+            var app = APP.GetByCode(flow.ID.ToString());
+            if (app != null)
+            {
+                APP.Delete(app.ID);
+                new Business.Platform.RoleApp().DeleteByAppID(app.ID);
+            }
+            Business.Platform.Log.Add("删除了流程", flow.Serialize(), Business.Platform.Log.Types.流程相关);
+
+            Response.Write("1");
+            Response.End();
+        }
+    }
+}

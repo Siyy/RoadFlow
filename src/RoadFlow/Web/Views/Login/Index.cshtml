@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = "RoadFlow";
+    Page.BodyStyle = "style='background:#d7effb; overflow:hidden;'";
+    Page.CheckApp = false;
+}
+<div id="bgdiv" class="loginbgdiv"></div>
+<script type="text/javascript">
+    var win = new RoadUI.Window();
+    $(function ()
+    {
+        var left = $(window).width() - 500;
+        var top = $(window).height() - 280;
+        win.open({ url: "Login/Login", width: 300, height: 200, top: top, left: left, showico: false, title: "用户登录", resize: false, ismodal: false, showclose: false });
+    });
+</script>
