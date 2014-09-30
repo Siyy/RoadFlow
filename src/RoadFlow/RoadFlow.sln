@@ -25,9 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Model", "Data.Model\Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.MSSQL", "Data.MSSQL\Data.MSSQL.csproj", "{EFCD6A7C-C598-4BBD-BDC6-3016AAABD26C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{AE6C0E7E-9F25-4B9B-B11C-D4A0F92DFB23}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{AE6C0E7E-9F25-4B9B-B11C-D4A0F92DFB23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{5A3C6BB6-ADB9-4C44-AFE2-8DA354130488}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMvc", "WebMvc\WebMvc.csproj", "{5A3C6BB6-ADB9-4C44-AFE2-8DA354130488}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{BE001BA4-6BD4-4B23-AED6-DDDA2A1B3B55}"
 EndProject
@@ -85,10 +85,10 @@ Global
 		SccProjectTopLevelParentUniqueName11 = RoadFlow.sln
 		SccProjectName11 = Utility
 		SccLocalPath11 = Utility
-		SccProjectUniqueName12 = Web\\Web.csproj
+		SccProjectUniqueName12 = WebMvc\\WebMvc.csproj
 		SccProjectTopLevelParentUniqueName12 = RoadFlow.sln
-		SccProjectName12 = Web
-		SccLocalPath12 = Web
+		SccProjectName12 = WebMvc
+		SccLocalPath12 = WebMvc
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
