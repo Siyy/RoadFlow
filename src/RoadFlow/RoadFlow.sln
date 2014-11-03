@@ -25,9 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Model", "Data.Model\Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.MSSQL", "Data.MSSQL\Data.MSSQL.csproj", "{EFCD6A7C-C598-4BBD-BDC6-3016AAABD26C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{AE6C0E7E-9F25-4B9B-B11C-D4A0F92DFB23}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{AE6C0E7E-9F25-4B9B-B11C-D4A0F92DFB23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{5A3C6BB6-ADB9-4C44-AFE2-8DA354130488}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMvc", "WebMvc\WebMvc.csproj", "{5A3C6BB6-ADB9-4C44-AFE2-8DA354130488}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utility", "Utility", "{BE001BA4-6BD4-4B23-AED6-DDDA2A1B3B55}"
 EndProject
@@ -39,62 +39,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{45
 	ProjectSection(SolutionItems) = preProject
 		..\..\LICENSE = ..\..\LICENSE
 		..\..\README.md = ..\..\README.md
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs19
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Business.Platform\\Business.Platform.csproj
-		SccProjectTopLevelParentUniqueName1 = RoadFlow.sln
-		SccProjectName1 = Business.Platform
-		SccLocalPath1 = Business.Platform
-		SccProjectUniqueName2 = Data.Factory\\Data.Factory.csproj
-		SccProjectTopLevelParentUniqueName2 = RoadFlow.sln
-		SccProjectName2 = Data.Factory
-		SccLocalPath2 = Data.Factory
-		SccProjectUniqueName3 = Data.Interface\\Data.Interface.csproj
-		SccProjectTopLevelParentUniqueName3 = RoadFlow.sln
-		SccProjectName3 = Data.Interface
-		SccLocalPath3 = Data.Interface
-		SccProjectUniqueName4 = Data.Model\\Data.Model.csproj
-		SccProjectTopLevelParentUniqueName4 = RoadFlow.sln
-		SccProjectName4 = Data.Model
-		SccLocalPath4 = Data.Model
-		SccProjectUniqueName5 = Data.MSSQL\\Data.MSSQL.csproj
-		SccProjectTopLevelParentUniqueName5 = RoadFlow.sln
-		SccProjectName5 = Data.MSSQL
-		SccLocalPath5 = Data.MSSQL
-		SccProjectUniqueName6 = LitJSON\\LitJSON.csproj
-		SccProjectTopLevelParentUniqueName6 = RoadFlow.sln
-		SccProjectName6 = LitJSON
-		SccLocalPath6 = LitJSON
-		SccProjectUniqueName7 = MyCache.Factory\\MyCache.Factory.csproj
-		SccProjectTopLevelParentUniqueName7 = RoadFlow.sln
-		SccProjectName7 = MyCache.Factory
-		SccLocalPath7 = MyCache.Factory
-		SccProjectUniqueName8 = MyCache.InProc\\MyCache.InProc.csproj
-		SccProjectTopLevelParentUniqueName8 = RoadFlow.sln
-		SccProjectName8 = MyCache.InProc
-		SccLocalPath8 = MyCache.InProc
-		SccProjectUniqueName9 = MyCache.Interface\\MyCache.Interface.csproj
-		SccProjectTopLevelParentUniqueName9 = RoadFlow.sln
-		SccProjectName9 = MyCache.Interface
-		SccLocalPath9 = MyCache.Interface
-		SccProjectUniqueName10 = MyCache.IO\\MyCache.IO.csproj
-		SccProjectTopLevelParentUniqueName10 = RoadFlow.sln
-		SccProjectName10 = MyCache.IO
-		SccLocalPath10 = MyCache.IO
-		SccProjectUniqueName11 = Utility\\Utility.csproj
-		SccProjectTopLevelParentUniqueName11 = RoadFlow.sln
-		SccProjectName11 = Utility
-		SccLocalPath11 = Utility
-		SccProjectUniqueName12 = Web\\Web.csproj
-		SccProjectTopLevelParentUniqueName12 = RoadFlow.sln
-		SccProjectName12 = Web
-		SccLocalPath12 = Web
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
