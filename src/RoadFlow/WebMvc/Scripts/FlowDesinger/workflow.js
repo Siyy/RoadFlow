@@ -30,7 +30,7 @@ $(function ()
 });
 
 //添加步骤
-function addStep(x, y, text, id, addToJSON)
+function addStep(x, y, text, id, addToJSON, type1, bordercolor, bgcolor)
 {
     var guid = getGuid();
     var xy = getNewXY();
@@ -39,14 +39,21 @@ function addStep(x, y, text, id, addToJSON)
     text = text || wf_stepDefaultName;
     id = id || guid;
     var rect = wf_r.rect(x, y, wf_width, wf_height, wf_rect);
-    rect.attr({ "fill": wf_noteColor, "stroke": wf_nodeBorderColor, "fill-opacity": 1, "stroke-width": 1, "cursor": "default" });
+    rect.attr({ "fill": bgcolor || wf_noteColor, "stroke": bordercolor || wf_nodeBorderColor, "fill-opacity": 1, "stroke-width": 1, "cursor": "default" });
     rect.id = id;
-    rect.type1 = "step";
+    rect.type1 = type1 ? type1 : "step";
     rect.drag(move, dragger, up);
     if (wf_designer)
     {
         rect.click(click);
-        rect.dblclick(stepSetting);
+        if ("step" == rect.type1)
+        {
+            rect.dblclick(stepSetting);
+        }
+        else if ("subflow" == rect.type1)
+        {
+            rect.dblclick(subflowSetting);
+        }
     }
     wf_steps.push(rect);
 
@@ -63,42 +70,58 @@ function addStep(x, y, text, id, addToJSON)
     {
         var step = {};
         step.id = guid;
+        step.type = type1 ? type1 : "step";
         step.name = text;
-        step.opinionDisplay = "";
-        step.expiredPrompt = "";
-        step.signatureType = "";
-        step.workTime = "";
-        step.limitTime = "";
-        step.otherTime = "";
-        step.archives = "";
-        step.archivesParams = "";
-        step.note = "";
         step.position = { x: x, y: y, width: wf_width, height: wf_height };
-        step.behavior = {
-            flowType: "",
-            runSelect: "",
-            handlerType: "",
-            selectRange: "",
-            handlerStep: "",
-            valueField: "",
-            defaultHandler: "",
-            hanlderModel: "",
-            backModel: "",
-            backStep: "",
-            backType: "",
-            percentage: ""
-        };
-        step.forms = [];
-        step.buttons = [];
-        step.fieldStatus = [];
-        step.event = {
-            submitBefore: "",
-            submitAfter: "",
-            backBefore: "",
-            backAfter: ""
-        };
+        if (rect.type1 == "step")
+        {
+            step.opinionDisplay = "";
+            step.expiredPrompt = "";
+            step.signatureType = "";
+            step.workTime = "";
+            step.limitTime = "";
+            step.otherTime = "";
+            step.archives = "";
+            step.archivesParams = "";
+            step.note = "";
+            step.behavior = {
+                flowType: "",
+                runSelect: "",
+                handlerType: "",
+                selectRange: "",
+                handlerStep: "",
+                valueField: "",
+                defaultHandler: "",
+                hanlderModel: "",
+                backModel: "",
+                backStep: "",
+                backType: "",
+                percentage: ""
+            };
+            step.forms = [];
+            step.buttons = [];
+            step.fieldStatus = [];
+            step.event = {
+                submitBefore: "",
+                submitAfter: "",
+                backBefore: "",
+                backAfter: ""
+            };
+        }
+        else if (rect.type1 == "subflow")
+        {
+            step.flowid = "";
+            step.handler = "";
+            step.strategy = 0;
+        }
         addStep1(step);
     }
+}
+
+//添加子流程节点
+function addSubFlow()
+{
+    addStep(null, null, "子流程步骤", null, null, "subflow", null, null)
 }
 
 //复制当前选中步骤
@@ -366,7 +389,7 @@ function isLine(obj)
 //判断一个对象是否是步骤对象
 function isStepObj(obj)
 {
-    return obj && obj.type1 && obj.type1.toString() == "step";
+    return obj && obj.type1 && (obj.type1.toString() == "step" || obj.type1.toString() == "subflow");
 }
 
 //得到XML DOM
@@ -673,7 +696,7 @@ function initLinks_Tables_Fields(databases)
         var fields = getFields(databases[i].link, databases[i].table);
         for (var k = 0; k < fields.length; k++)
         {
-            links_tables_fields.push({ link: databases[i].link, linkName: databases[i].linkName, table: databases[i].table, field: fields[k].name });
+            links_tables_fields.push({ link: databases[i].link, linkName: databases[i].linkName, table: databases[i].table, field: fields[k].name, fieldNote:fields[k].note });
         }
     }
 }
@@ -732,7 +755,7 @@ function reloadFlow(json)
     {
         for (var i = 0; i < steps.length; i++)
         {
-            addStep(steps[i].position.x, steps[i].position.y, steps[i].name, steps[i].id, false);
+            addStep(steps[i].position.x, steps[i].position.y, steps[i].name, steps[i].id, false, steps[i].type);
         }
     }
     var lines = wf_json.lines;
@@ -786,6 +809,14 @@ function stepSetting()
     var bbox = this.getBBox();
     var url = "WorkFlowDesigner/Set_Step?appid=" + appid + "&id=" + this.id + "&x=" + bbox.x + "&y=" + bbox.y + "&width=" + bbox.width + "&height=" + bbox.height;
     dialog.open({ title: "步骤参数设置", width: 700, height: 400, url: url, openerid: iframeid, resize: false });
+}
+
+//子流程设置
+function subflowSetting()
+{
+    var bbox = this.getBBox();
+    var url = "WorkFlowDesigner/Set_SubFlow?appid=" + appid + "&id=" + this.id + "&x=" + bbox.x + "&y=" + bbox.y + "&width=" + bbox.width + "&height=" + bbox.height;
+    dialog.open({ title: "子流程参数设置", width: 500, height: 320, url: url, openerid: iframeid, resize: false });
 }
 
 //流转条件设置

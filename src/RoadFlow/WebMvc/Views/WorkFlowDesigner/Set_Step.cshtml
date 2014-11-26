@@ -29,11 +29,11 @@
     <div id="div_base" class="mytab_div" style="display:block;">
     <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
         <tr>
-            <th >步骤ID：</th>
+            <th>步骤ID：</th>
             <td colspan="3"><input type="text" id="base_ID" value="@stepID" class="mytext" readonly="readonly" style="width:75%"/></td>
         </tr>
         <tr>
-            <th >步骤名称：</th>
+            <th>步骤名称：</th>
             <td colspan="3"><input type="text" id="base_Name" class="mytext" style="width:75%"/></td>
         </tr>
         <tr>
@@ -54,7 +54,7 @@
         </tr>
         <tr>
             <th>审签类型：</th>
-            <td >
+            <td>
                 <select class="myselect" value1="2" style="width:75%;" id="base_SignatureType">
                     <option value="0">无签批意见栏</option>
                     <option value="1">有签批意见(无须签章)</option>
@@ -64,25 +64,20 @@
             <th>工时(小时)：</th>
             <td><input type="text" id="base_WorkTime" class="mytext" style="width:73%;"/></td>
         </tr>
-        <!--tr>
-            <th >限额时间(小时)：</th>
-            <td><input type="text" id="base_LimitTime" class="mytext" style="width:73%;"/></td>
-            <th >额外时间(小时)：</th>
-            <td><input type="text" id="base_OtherTime" class="mytext" style="width:73%;"/></td>
-        </tr-->
         <tr>
-            <th >是否归档：</th>
+            <th>是否归档：</th>
             <td>
                 <select class="myselect" value1="0" style="width:75%;" id="base_Archives">
                     <option value="0">不归档</option>
                     <option value="1">归档</option>
                 </select>
             </td>
-            <th ><!--归档参数：--></th>
-            <td><!--<input type="text" id="base_ArchivesParams" class="mytext" style="width:73%;"/>--></td>
+            <th></th>
+            <td>
+            </td>
         </tr>
         <tr>
-            <th >表单：</th>
+            <th>表单：</th>
             <td colspan="3">
                 <select class="myselect" style="width:130px; max-height:200px;" onchange="form_types_change(this.value);" id="form_types">
                     <option value=""></option>
@@ -92,7 +87,7 @@
             </td>
         </tr>
         <tr>
-            <th >说明：</th>
+            <th>说明：</th>
             <td colspan="3"><textarea id="base_Note" class="mytext" style="width:89%; height:50px;"></textarea></td>
         </tr>
     </table>
@@ -118,7 +113,7 @@
             </td>
         </tr>
         <tr>
-            <th >处理者类型：</th>
+            <th>处理者类型：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_HandlerType">
                     <option value="0">所有成员</option>
@@ -136,23 +131,23 @@
                     <option value="12">当前处理者分管领导</option>
                 </select>
             </td>
-            <th >选择范围：</th>
+            <th>选择范围：</th>
             <td><input type="text" id="behavior_SelectRange" onchange="handlerTypeCng()" user="0" more="0" dept="1" station="1" workgroup="1" class="mymember" style="width:164px;"/></td>
         </tr>
         <tr>
-            <th >处理者步骤：</th>
+            <th>处理者步骤：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_HandlerStep"></select>
             </td>
-            <th >值字段：</th>
+            <th>值字段：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_ValueField"></select>
             </td>
         </tr>
         <tr>
-            <th >默认处理者：</th>
+            <th>默认处理者：</th>
             <td><input type="text" class="mymember" dept="1" station="1" workgroup="1" user="1" more="1" id="behavior_DefaultHandler" style="width:164px;"/></td>
-            <th >退回策略：</th>
+            <th>退回策略：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_BackModel">
                     <option value="1">根据处理策略退回</option>
@@ -161,7 +156,7 @@
             </td>
         </tr>
         <tr>
-            <th >处理策略：</th>
+            <th>处理策略：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_HanlderModel">
                     <option value="0">所有人必须同意</option>
@@ -170,7 +165,7 @@
                     <option value="3">独立处理</option>
                 </select>
             </td>
-            <th >退回类型：</th>
+            <th>退回类型：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_BackType">
                     <option value="0">退回前一步</option>
@@ -180,12 +175,27 @@
             </td>
         </tr>
         <tr>
-            <th >策略百分比：</th>
+            <th>策略百分比：</th>
             <td><input type="text" id="behavior_Percentage" class="mytext" style="width:205px" /></td>
-            <th >退回步骤：</th>
+            <th>退回步骤：</th>
             <td>
                 <select class="myselect" style="width:210px;" id="behavior_BackStep">
                 </select>
+            </td>
+        </tr>
+        <tr>
+            <th>会签策略：</th>
+            <td>
+                <select class="myselect" value1="0" style="width:210px;" id="behavior_Countersignature">
+                    <option value="0">不会签</option>
+                    <option value="1">所有步骤同意</option>
+                    <option value="2">一个步骤同意即可</option>
+                    <option value="3">依据比例</option>
+                </select>
+            </td>
+            <th>会签百分比：</th>
+            <td>
+                <input type="text" id="behavior_CountersignaturePercentage" class="mytext" style="width:205px" />
             </td>
         </tr>
     </table>
@@ -257,11 +267,11 @@
     <table cellpadding="0" cellspacing="1" border="0" width="100%" class="listtable" id="data_table">
         <thead>
         <tr>
-            <th style="width:12%">数据连接</th>
-            <th style="width:18%">数据表</th>
-            <th style="width:15%">字段名称</th>
-            <th style="width:15%">字段状态</th>
-            <th style="width:15%">数据检查</th>
+            <th>数据连接</th>
+            <th>数据表</th>
+            <th>字段名称</th>
+            <th>字段状态</th>
+            <th>数据检查</th>
         </tr>
         </thead>
         <tbody>
@@ -275,27 +285,27 @@
     <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
         <tr>
             <th style="width:130px;">步骤提交前事件：</th>
-            <td ><input type="text" id="event_SubmitBefore" class="mytext" style="width:75%" /></td>
+            <td><input type="text" id="event_SubmitBefore" class="mytext" style="width:75%" /></td>
         </tr>
         <tr>
-            <th >步骤提交后事件：</th>
-            <td ><input type="text" id="event_SubmitAfter" class="mytext" style="width:75%" /></td>
+            <th>步骤提交后事件：</th>
+            <td><input type="text" id="event_SubmitAfter" class="mytext" style="width:75%" /></td>
         </tr>
         <tr>
-            <th >步骤退回前事件：</th>
-            <td ><input type="text" id="event_BackBefore" class="mytext" style="width:75%" /></td>
+            <th>步骤退回前事件：</th>
+            <td><input type="text" id="event_BackBefore" class="mytext" style="width:75%" /></td>
         </tr>
         <tr>
-            <th >步骤退回后事件：</th>
-            <td ><input type="text" id="event_BackAfter" class="mytext" style="width:75%" /></td>
+            <th>步骤退回后事件：</th>
+            <td><input type="text" id="event_BackAfter" class="mytext" style="width:75%" /></td>
         </tr>
     </table>
    
     </div>
 
     <div style="width:100%; margin:10px auto 10px auto; text-align:center;">
-    <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
-    <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
+        <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
+        <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
     </div>
     </form>
     <script type="text/javascript">
@@ -320,26 +330,26 @@
             var tables = [];
             if(fields && fields.length>0)
             {
-            var trs='';
-            var valueFieldOptions='<option value=""></option>';
-            for(var i=0;i<fields.length;i++)
-            {
-                valueFieldOptions+='<option value="'+fields[i].link+'.'+fields[i].table+'.'+fields[i].field+'">'+fields[i].linkName+'.'+fields[i].table+'.'+fields[i].field+'</option>';
-                trs+='<tr>';
-                trs+='<td style="background:#ffffff; height:30px;">';
-                trs+='<input type="hidden" value="'+i.toString()+'" id="data_check_index_'+i.toString()+'" />';
-                trs+='<input type="hidden" value="'+fields[i].link+'.'+fields[i].table+'.'+fields[i].field+'" id="data_check_field_'+i.toString()+'" />';
-                trs+=fields[i].linkName+'</td>';
-                trs+='<td style="background:#ffffff;">'+fields[i].table+'</td>';
-                trs+='<td style="background:#ffffff;">'+fields[i].field+'</td>';
-                trs+='<td style="background:#ffffff;"><select class="myselect" id="data_check_status_'+i.toString()+'" style="width:60px;"><option value="0">编辑</option><option value="1">只读</option><option value="2">隐藏</option></select></td>';
-                trs+='<td style="background:#ffffff;"><select class="myselect" id="data_check_check_'+i.toString()+'" style="width:100px;"><option value="0">不检查</option><option value="1">允许为空,非空时检查</option><option value="2">不允许为空,并检查</option></select></td>';
-                trs+='</tr>';
-                tables.push(fields[i].table);
-            }
-            $("#behavior_ValueField").html(valueFieldOptions);
-            $("#data_table tbody").append(trs);
-            new RoadUI.Select().init($(".myselect", $("#data_table tbody")));
+                var trs='';
+                var valueFieldOptions='<option value=""></option>';
+                for(var i=0;i<fields.length;i++)
+                {
+                    valueFieldOptions+='<option value="'+fields[i].link+'.'+fields[i].table+'.'+fields[i].field+'">'+fields[i].linkName+'.'+fields[i].table+'.'+fields[i].field+(fields[i].fieldNote?'('+fields[i].fieldNote+')':'')+'</option>';
+                    trs+='<tr>';
+                    trs+='<td style="background:#ffffff; height:30px;">';
+                    trs+='<input type="hidden" value="'+i.toString()+'" id="data_check_index_'+i.toString()+'" />';
+                    trs+='<input type="hidden" value="'+fields[i].link+'.'+fields[i].table+'.'+fields[i].field+'" id="data_check_field_'+i.toString()+'" />';
+                    trs+=fields[i].linkName+'</td>';
+                    trs+='<td style="background:#ffffff;">'+fields[i].table+'</td>';
+                    trs+='<td style="background:#ffffff;">'+fields[i].field+(fields[i].fieldNote?'('+fields[i].fieldNote+')':'')+'</td>';
+                    trs+='<td style="background:#ffffff;"><select class="myselect" id="data_check_status_'+i.toString()+'" style="width:60px;"><option value="0">编辑</option><option value="1">只读</option><option value="2">隐藏</option></select></td>';
+                    trs+='<td style="background:#ffffff;"><select class="myselect" id="data_check_check_'+i.toString()+'" style="width:100px;"><option value="0">不检查</option><option value="1">允许为空,非空时检查</option><option value="2">不允许为空,并检查</option></select></td>';
+                    trs+='</tr>';
+                    tables.push(fields[i].table);
+                }
+                $("#behavior_ValueField").html(valueFieldOptions);
+                $("#data_table tbody").append(trs);
+                new RoadUI.Select().init($(".myselect", $("#data_table tbody")));
             }
             //初始化所有表过滤下拉选择
             tables = tables.unique();
@@ -378,17 +388,17 @@
              
             if(json && json.steps && json.steps.length>0)
             {
-            var stepOptions='<option value=""></option>';//初始化行为里面的处理者步骤和退回步骤选择
-            for(var i=0;i<json.steps.length;i++)
-            {
-                if(json.steps[i].id==stepid)
+                var stepOptions='<option value=""></option>';//初始化行为里面的处理者步骤和退回步骤选择
+                for(var i=0;i<json.steps.length;i++)
                 {
-                    step=json.steps[i];
+                    if(json.steps[i].id==stepid)
+                    {
+                        step=json.steps[i];
+                    }
+                    stepOptions+='<option value="'+json.steps[i].id+'">'+json.steps[i].name+'</option>';
                 }
-                stepOptions+='<option value="'+json.steps[i].id+'">'+json.steps[i].name+'</option>';
-            }
-            $("#behavior_HandlerStep").html(stepOptions);
-            $("#behavior_BackStep").html(stepOptions);
+                $("#behavior_HandlerStep").html(stepOptions);
+                $("#behavior_BackStep").html(stepOptions);
             }
 
             initStep(step);
@@ -516,7 +526,7 @@
         //if(step.otherTime) $("#base_OtherTime").val(step.otherTime);
         if(step.archives) $("#base_Archives").val(step.archives);
         if(step.note) $("#base_Note").val(step.note);
-
+        
         if(step.behavior.flowType) $("#behavior_FlowType").val(step.behavior.flowType);
         if(step.behavior.runSelect) $("#behavior_RunSelect").val(step.behavior.runSelect);
         if(step.behavior.handlerType) $("#behavior_HandlerType").val(step.behavior.handlerType);
@@ -537,6 +547,8 @@
         if(step.behavior.backType) $("#behavior_BackType").val(step.behavior.backType);
         if(step.behavior.backStep) $("#behavior_BackStep").val(step.behavior.backStep);
         if(step.behavior.percentage) $("#behavior_Percentage").val(step.behavior.percentage);
+        if(step.behavior.countersignature) $("#behavior_Countersignature").val(step.behavior.countersignature);
+        if(step.behavior.countersignaturePercentage) $("#behavior_CountersignaturePercentage").val(step.behavior.countersignaturePercentage);
 
         var forms=step.forms;
         if(forms && forms.length>0)
@@ -625,6 +637,7 @@
             step.archivesParams = $("#base_ArchivesParams").val()||"";
             step.note = $("#base_Note").val() || "";
             step.position = {x:@stepX, y:@stepY, width:@stepWidth, height:@stepHeight};
+            step.countersignature = $("#base_Countersignature_1").prop("checked") ? 1 : 0;
 
             step.behavior={
                 flowType: $("#behavior_FlowType").val() || "",
@@ -637,10 +650,12 @@
                 hanlderModel: $("#behavior_HanlderModel").val() || "",
                 backModel: $("#behavior_BackModel").val() || "",
                 backType: $("#behavior_BackType").val() || "",
-                backStep:$("#behavior_BackStep").val()||"",
-                percentage: $("#behavior_Percentage").val() || ""
+                backStep: $("#behavior_BackStep").val()||"",
+                percentage: $("#behavior_Percentage").val() || "",
+                countersignature: $("#behavior_Countersignature").val() || "0",
+                countersignaturePercentage: $("#behavior_CountersignaturePercentage").val() || ""
             };
-
+          
             step.forms = [];
             //$("#form_list div ul").each(function(i){
             //    var $spans=$(this).children('span');
@@ -672,7 +687,6 @@
                 backBefore: $("#event_BackBefore").val() || "",
                 backAfter: $("#event_BackAfter").val() || ""
             };
-
 
             frame.addStep1(step);
             frame.setStepText(step.id,step.name);

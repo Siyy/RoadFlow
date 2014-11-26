@@ -89,6 +89,29 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 得到待选事件选择项
+        /// </summary>
+        /// <returns></returns>
+        public string GetEventOptions(string name, string value, string att = "")
+        {
+            ListItem[] items = new ListItem[]{ 
+                new ListItem("onclick","onclick"){ Selected="onclick"==value},
+                new ListItem("onchange","onchange"){ Selected="onchange"==value},
+                new ListItem("ondblclick","ondblclick"){ Selected="ondblclick"==value},
+                new ListItem("onfocus","onfocus"){ Selected="onfocus"==value},
+                new ListItem("onblur","onblur"){ Selected="onblur"==value},
+                new ListItem("onkeydown","onkeydown"){ Selected="onkeydown"==value},
+                new ListItem("onkeypress","onkeypress"){ Selected="onkeypress"==value},
+                new ListItem("onkeyup","onkeyup"){ Selected="onkeyup"==value},
+                new ListItem("onmousedown","onmousedown"){ Selected="onmousedown"==value},
+                new ListItem("onmouseup","onmouseup"){ Selected="onmouseup"==value},
+                new ListItem("onmouseover","onmouseover"){ Selected="onmouseover"==value},
+                new ListItem("onmouseout","onmouseout"){ Selected="onmouseout"==value},
+            };
+            return Utility.Tools.GetOptionsString(items);
+        }
+
+        /// <summary>
         /// 得到流程值类型选择项字符串
         /// </summary>
         /// <returns></returns>
@@ -114,18 +137,26 @@ namespace Business.Platform
         /// <returns></returns>
         public string GetDefaultValueSelect(string value)
         {
-            ListItem[] items = new ListItem[]{ 
-                new ListItem("",""),
-                new ListItem("当前步骤用户ID","0"){ Selected="0"==value},
-                new ListItem("当前步骤用户姓名","1"){ Selected="1"==value},
-                new ListItem("当前步骤用户部门ID","2"){ Selected="2"==value},
-                new ListItem("当前步骤用户部门名称","3"){ Selected="3"==value},
-                new ListItem("短日期格式(2014/4/15)","4"){ Selected="4"==value},
-                new ListItem("长日期格式(2014年4月15日)","5"){ Selected="5"==value},
-                new ListItem("短日期时间格式(2014/4/15 22:31)","6"){ Selected="6"==value},
-                new ListItem("长日期时间格式(2014年4月15日 22时31分)","7"){ Selected="7"==value},
-            };
-            return Utility.Tools.GetOptionsString(items);
+            StringBuilder options = new StringBuilder(1000);
+            options.Append("<option value=\"\"></option>");
+            options.Append("<optgroup label=\"组织机构相关选项\"></optgroup>");
+            options.AppendFormat("<option value=\"u_@Business.Platform.Users.CurrentUserID.ToString()\" {0}>当前步骤用户ID</option>", "10" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Business.Platform.Users.CurrentUserName)\" {0}>当前步骤用户姓名</option>", "11" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Business.Platform.Users.CurrentDeptID)\" {0}>当前步骤用户部门ID</option>", "12" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Business.Platform.Users.CurrentDeptName)\" {0}>当前步骤用户部门名称</option>", "13" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"u_@(new Business.Platform.WorkFlowTask().GetFirstSnderID(FlowID.ToGuid(), GroupID.ToGuid(), true))\" {0}>流程发起者ID</option>", "14" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(new Business.Platform.Users().GetName(new Business.Platform.WorkFlowTask().GetFirstSnderID(FlowID.ToGuid(), GroupID.ToGuid(), true)))\" {0}>流程发起者姓名</option>", "15" == value ? "selected=\"selected\"" : "");
+            options.Append("<optgroup label=\"日期时间相关选项\"></optgroup>");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.ShortDate)\" {0}>短日期格式(2014/4/15)</option>", "20" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.LongDate)\" {0}>长日期格式(2014年4月15日)</option>", "21" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.ShortTime)\" {0}>短时间格式(23:59)</option>", "22" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.LongTime)\" {0}>长时间格式(23时59分)</option>", "23" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.ShortDateTime)\" {0}>短日期时间格式(2014/4/15 22:31)</option>", "24" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@(Utility.DateTimeNew.LongDateTime)\" {0}>长日期时间格式(2014年4月15日 22时31分)</option>", "25" == value ? "selected=\"selected\"" : "");
+            options.Append("<optgroup label=\"流程实例相关选项\"></optgroup>");
+            options.AppendFormat("<option value=\"@Html.Raw(BWorkFlow.GetFlowName(FlowID.ToGuid()))\" {0}>当前流程名称</option>", "30" == value ? "selected=\"selected\"" : "");
+            options.AppendFormat("<option value=\"@Html.Raw(BWorkFlow.GetStepName(StepID.ToGuid(), FlowID.ToGuid(), true))\" {0}>当前步骤名称</option>", "31" == value ? "selected=\"selected\"" : "");
+            return options.ToString();
         }
 
         /// <summary>
@@ -362,6 +393,153 @@ namespace Business.Platform
                 items.Add(new ListItem(title, value1));
             }
             return Utility.Tools.GetCheckBoxString(items.ToArray(), name, (value ?? "").Split(','), attr);
+        }
+
+        /// <summary>
+        /// 得到Grid的html
+        /// </summary>
+        /// <param name="dataFormat"></param>
+        /// <param name="dataSource"></param>
+        /// <param name="dataSource1"></param>
+        /// <returns></returns>
+        public string GetFormGridHtml(string connID, string dataFormat, string dataSource, string dataSource1)
+        {
+            if (!dataFormat.IsInt() || !dataSource.IsInt() || dataSource1.IsNullOrEmpty())
+            {
+                return "";
+            }
+ 
+            switch (dataSource)
+            { 
+                case "0":
+                    DBConnection dbConn = new DBConnection();
+                    var dbconn = dbConn.Get(connID.ToGuid());
+                    if (dbconn == null)
+                    {
+                        return "";
+                    }
+                    DataTable dt = dbConn.GetDataTable(dbconn, dataSource1.ReplaceSelectSql());
+                    switch (dataFormat)
+                    { 
+                        case "0":
+                            return dataTableToHtml(dt);
+                        case "1":
+                            return dt.Rows.Count > 0 ? dt.Rows[0][0].ToString() : "";
+                        case "2":
+                            return dt.Rows.Count > 0 ? jsonToHtml(dt.Rows[0][0].ToString()) : "";
+                        default:
+                            return "";
+                    }
+                    
+                case "1":
+                    string str = string.Empty;
+                    try
+                    {
+                        str = Utility.HttpHelper.SendGet(dataSource1);
+                        switch (dataFormat)
+                        {
+                            case "0":
+                            case "1":
+                                return str;
+                            case "2":
+                                return jsonToHtml(str);
+                            default:
+                                return "";
+                        }
+                    }
+                    catch
+                    {
+                        return "";
+                    }
+                case "2":
+                    Data.Model.WorkFlowCustomEventParams eventParams = new Data.Model.WorkFlowCustomEventParams();
+                    eventParams.FlowID = (System.Web.HttpContext.Current.Request.QueryString["FlowID"] ?? "").ToGuid();
+                    eventParams.GroupID = (System.Web.HttpContext.Current.Request.QueryString["GroupID"] ?? "").ToGuid();
+                    eventParams.StepID = (System.Web.HttpContext.Current.Request.QueryString["StepID"] ?? "").ToGuid();
+                    eventParams.TaskID = (System.Web.HttpContext.Current.Request.QueryString["TaskID"] ?? "").ToGuid();
+                    eventParams.InstanceID = System.Web.HttpContext.Current.Request.QueryString["InstanceID"] ?? "";
+                    object obj = null;
+                    try
+                    {
+                        obj = new WorkFlowTask().ExecuteFlowCustomEvent(dataSource1, eventParams);
+                        switch (dataFormat)
+                        {
+                            case "0":
+                                return dataTableToHtml((DataTable)obj);
+                            case "1":
+                                return obj.ToString();
+                            case "2":
+                                return jsonToHtml(obj.ToString());
+                            default:
+                                return "";
+                        }
+                    }
+                    catch
+                    {
+                        return "";
+                    }
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// 将一个DataTable转换为HTML表格
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private string dataTableToHtml(DataTable dt)
+        {
+            StringBuilder table = new StringBuilder(2000);
+            table.Append("<table border=\"1\" style=\"border-collapse:collapse;width:100%;\">");
+            table.Append("<thead><tr style=\"height:25px;\">");
+            foreach (DataColumn column in dt.Columns)
+            {
+                table.AppendFormat("<th>{0}</th>", column.ColumnName);
+            }
+            table.Append("</tr></thead>");
+            table.Append("<tbody>");
+            foreach (DataRow dr in dt.Rows)
+            {
+                table.Append("<tr style=\"height:22px;\">");
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    table.AppendFormat("<td>{0}</td>", dr[i].ToString().HtmlEncode());
+                }
+                table.Append("</tr>");
+            }
+            table.Append("</tbody>");
+            table.Append("</table>");
+            return table.ToString();
+        }
+
+        /// <summary>
+        /// 将json转换为HTML表格
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        private string jsonToHtml(string jsonStr)
+        {
+            LitJson.JsonData json = LitJson.JsonMapper.ToObject(jsonStr);
+            if (!json.IsArray)
+            {
+                return "";
+            }
+            StringBuilder table = new StringBuilder(2000);
+            table.Append("<table border=\"1\" style=\"border-collapse:collapse;width:100%;\">");
+            table.Append("<tbody><tr style=\"height:25px;\">");
+            foreach (LitJson.JsonData tr in json)
+            {
+                table.Append("<tr style=\"height:22px;\">");
+                foreach(LitJson.JsonData td in tr)
+                {
+                    table.AppendFormat("<td>{0}</td>", td.ToString());
+                }
+                table.Append("</tr>");
+            }
+            table.Append("</tbody>");
+            table.Append("</table>");
+            return table.ToString();
         }
 
 

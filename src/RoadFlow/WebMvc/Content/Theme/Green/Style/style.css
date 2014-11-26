@@ -1,8 +1,8 @@
-﻿body {font-size:12px; margin:0; padding:0; font-family:Arial, Helvetica, sans-serif;}
-table,td,th {font-size:12px; font-family:Arial, Helvetica, sans-serif;}
+﻿body {font-size:12px; margin:0; padding:0; font-family:Arial;}
+table,td,th {font-size:12px; font-family:Arial;}
 body,form {margin:0px; padding:0;}
-input,textarea {outline:none; font-size:12px; font-family:Arial, Helvetica, sans-serif;}
-select{outline:none; font-size:12px; font-family:宋体;}
+input,textarea,button {outline:none; font-size:12px; font-family:Arial;}
+select{outline:none; font-size:12px; font-family:Arial;}
 
 a:link,a:visited,a:active {color:#000000; text-decoration:none;}
 a:hover {color:Green; text-decoration:underline;} 
@@ -80,7 +80,7 @@ a.red:hover {color:red; text-decoration:underline;}
 
 .buttondiv{width:99%; margin:10px auto 0 auto; text-align:center;}
 
-.toolbar{margin-top:1px; height:26px; padding-left:2px; background:#e7f9ba; border-top:1px solid #b1d064;border-bottom:1px solid #b1d064; }
+.toolbar{margin-top:1px; font-family:Arial; height:26px; padding-left:2px; background:#e7f9ba; border-top:1px solid #b1d064;border-bottom:1px solid #b1d064; }
 .toolbar a{display:inline-block; cursor:default; height:23px; padding:0 2px 0 2px; line-height:23px; border:1px dashed transparent; _border-color:#abe423; _filter:chroma(color=#abe423); text-decoration:none; color:#000000;}
 .toolbar a:hover{display:inline-block; cursor:default; height:21px; padding:0 2px 0 2px; line-height:21px; border:1px solid #639d0a; background:url(../images/toolbar/bg.gif); text-decoration:none; color:#000000;}
 .toolbar a span{padding-left:20px; display:inline-block; cursor:default; background-position:left center; background-repeat:no-repeat;}

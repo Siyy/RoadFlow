@@ -109,5 +109,20 @@
 .accordioncontent { overflow:auto;}
 /*accordion*/
 
+/*grid*/
+.gridheadcontainer {position: relative; overflow:auto; background: #f5f5f5; text-align: left;  z-index:2;}
+.gridcontainer {position: relative; overflow:auto; background: #f5f5f5; text-align: left; z-index:1; margin-top:-1px;}
+.gridhead{border-collapse:separate; border-spacing: 1px; text-align: left; background:#e6eef7; }
+.gridhead tr td {position:relative; padding-left:3px; height:22px; background:#eef5fd;}
+.grid{border-collapse:separate; border-spacing: 1px; text-align: left; background:#e6eef7; z-index:1;}
+.grid tr td{padding-left:3px; height:23px; word-break:break-all;}
+.gridtitlediv {position: relative; z-index: 1;  height:22px;}
+.gridtitle { font-weight: bold; line-height: 24px; height:22px; float:left;}
+.gridtitlesort {overflow: hidden; display:none; width: 7px;  height:22px; margin-left: 2px;  float:left;}
+.gridtitleresize {position:relative; width:4px; height:22px; z-index:1; right: -5px; _right: -3px; cursor:col-resize; float:right;}
+.gridtdrout{background:#ffffff; }
+.gridtdover{background:#f9f9f9; }
+/*grid*/
+
 
 

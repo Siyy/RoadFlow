@@ -29,24 +29,31 @@ namespace WebMvc.Controllers
         }
 
         [HttpPost]
-        public ActionResult List(FormCollection collection)
+        public RedirectToRouteResult Delete()
         {
-            if (!Request.Form["DeleteBut"].IsNullOrEmpty())
+            Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
+            string deleteID = Request.Form["checkbox_app"];
+            System.Text.StringBuilder delxml = new System.Text.StringBuilder();
+            foreach (string id in deleteID.Split(','))
             {
-                Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
-                string deleteID = Request.Form["checkbox_app"];
-                System.Text.StringBuilder delxml = new System.Text.StringBuilder();
-                foreach (string id in deleteID.Split(','))
+                Guid gid;
+                if (id.IsGuid(out gid))
                 {
-                    Guid gid;
-                    if (id.IsGuid(out gid))
+                    var app = bappLibrary.Get(gid);
+                    if (app != null)
                     {
-                        delxml.Append(bappLibrary.Get(gid).Serialize());
+                        delxml.Append(app.Serialize());
                         bappLibrary.Delete(gid);
                     }
                 }
-                Business.Platform.Log.Add("删除了一批应用程序库", delxml.ToString(), Business.Platform.Log.Types.角色应用);
             }
+            Business.Platform.Log.Add("删除了一批应用程序库", delxml.ToString(), Business.Platform.Log.Types.角色应用);
+            return RedirectToAction("List", Common.Tools.GetRouteValueDictionary());
+        }
+
+        [HttpPost]
+        public ActionResult List(FormCollection collection)
+        {
             string title1 = collection["title1"];
             string address = collection["address"];
             return query(title1, address);

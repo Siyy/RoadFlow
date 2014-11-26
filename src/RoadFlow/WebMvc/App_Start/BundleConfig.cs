@@ -15,7 +15,7 @@ namespace WebMvc
             //            "~/Scripts/modernizr-*"));
 
             BundleTable.Bundles.Add(new ScriptBundle("~/bundles/script")
-                    .Include("~/Scripts/jquery-1.10.2.js")
+                    .Include("~/Scripts/jquery-1.11.1.js")
                     .Include("~/Scripts/jquery.cookie.js")
                     .Include("~/Scripts/json.js")
                     .Include("~/Scripts/roadui.core.js")

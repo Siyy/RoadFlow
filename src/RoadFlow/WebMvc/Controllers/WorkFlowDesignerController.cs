@@ -104,13 +104,13 @@ namespace WebMvc.Controllers
             {
                 return "[]";
             }
-            List<string> fields = new Business.Platform.DBConnection().GetFields(connid.ToGuid(), table);
+            Dictionary<string, string> fields = new Business.Platform.DBConnection().GetFields(connid.ToGuid(), table);
             System.Text.StringBuilder sb = new System.Text.StringBuilder("[", 1000);
 
-            foreach (string field in fields)
+            foreach (var field in fields)
             {
-                sb.Append("{\"name\":");
-                sb.AppendFormat("\"{0}\"", field);
+                sb.Append("{");
+                sb.AppendFormat("\"name\":\"{0}\",\"note\":\"{1}\"", field.Key, field.Value);
                 sb.Append("},");
             }
             return sb.ToString().TrimEnd(',') + "]";
@@ -118,6 +118,11 @@ namespace WebMvc.Controllers
 
 
         public ActionResult Set_Step()
+        {
+            return View();
+        }
+
+        public ActionResult Set_SubFlow()
         {
             return View();
         }

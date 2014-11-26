@@ -1,0 +1,20 @@
+﻿@{
+    Business.Platform.WorkFlowTask bworkFlowTask = new Business.Platform.WorkFlowTask();
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+}
+<script type="text/javascript">
+    var isshowDesign = true;
+    var taskJSON = {};
+</script>
+<div id="flowdiv" style="margin:0; padding:0; overflow:auto;"></div>
+<script src="~/Scripts/FlowDesinger/draw-min.js" type="text/javascript"></script>
+<script src="~/Scripts/FlowDesinger/workflow-show.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var appid = '@Request.QueryString["appid"]';
+    var iframeid = '@Request.QueryString["tabid"]';
+    $(function ()
+    {
+        openFlow1('@Request.QueryString["FlowID"]');
+    });
+</script>
+

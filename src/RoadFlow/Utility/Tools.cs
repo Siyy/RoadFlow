@@ -98,22 +98,26 @@ namespace Utility
         {
             string osVersion = System.Web.HttpContext.Current.Request.Browser.Platform;
             string userAgent = System.Web.HttpContext.Current.Request.UserAgent;
-
-            if (userAgent.Contains("NT 6.2"))
+            
+            if (userAgent.Contains("NT 6.3"))
             {
-                osVersion = "Windows8/Server 2012";
+                osVersion = "Windows8.1";
             }
-            if (userAgent.Contains("NT 6.1"))
+            else if (userAgent.Contains("NT 6.2"))
             {
-                osVersion = "Windows7/Server 2008 R2";
+                osVersion = "Windows8";
+            }
+            else if (userAgent.Contains("NT 6.1"))
+            {
+                osVersion = "Windows7";
             }
             else if (userAgent.Contains("NT 6.0"))
             {
-                osVersion = "Windows Vista/Server 2008";
+                osVersion = "WindowsVista";
             }
             else if (userAgent.Contains("NT 5.2"))
             {
-                osVersion = "Windows Server 2003";
+                osVersion = "WindowsServer2003";
             }
             else if (userAgent.Contains("NT 5.1"))
             {
@@ -473,6 +477,7 @@ namespace Utility
             }
             return checkCode;
         }
+
         /// <summary>
         /// 产生随机字母
         /// </summary>
@@ -505,6 +510,23 @@ namespace Utility
             System.IO.FileInfo fi = new System.IO.FileInfo(file);
 
             return fi.Length.ToString("###,###");
+        }
+
+        public static string DataTableToJsonString(System.Data.DataTable dt)
+        {
+            LitJson.JsonData json = new LitJson.JsonData();
+            foreach(System.Data.DataRow dr in dt.Rows)
+            {
+                LitJson.JsonData drJson = new LitJson.JsonData();
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    LitJson.JsonData drJson1 = new LitJson.JsonData();
+                    drJson1 = dr[i].ToString();
+                    drJson.Add(drJson1);
+                }
+                json.Add(drJson);
+            }
+            return json.ToJson();
         }
     }
 }

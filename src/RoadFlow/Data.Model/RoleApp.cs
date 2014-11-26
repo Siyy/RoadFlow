@@ -1,4 +1,4 @@
-锘縰sing System;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,51 +14,51 @@ namespace Data.Model
         public Guid ID { get; set; }
 
         /// <summary>
-        /// 涓婄骇ID
+        /// 上级ID
         /// </summary>
-        [DisplayName("涓婄骇ID")]
+        [DisplayName("上级ID")]
         public Guid ParentID { get; set; }
 
         /// <summary>
-        /// 瑙掕壊ID
+        /// 角色ID
         /// </summary>
-        [DisplayName("瑙掕壊ID")]
+        [DisplayName("角色ID")]
         public Guid RoleID { get; set; }
 
         /// <summary>
-        /// 搴旂敤ID
+        /// 应用ID
         /// </summary>
-        [DisplayName("搴旂敤ID")]
+        [DisplayName("应用ID")]
         public Guid? AppID { get; set; }
 
         /// <summary>
-        /// 鏄剧ず鏍囬
+        /// 显示标题
         /// </summary>
-        [DisplayName("鏄剧ず鏍囬")]
+        [DisplayName("显示标题")]
         public string Title { get; set; }
 
         /// <summary>
-        /// 鐩稿叧鍙傛暟
+        /// 相关参数
         /// </summary>
-        [DisplayName("鐩稿叧鍙傛暟")]
+        [DisplayName("相关参数")]
         public string Params { get; set; }
 
         /// <summary>
-        /// 鏄剧ず椤哄簭
+        /// 显示顺序
         /// </summary>
-        [DisplayName("鏄剧ず椤哄簭")]
+        [DisplayName("显示顺序")]
         public int Sort { get; set; }
 
         /// <summary>
-        /// 搴旂敤鍥炬爣
+        /// 应用图标
         /// </summary>
-        [DisplayName("搴旂敤鍥炬爣")]
+        [DisplayName("应用图标")]
         public string Ico { get; set; }
 
         /// <summary>
-        /// 0:妯℃澘搴旂敤 1:涓汉搴旂敤
+        /// 0:模板应用 1:个人应用
         /// </summary>
-        [DisplayName("0:妯℃澘搴旂敤 1:涓汉搴旂敤")]
+        [DisplayName("0:模板应用 1:个人应用")]
         public int Type { get; set; }
 
     }

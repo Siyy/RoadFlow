@@ -1,0 +1,40 @@
+﻿@{
+	string FlowID = Request.QueryString["flowid"];
+	string StepID = Request.QueryString["stepid"];
+	string GroupID = Request.QueryString["groupid"];
+	string TaskID = Request.QueryString["taskid"];
+	string InstanceID = Request.QueryString["instanceid"];
+	string DisplayModel = Request.QueryString["display"] ?? "0";
+	string DBConnID = "06075250-30dc-4d32-bf97-e922cb30fac8";
+	string DBTable = "TempTest_News";
+	string DBTablePK = "ID";
+	string DBTableTitle = "Title";
+	Business.Platform.Dictionary BDictionary = new Business.Platform.Dictionary();
+	Business.Platform.WorkFlow BWorkFlow = new Business.Platform.WorkFlow();
+	Business.Platform.WorkFlowTask BWorkFlowTask = new Business.Platform.WorkFlowTask();
+	string fieldStatus = BWorkFlow.GetFieldStatus(FlowID, StepID);
+	LitJson.JsonData initData = BWorkFlow.GetFormData(DBConnID, DBTable, DBTablePK, InstanceID, fieldStatus);
+	string TaskTitle = BWorkFlow.GetFromFieldData(initData, DBTable, DBTableTitle);
+}
+<link href="~/Scripts/FlowRun/Forms/flowform.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/FlowRun/Forms/common.js" type="text/javascript" ></script>
+<script src="~/Scripts/Ueditor/ueditor.config.js" type="text/javascript" ></script>
+<script src="~/Scripts/Ueditor/ueditor.all.min.js" type="text/javascript" ></script>
+<script src="~/Scripts/Ueditor/lang/zh-cn/zh-cn.js" type="text/javascript" ></script>
+<input type="hidden" id="Form_HasUEditor" name="Form_HasUEditor" value="1" />
+<input type="hidden" id="Form_ValidateAlertType" name="Form_ValidateAlertType" value="1" />
+<input type="hidden" id="Form_TitleField" name="Form_TitleField" value="TempTest_News.Title" />
+<input type="hidden" id="Form_DBConnID" name="Form_DBConnID" value="06075250-30dc-4d32-bf97-e922cb30fac8" />
+<input type="hidden" id="Form_DBTable" name="Form_DBTable" value="TempTest_News" />
+<input type="hidden" id="Form_DBTablePk" name="Form_DBTablePk" value="ID" />
+<input type="hidden" id="Form_DBTableTitle" name="Form_DBTableTitle" value="Title" />
+<input type="hidden" id="Form_AutoSaveData" name="Form_AutoSaveData" value="1" />
+<script type="text/javascript">
+	var initData = @Html.Raw(BWorkFlow.GetFormDataJsonString(initData));
+	var fieldStatus = @Html.Raw(fieldStatus);
+	var displayModel = '@DisplayModel';
+	$(function (){
+		formrun.initData(initData, "TempTest_News", fieldStatus, displayModel);
+	});
+</script>
+<p> </p><p style="text-align: center;"> <span style="font-size: 24px;"></span></p><p style="text-align: center;"><span style="font-size: 24px;"><strong>信 息 发 布</strong></span></p><p style="text-align: center;"> </p><table class="flowformtable" cellspacing="1" cellpadding="0"><tbody><tr class="firstRow"><td width="81" valign="top" style="-ms-word-break: break-all;">标题：<br/></td><td width="1036" valign="top"><input name="TempTest_News.Title" title="" class="mytext" id="TempTest_News.Title" style="width: 80%;" type="text" maxlength="500" value="" isflow="1" type1="flow_text" valuetype="0"/></td></tr><tr><td width="81" valign="top" style="-ms-word-break: break-all;">副标题：<br/></td><td width="1036" valign="top" style="-ms-word-break: break-all;"><textarea name="TempTest_News.Title1" class="mytext" id="TempTest_News.Title1" style="width: 80%; height: 70px;" maxlength="1000" isflow="1" type1="flow_textarea"></textarea> <span style="font-size: 24px;"></span></td></tr><tr><td width="81" valign="top" style="-ms-word-break: break-all;">分类：<br/></td><td width="1036" valign="top" style="-ms-word-break: break-all;">@Html.Raw(BDictionary.GetCheckboxsByID("a8b9101f-4f8b-4830-9de1-c86ad89405c3".ToGuid(), "TempTest_News.Type", Business.Platform.Dictionary.OptionValueField.ID, "", "isflow='1' type1='flow_checkbox'"))</td></tr><tr><td width="81" valign="top" style="-ms-word-break: break-all;">内容：<br/></td><td width="1036" valign="top" style="-ms-word-break: break-all;"><textarea name="TempTest_News.Contents" class="mytextarea" id="TempTest_News.Contents" style="width: 99%; height: 350px;" isflow="1" type1="flow_textarea" model="html">@Html.Raw(BWorkFlow.GetFromFieldData(initData, "TempTest_News","Contents"))</textarea></td></tr></tbody></table><p> </p>

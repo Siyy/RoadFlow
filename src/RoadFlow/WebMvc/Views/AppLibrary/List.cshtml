@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "List";
 }
-<form method="post" >
+<form method="post" id="form1" >
 <div class="querybar">
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
@@ -17,7 +17,6 @@
 <div class="toolbar" style="margin-top:0; border-top:0;">
     <a href="javascript:void(0);" onclick="add();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_add.png"));">添加应用</span></a>
     <span class="toolbarsplit">&nbsp;</span>
-    <input type="submit" style="display:none;" value="d" id="DeleteBut" name="DeleteBut" />
     <a href="javascript:void(0);" onclick="del();return false;"><span style="background-image:url(@Url.Content("~/Images/ico/folder_classic_stuffed_remove.png"));">删除所选</span></a>
 </div>
 <table cellpadding="0" cellspacing="1" border="0" class="listtable">
@@ -76,7 +75,8 @@
         {
             return false;
         }
-        $("#DeleteBut").click();
+        $("#form1").attr("action", "Delete"+"@Html.Raw(Request.Url.Query)");
+        $("#form1").submit();
         return true;
     }
 </script>

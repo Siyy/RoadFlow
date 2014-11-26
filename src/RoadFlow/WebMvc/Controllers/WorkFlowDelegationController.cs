@@ -88,12 +88,6 @@ namespace WebMvc.Controllers
 
             bool isOneSelf = "1" == Request.QueryString["isoneself"];
 
-            if (isOneSelf)
-            {
-                UserID = Business.Platform.Users.PREFIX + Business.Platform.Users.CurrentUserID.ToString();
-                workFlowDelegation.UserID = Business.Platform.Users.CurrentUserID;
-            }
-
             Guid delegationID;
             if (id.IsGuid(out delegationID))
             {
@@ -120,7 +114,7 @@ namespace WebMvc.Controllers
                     workFlowDelegation = new Data.Model.WorkFlowDelegation();
                     workFlowDelegation.ID = Guid.NewGuid();
                 }
-                workFlowDelegation.UserID = Business.Platform.Users.RemovePrefix(UserID).ToGuid();
+                workFlowDelegation.UserID = isOneSelf ? Business.Platform.Users.CurrentUserID : Business.Platform.Users.RemovePrefix(UserID).ToGuid();
                 workFlowDelegation.EndTime = EndTime.ToDateTime();
                 if (FlowID.IsGuid())
                 {
@@ -147,7 +141,7 @@ namespace WebMvc.Controllers
                 ViewBag.Script = "alert('保存成功!');new RoadUI.Window().reloadOpener();";
             }
             ViewBag.FlowOptions = new Business.Platform.WorkFlow().GetOptions(FlowID);
-            return View(workFlowDelegation == null ? new Data.Model.WorkFlowDelegation() : workFlowDelegation);
+            return View(workFlowDelegation == null ? new Data.Model.WorkFlowDelegation() { UserID = Business.Platform.Users.CurrentUserID } : workFlowDelegation);
         }
 
     }

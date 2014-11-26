@@ -52,11 +52,11 @@
     var dialog = top.mainDialog;
     function add()
     {
-        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "添加意见", width: 700, height: 260, url: 'WorkFlowComments/Edit?1=1' + '@query1', openerid: iframeid });
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "添加意见", width: 700, height: 260, url: top.rootdir + '/WorkFlowComments/Edit?1=1' + '@query1', openerid: iframeid });
     }
     function edit(id)
     {
-        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "编辑意见", width: 700, height: 260, url: 'WorkFlowComments/Edit?id=' + id + '@query1', openerid: iframeid });
+        dialog.open({ id: "window_" + appid.replaceAll('-', ''), title: "编辑意见", width: 700, height: 260, url: top.rootdir + 'WorkFlowComments/Edit?id=' + id + '@query1', openerid: iframeid });
     }
     function checkAll(checked)
     {

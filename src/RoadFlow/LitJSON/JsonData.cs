@@ -819,7 +819,7 @@ namespace LitJson
 
         public bool ContainsKey(string key)
         {
-            return ((IDictionary)this).Contains(key);
+            return this.Keys.Contains(key);
         }
 
         public bool Equals (JsonData x)

@@ -9,6 +9,10 @@ namespace WebMvc.Common
 {
     public class CustomFormSave
     {
+        public static object GetJson(Data.Model.WorkFlowCustomEventParams eventParams)
+        {
+            return new Data.MSSQL.DBHelper().GetDataTable("select * from users");
+        }
         public static string QianShi(Data.Model.WorkFlowCustomEventParams eventParams)
         {
             string title = System.Web.HttpContext.Current.Request.Form["Title"];

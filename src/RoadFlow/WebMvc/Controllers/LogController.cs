@@ -66,6 +66,14 @@ namespace WebMvc.Controllers
             return View(dt);
         }
 
+        public string GetData(string title="", string type="", string date1="", string date2="", string userid="")
+        {
+            string pager;
+            Business.Platform.Log blog = new Business.Platform.Log();
+            System.Data.DataTable dt = blog.GetPagerData(out pager, "", title, type, date1, date2, userid);
+            return Utility.Tools.DataTableToJsonString(dt);
+        }
+
         public ActionResult Detail()
         {
             string id = Request.QueryString["id"];

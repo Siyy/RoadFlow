@@ -233,7 +233,7 @@ namespace Data.Model.WorkFlowExecute
         /// </summary>
         public Data.Model.Users Sender { get; set; }
         /// <summary>
-        /// 处理的步骤和人员
+        /// 接收的步骤和人员
         /// </summary>
         public Dictionary<Guid, List<Data.Model.Users>> Steps { get; set; }
         /// <summary>

@@ -240,6 +240,10 @@
             {
                 initValue = $control.prev().val();
             }
+            else if (type == "flow_checkbox" || type == "flow_radio")
+            {
+                initValue = $control.prop("checked") ? $control.val() : "";
+            }
             else
             {
                 initValue = $control.val();
@@ -248,6 +252,7 @@
             {
                 initValue = "";
             }
+            
         }
         switch (type)
         {

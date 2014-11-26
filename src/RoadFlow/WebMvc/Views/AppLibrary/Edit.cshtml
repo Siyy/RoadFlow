@@ -3,8 +3,8 @@
     ViewBag.Title = "Edit";
 }
 <form method="post" onsubmit="return new RoadUI.Validate().validateForm(this);">
-@Html.AntiForgeryToken()
-<br />
+    @Html.AntiForgeryToken()
+    <br />
     <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
     <tr>
         <th style="width: 80px;">应用名称：</th>

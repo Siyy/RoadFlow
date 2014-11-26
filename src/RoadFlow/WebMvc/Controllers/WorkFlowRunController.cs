@@ -56,5 +56,15 @@ namespace WebMvc.Controllers
         {
             return View();
         }
+
+
+        /// <summary>
+        /// 查看流程图
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ShowDesign()
+        {
+            return View();
+        }
     }
 }

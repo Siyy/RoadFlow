@@ -160,13 +160,13 @@ namespace Business.Platform
         /// <param name="id">连接ID</param>
         /// <param name="table">表名</param>
         /// <returns></returns>
-        public List<string> GetFields(Guid id, string table)
+        public Dictionary<string, string> GetFields(Guid id, string table)
         {
-            if (table.IsNullOrEmpty()) return new List<string>();
+            if (table.IsNullOrEmpty()) return new Dictionary<string, string>();
             var allConns = GetAll(true);
             var conn = allConns.Find(p => p.ID == id);
-            if (conn == null) return new List<string>();
-            List<string> fields = new List<string>();
+            if (conn == null) return new Dictionary<string, string>();
+            Dictionary<string, string> fields = new Dictionary<string, string>();
             switch (conn.Type)
             {
                 case "SqlServer":
@@ -354,7 +354,7 @@ namespace Business.Platform
         /// <param name="conn"></param>
         /// <param name="table"></param>
         /// <returns></returns>
-        private List<string> getFields_SqlServer(Data.Model.DBConnection conn, string table)
+        private Dictionary<string, string> getFields_SqlServer(Data.Model.DBConnection conn, string table)
         {
             using (SqlConnection sqlConn = new SqlConnection(conn.ConnectionString))
             {
@@ -365,24 +365,25 @@ namespace Business.Platform
                 catch (SqlException err)
                 {
                     Log.Add(err);
-                    return new List<string>();
+                    return new Dictionary<string, string>();
                 }
-                List<string> fields = new List<string>();
-                string sql = string.Format(@"select a.name as f_name,b.name as t_name,[length],a.isnullable as is_null from 
-                    sys.syscolumns a inner join sys.types b on b.user_type_id=a.xtype 
-                    where object_id('{0}')=id order by a.colid", table);
+                Dictionary<string, string> fields = new Dictionary<string, string>();
+                string sql = string.Format(@"SELECT a.name as f_name, b.value from 
+sys.syscolumns a LEFT JOIN sys.extended_properties b on a.id=b.major_id AND a.colid=b.minor_id AND b.name='MS_Description' 
+WHERE object_id('{0}')=a.id ORDER BY a.colid", table);
                 using (SqlCommand sqlCmd = new SqlCommand(sql, sqlConn))
                 {
                     SqlDataReader dr = sqlCmd.ExecuteReader();
                     while (dr.Read())
                     {
-                        fields.Add(dr.GetString(0));
+                        fields.Add(dr.GetString(0), dr.IsDBNull(1) ? "" : dr.GetString(1));
                     }
                     dr.Close();
                     return fields;
                 }
             }
         }
+
         /// <summary>
         /// 得到一个连接一个表一个字段的值
         /// </summary>

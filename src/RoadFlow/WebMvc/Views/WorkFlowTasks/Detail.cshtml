@@ -70,11 +70,13 @@ else
     </div>
     <div id="flowdiv" style="margin:0; padding:0; overflow:auto;"></div>
     <script type="text/javascript">
+        var isshowDesign = false;
         var taskJSON=@Html.Raw(tasksjson.ToString());
     </script>
     <script src="~/Scripts/FlowDesinger/draw-min.js" type="text/javascript"></script>
     <script src="~/Scripts/FlowDesinger/workflow-show.js" type="text/javascript"></script>
     <script type="text/javascript">
+        
         $(function ()
         {
             openFlow1('@ViewBag.flowid');

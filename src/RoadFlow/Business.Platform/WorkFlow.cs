@@ -487,130 +487,173 @@ namespace Business.Platform
             {
                 foreach (LitJson.JsonData step in steps)
                 {
-                    #region 行为
-                    LitJson.JsonData behavior = step["behavior"];
-                    Data.Model.WorkFlowInstalledSub.StepSet.Behavior behavior1=new Data.Model.WorkFlowInstalledSub.StepSet.Behavior();
-                    if (behavior.IsObject)
+                    string stepType = step.ContainsKey("type") ? step["type"].ToString() : "step";
+                    if ("step" == stepType)
                     {
-                        behavior1.BackModel = behavior["backModel"].ToString().ToInt();
-                        behavior1.BackStepID = behavior["backStep"].ToString().ToGuid();
-                        behavior1.BackType = behavior["backType"].ToString().ToInt();
-                        behavior1.DefaultHandler = behavior["defaultHandler"].ToString();
-                        behavior1.FlowType = behavior["flowType"].ToString().ToInt();
-                        behavior1.HandlerStepID = behavior["handlerStep"].ToString().ToGuid();
-                        behavior1.HandlerType = behavior["handlerType"].ToString().ToInt();
-                        behavior1.HanlderModel = behavior["hanlderModel"].ToString().ToInt(3);
-                        behavior1.Percentage = behavior["percentage"].ToString().IsDecimal() ? behavior["percentage"].ToString().ToDecimal() : decimal.MinusOne;
-                        behavior1.RunSelect = behavior["runSelect"].ToString().ToInt();
-                        behavior1.SelectRange = behavior["selectRange"].ToString();
-                        behavior1.ValueField = behavior["valueField"].ToString();
-                    }
-                    #endregion
-                    #region 按钮
-                    LitJson.JsonData buttons = step["buttons"];
-                    List<Data.Model.WorkFlowInstalledSub.StepSet.Button> buttionList = new List<Data.Model.WorkFlowInstalledSub.StepSet.Button>();
-                    if (buttons.IsArray)
-                    {
-                        foreach (LitJson.JsonData button in buttons)
+                        #region 行为
+                        LitJson.JsonData behavior = step["behavior"];
+                        Data.Model.WorkFlowInstalledSub.StepSet.Behavior behavior1 = new Data.Model.WorkFlowInstalledSub.StepSet.Behavior();
+                        if (behavior.IsObject)
                         {
-                            buttionList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.Button()
-                            {
-                                ID = button["id"].ToString(),
-                                Sort = button["sort"].ToString().ToInt()
-                            });
+                            behavior1.BackModel = behavior["backModel"].ToString().ToInt();
+                            behavior1.BackStepID = behavior["backStep"].ToString().ToGuid();
+                            behavior1.BackType = behavior["backType"].ToString().ToInt();
+                            behavior1.DefaultHandler = behavior["defaultHandler"].ToString();
+                            behavior1.FlowType = behavior["flowType"].ToString().ToInt();
+                            behavior1.HandlerStepID = behavior["handlerStep"].ToString().ToGuid();
+                            behavior1.HandlerType = behavior["handlerType"].ToString().ToInt();
+                            behavior1.HanlderModel = behavior["hanlderModel"].ToString().ToInt(3);
+                            behavior1.Percentage = behavior["percentage"].ToString().IsDecimal() ? behavior["percentage"].ToString().ToDecimal() : decimal.MinusOne;
+                            behavior1.RunSelect = behavior["runSelect"].ToString().ToInt();
+                            behavior1.SelectRange = behavior["selectRange"].ToString();
+                            behavior1.ValueField = behavior["valueField"].ToString();
+                            behavior1.Countersignature = behavior.ContainsKey("countersignature") ? behavior["countersignature"].ToString().ToInt() : 0;
+                            behavior1.CountersignaturePercentage = behavior.ContainsKey("countersignaturePercentage") ? behavior["countersignaturePercentage"].ToString().ToDecimal() : decimal.MinusOne;
                         }
-                    }
-                    if (buttionList.Count == 0)
-                    {
-                        errMsg = string.Format("步骤[{0}]未设置按钮", step["name"].ToString());
-                        return null;
-                    }
-                    #endregion
-                    #region 事件
-                    LitJson.JsonData event1 = step["event"];
-                    Data.Model.WorkFlowInstalledSub.StepSet.Event event2 = new Data.Model.WorkFlowInstalledSub.StepSet.Event();
-                    if (event1.IsObject)
-                    {
-                        event2.BackAfter = event1["backAfter"].ToString();
-                        event2.BackBefore = event1["backBefore"].ToString();
-                        event2.SubmitAfter = event1["submitAfter"].ToString();
-                        event2.SubmitBefore = event1["submitBefore"].ToString();
-                    }
-                    #endregion
-                    #region 表单
-                    LitJson.JsonData forms = step["forms"];
-                    List<Data.Model.WorkFlowInstalledSub.StepSet.Form> formList = new List<Data.Model.WorkFlowInstalledSub.StepSet.Form>();
-                    if (forms.IsArray)
-                    {
-                        foreach (LitJson.JsonData form in forms)
+                        #endregion
+                        #region 按钮
+                        LitJson.JsonData buttons = step["buttons"];
+                        List<Data.Model.WorkFlowInstalledSub.StepSet.Button> buttionList = new List<Data.Model.WorkFlowInstalledSub.StepSet.Button>();
+                        if (buttons.IsArray)
                         {
-                            formList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.Form()
+                            foreach (LitJson.JsonData button in buttons)
                             {
-                                ID = form["id"].ToString().ToGuid(),
-                                Name = form["name"].ToString(),
-                                Sort = form["srot"].ToString().ToInt()
-                            });
+                                string butID = button["id"].ToString();
+                                if (!butID.IsGuid())
+                                {
+                                    continue;
+                                }
+                                var buttonModel = new WorkFlowButtons().Get(butID.ToGuid(), true);
+                                buttionList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.Button()
+                                {
+                                    ID = butID,
+                                    Note = buttonModel == null ? "" : buttonModel.Note.Replace("\"", "'"),
+                                    Sort = button["sort"].ToString().ToInt()
+                                });
+                            }
                         }
-                    }
-                    if (formList.Count == 0)
-                    {
-                        errMsg = string.Format("步骤[{0}]未设置表单", step["name"].ToString());
-                        return null;
-                    }
-                    #endregion
-                    #region 字段状态
-                    LitJson.JsonData fieldStatus = step["fieldStatus"];
-                    List<Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus> fieldStatusList = new List<Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus>();
-                    if (fieldStatus.IsArray)
-                    {
-                        foreach (LitJson.JsonData field in fieldStatus)
+                        if (buttionList.Count == 0)
                         {
-                            fieldStatusList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus()
-                            {
-                                Check = field["check"].ToString().ToInt(),
-                                Field = field["field"].ToString(),
-                                Status1 = field["status"].ToString().ToInt()
-                            });
+                            errMsg = string.Format("步骤[{0}]未设置按钮", step["name"].ToString());
+                            return null;
                         }
-                    }
-                    #endregion
-                    #region 坐标
-                    LitJson.JsonData position = step["position"];
-                    decimal x=0, y=0;
-                    if (position.IsObject)
-                    {
-                        x = position["x"].ToString().ToDecimal();
-                        y = position["y"].ToString().ToDecimal();
-                    }
+                        #endregion
+                        #region 事件
+                        LitJson.JsonData event1 = step["event"];
+                        Data.Model.WorkFlowInstalledSub.StepSet.Event event2 = new Data.Model.WorkFlowInstalledSub.StepSet.Event();
+                        if (event1.IsObject)
+                        {
+                            event2.BackAfter = event1["backAfter"].ToString();
+                            event2.BackBefore = event1["backBefore"].ToString();
+                            event2.SubmitAfter = event1["submitAfter"].ToString();
+                            event2.SubmitBefore = event1["submitBefore"].ToString();
+                        }
+                        #endregion
+                        #region 表单
+                        LitJson.JsonData forms = step["forms"];
+                        List<Data.Model.WorkFlowInstalledSub.StepSet.Form> formList = new List<Data.Model.WorkFlowInstalledSub.StepSet.Form>();
+                        if (forms.IsArray)
+                        {
+                            foreach (LitJson.JsonData form in forms)
+                            {
+                                formList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.Form()
+                                {
+                                    ID = form["id"].ToString().ToGuid(),
+                                    Name = form["name"].ToString(),
+                                    Sort = form["srot"].ToString().ToInt()
+                                });
+                            }
+                        }
+                        if (formList.Count == 0)
+                        {
+                            errMsg = string.Format("步骤[{0}]未设置表单", step["name"].ToString());
+                            return null;
+                        }
+                        #endregion
+                        #region 字段状态
+                        LitJson.JsonData fieldStatus = step["fieldStatus"];
+                        List<Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus> fieldStatusList = new List<Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus>();
+                        if (fieldStatus.IsArray)
+                        {
+                            foreach (LitJson.JsonData field in fieldStatus)
+                            {
+                                fieldStatusList.Add(new Data.Model.WorkFlowInstalledSub.StepSet.FieldStatus()
+                                {
+                                    Check = field["check"].ToString().ToInt(),
+                                    Field = field["field"].ToString(),
+                                    Status1 = field["status"].ToString().ToInt()
+                                });
+                            }
+                        }
+                        #endregion
+                        #region 坐标/基本信息
+                        LitJson.JsonData position = step["position"];
+                        decimal x = 0, y = 0;
+                        if (position.IsObject)
+                        {
+                            x = position["x"].ToString().ToDecimal();
+                            y = position["y"].ToString().ToDecimal();
+                        }
 
-                    stepsList.Add(new Data.Model.WorkFlowInstalledSub.Step()
+                        stepsList.Add(new Data.Model.WorkFlowInstalledSub.Step()
+                        {
+                            Archives = step["archives"].ToString().ToInt(),
+                            ArchivesParams = step["archivesParams"].ToString(),
+                            Behavior = behavior1,
+                            Buttons = buttionList,
+                            Event = event2,
+                            ExpiredPrompt = step["expiredPrompt"].ToString().ToInt(),
+                            Forms = formList,
+                            FieldStatus = fieldStatusList,
+                            ID = step["id"].ToString().ToGuid(),
+                            Type = "step",
+                            LimitTime = step["limitTime"].ToString().ToDecimal(),
+                            Name = step["name"].ToString(),
+                            Note = step["note"].ToString(),
+                            OpinionDisplay = step["opinionDisplay"].ToString().ToInt(),
+                            OtherTime = step["otherTime"].ToString().ToDecimal(),
+                            SignatureType = step["signatureType"].ToString().ToInt(),
+                            WorkTime = step["workTime"].ToString().ToDecimal(),
+                            Position_x = x,
+                            Position_y = y
+                        });
+                        #endregion
+                    }
+                    else if ("subflow" == stepType)
                     {
-                        Archives = step["archives"].ToString().ToInt(),
-                        ArchivesParams = step["archivesParams"].ToString(),
-                        Behavior = behavior1,
-                        Buttons = buttionList,
-                        Event = event2,
-                        ExpiredPrompt = step["expiredPrompt"].ToString().ToInt(),
-                        Forms = formList,
-                        FieldStatus = fieldStatusList,
-                        ID = step["id"].ToString().ToGuid(),
-                        LimitTime = step["limitTime"].ToString().ToDecimal(),
-                        Name = step["name"].ToString(),
-                        Note = step["note"].ToString(),
-                        OpinionDisplay = step["opinionDisplay"].ToString().ToInt(),
-                        OtherTime = step["otherTime"].ToString().ToDecimal(),
-                        SignatureType = step["signatureType"].ToString().ToInt(),
-                        WorkTime = step["workTime"].ToString().ToDecimal(),
-                        Position_x = x,
-                        Position_y = y
-                    });
-                    #endregion
+                        #region 子流流程步骤参数
+                        LitJson.JsonData position = step["position"];
+                        decimal x = 0, y = 0;
+                        if (position.IsObject)
+                        {
+                            x = position["x"].ToString().ToDecimal();
+                            y = position["y"].ToString().ToDecimal();
+                        }
+                        if (!step["flowid"].ToString().IsGuid() || step["handler"].ToString().IsNullOrEmpty())
+                        {
+                            errMsg = string.Format("子流程步骤[{0}]未设置流程或处理者", step["name"].ToString());
+                            return null;
+                        }
+
+                        stepsList.Add(new Data.Model.WorkFlowInstalledSub.Step()
+                        {
+                            ID = step["id"].ToString().ToGuid(),
+                            Type = "subflow",
+                            Name = step["name"].ToString(),
+                            SubFlow_FlowID = step["flowid"].ToString(),
+                            SubFlow_Handler = step["handler"].ToString(),
+                            SubFlow_Strategy = step["strategy"].ToString().ToInt(),
+                            Position_x = x,
+                            Position_y = y
+                        });
+                        #endregion
+                    }
                 }
             }
             wfInstalled.Steps = stepsList;
             if (stepsList.Count == 0)
             {
-                errMsg = "流程至少需要两个步骤";
+                errMsg = "流程至少需要一个步骤";
                 return null;
             }
             #endregion
@@ -859,7 +902,7 @@ namespace Business.Platform
         {
             var dicts = GetAllIDAndName();
             StringBuilder options = new StringBuilder();
-            foreach (var dict in dicts)
+            foreach (var dict in dicts.OrderBy(p=>p.Value))
             {
                 options.AppendFormat("<option value=\"{0}\" {1}>{2}</option>", dict.Key, 
                     dict.Key.ToString() == value ? "selected=\"selected\"" : "", dict.Value);

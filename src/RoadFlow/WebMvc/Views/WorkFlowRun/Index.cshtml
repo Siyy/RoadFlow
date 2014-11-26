@@ -94,7 +94,7 @@
 <form id="mainform" name="mainform" method="post" target="submiter" style="display:none;">
 @if ("0" == display)//display为0表示执行，1表示查看
 {
-    <div class="toolbar" style="margin-top:0; border-top:none 0; position:fixed; top:0; left:0; right:0; margin-left:auto; z-index:99999999; width:100%; margin-right:auto; height:26px;">
+    <div class="toolbar" style="margin-top:0; border-top:none 0; position:fixed; top:0; left:0; right:0; margin-left:auto; z-index:999; width:100%; margin-right:auto; height:26px;">
         <div>
         @foreach (var button in currentStep.Buttons)
         {
@@ -107,7 +107,7 @@
                     continue;
                 }
                 var funName = string.Concat("fun_", button1.ID.ToString("N"), "()");
-            <a href="#" onclick="@funName;return false;">
+            <a href="#" onclick="@funName;return false;" title="@button1.Note.Replace("\"","'")">
                 <span style="background:url(@Url.Content("~"+button1.Ico)) no-repeat left center;">@button1.Title</span>
             </a>
             <script type="text/javascript">
@@ -120,7 +120,6 @@
             }
         }
         </div>
-       
     </div>
     
     <input type="hidden" name="params" id="params" value="" />

@@ -19,7 +19,7 @@ namespace WebMvc.Common
     <link href=""{0}Content/Theme/{1}/Style/style.css"" id=""style_style"" rel=""stylesheet"" type=""text/css"" media=""screen""/>
     <link href=""{0}Content/Theme/{1}/Style/ui.css"" id=""style_ui"" rel=""stylesheet"" type=""text/css"" media=""screen""/> 
     <script type=""text/javascript"" src=""{0}Scripts/My97DatePicker/WdatePicker.js""></script>
-    <script type=""text/javascript"" src=""{0}Scripts/jquery-1.10.2.js""></script>
+    <script type=""text/javascript"" src=""{0}Scripts/jquery-1.11.1.min.js""></script>
     <script type=""text/javascript"" src=""{0}Scripts/jquery.cookie.js""></script>
     <script type=""text/javascript"" src=""{0}Scripts/json.js""></script>
     <script type=""text/javascript"" src=""{0}Scripts/roadui.core.js""></script>
@@ -64,7 +64,9 @@ namespace WebMvc.Common
                 return false;
             }
 
-            return true;//正式使用时请注释掉这一行
+            #if DEBUG
+            return true; //正式使用时请注释掉这一行
+            #endif
 
             string uniqueIDSessionKey = Utility.Keys.SessionKeys.UserUniqueID.ToString();
             var user = new Business.Platform.OnlineUsers().Get(uid);
@@ -124,13 +126,17 @@ namespace WebMvc.Common
                 {
                     return true;
                 }
+                else
+                {
+                    msg = "<script>top.location=top.rootdir+'/Login';</script>";
+                }
             }
             else
             {
                 var userID = Business.Platform.Users.CurrentUserID;
                 if (userID.IsEmptyGuid())
                 {
-                    msg = "登录失效!";
+                    msg = "<script>top.location=top.rootdir+'/Login';</script>";
                     return false;
                 }
                 var userApp = new Business.Platform.UsersApp().GetUserDataRows(userID);
@@ -145,6 +151,34 @@ namespace WebMvc.Common
 
             return false;
         }
+
+
+        /// <summary>
+        /// 将当前url参数转换为RouteValueDictionary(以便于在mvc中重定向时的参数)
+        /// </summary>
+        /// <returns></returns>
+        public static System.Web.Routing.RouteValueDictionary GetRouteValueDictionary()
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            string query = System.Web.HttpContext.Current.Request.Url.Query;
+            if (query.IsNullOrEmpty())
+            {
+                return new System.Web.Routing.RouteValueDictionary(dict);
+            }
+            string[] queryArray = query.TrimStart('?').Split('&');
+            foreach (string q in queryArray)
+            {
+                string[] qArray = q.Split('=');
+                if (qArray.Length < 2)
+                {
+                    continue;
+                }
+                dict.Add(qArray[0], qArray[1]);
+            }
+            return new System.Web.Routing.RouteValueDictionary(dict);
+        }
+
+        
     }
 
 }

@@ -91,10 +91,12 @@ namespace Business.Platform
         /// </summary>
         /// <param name="flowID"></param>
         /// <param name="groupID"></param>
+        /// <param name="isDefault">如果为空是否返回当前登录用户ID</param>
         /// <returns></returns>
-        public Guid GetFirstSnderID(Guid flowID, Guid groupID)
+        public Guid GetFirstSnderID(Guid flowID, Guid groupID, bool isDefault = false)
         {
-            return dataWorkFlowTask.GetFirstSnderID(flowID, groupID);
+            Guid senderID=dataWorkFlowTask.GetFirstSnderID(flowID, groupID);
+            return senderID.IsEmptyGuid() && isDefault ? Users.CurrentUserID : senderID;
         }
 
         /// <summary>
@@ -267,32 +269,35 @@ namespace Business.Platform
                 return result;
             }
 
-            switch (executeModel.ExecuteType)
-            { 
-                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Back:
-                    executeBack(executeModel);
-                    break;
-                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Completed:
-                    executeComplete(executeModel);
-                    break;
-                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Save:
-                    executeSave(executeModel);
-                    break;
-                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit:
-                    executeSubmit(executeModel);
-                    break;
-                case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect:
-                    executeRedirect(executeModel);
-                    break;
-                default:
-                    result.DebugMessages = "流程处理类型为空";
-                    result.IsSuccess = false;
-                    result.Messages = "流程处理类型为空";
-                    return result;
-            }
+            lock (executeModel.GroupID.ToString())
+            {
+                switch (executeModel.ExecuteType)
+                {
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Back:
+                        executeBack(executeModel);
+                        break;
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Completed:
+                        executeComplete(executeModel);
+                        break;
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Save:
+                        executeSave(executeModel);
+                        break;
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Submit:
+                        executeSubmit(executeModel);
+                        break;
+                    case Data.Model.WorkFlowExecute.EnumType.ExecuteType.Redirect:
+                        executeRedirect(executeModel);
+                        break;
+                    default:
+                        result.DebugMessages = "流程处理类型为空";
+                        result.IsSuccess = false;
+                        result.Messages = "流程处理类型为空";
+                        return result;
+                }
 
-            result.NextTasks = nextTasks;
-            return result;
+                result.NextTasks = nextTasks;
+                return result;
+            }
         }
 
         private void executeSubmit(Data.Model.WorkFlowExecute.Execute executeModel)
@@ -339,7 +344,7 @@ namespace Business.Platform
                 switch (currentStep.Behavior.HanlderModel)
                 { 
                     case 0://所有人必须处理
-                        var taskList = GetTaskList(currentTask.ID);
+                        var taskList = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                         if (taskList.Count > 1)
                         {
                             var noCompleted = taskList.Where(p => p.Status != 2);
@@ -351,7 +356,7 @@ namespace Business.Platform
                         Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign);
                         break;
                     case 1://一人同意即可
-                        var taskList1 = GetTaskList(currentTask.ID);
+                        var taskList1 = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                         foreach (var task in taskList1)
                         {
                             if (task.ID != currentTask.ID)
@@ -368,12 +373,11 @@ namespace Business.Platform
                         }
                         break;
                     case 2://依据人数比例
-                        var taskList2 = GetTaskList(currentTask.ID);
+                        var taskList2 = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                         if (taskList2.Count > 1)
                         {
-                            decimal percentage = currentStep.Behavior.Percentage;//比例
-                            var noCompleted = taskList2.Where(p => p.Status != 2);
-                            if ((((decimal)(taskList2.Count - (noCompleted.Count() - 1)) / (decimal)taskList2.Count) * 100).Round() < percentage)
+                            decimal percentage = currentStep.Behavior.Percentage <= 0 ? 100 : currentStep.Behavior.Percentage;//比例
+                            if ((((decimal)(taskList2.Where(p => p.Status == 2).Count() + 1) / (decimal)taskList2.Count) * 100).Round() < percentage)
                             {
                                 status = -1;
                             }
@@ -381,7 +385,7 @@ namespace Business.Platform
                             {
                                 foreach (var task in taskList2)
                                 {
-                                    if (task.ID != currentTask.ID && task.Status.In(0,1))
+                                    if (task.ID != currentTask.ID && task.Status.In(0, 1))
                                     {
                                         Completed(task.ID, "", false, 4);
                                     }
@@ -395,8 +399,7 @@ namespace Business.Platform
                         break;
                 }
 
-                //修改日期：2014-05-22
-                //将此处处理类型判断改为：如果条件不满足则不创建后续任务，直到最后一个条件满足时才创建后续任务。等待中的任务 状态为：5 已不用
+                //如果条件不满足则不创建后续任务，直到最后一个条件满足时才创建后续任务。等待中的任务 状态为：5 已不用
                 if (status == -1)
                 {
                     result.DebugMessages += "已发送,其他人未处理,不创建后续任务";
@@ -421,53 +424,123 @@ namespace Business.Platform
                         {
                             continue;
                         }
+                        var nextStep = nextSteps.First();
 
-                        Data.Model.WorkFlowTask task = new Data.Model.WorkFlowTask();
-                        if (nextSteps.First().WorkTime > 0)
-                        {
-                            task.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)nextSteps.First().WorkTime);
-                        }
 
-                        task.FlowID = executeModel.FlowID;
-                        task.GroupID = currentTask != null ? currentTask.GroupID : executeModel.GroupID;
-                        task.ID = Guid.NewGuid();
-                        task.Type = 0;
-                        task.InstanceID = executeModel.InstanceID;
-                        if (!executeModel.Note.IsNullOrEmpty())
+                        #region 如果下一步骤为会签，则要检查当前步骤的平级步骤是否已处理
+                        bool isPassing = 0 == nextStep.Behavior.Countersignature;
+                        if (0 != nextStep.Behavior.Countersignature)
                         {
-                            task.Note = executeModel.Note;
+                            var prevSteps = bWorkFlow.GetPrevSteps(executeModel.FlowID, nextStep.ID);
+                            switch (nextStep.Behavior.Countersignature)
+                            { 
+                                case 1://所有步骤同意
+                                    isPassing = true;
+                                    foreach (var prevStep in prevSteps)
+                                    {
+                                        if (!IsPassing(prevStep, executeModel.FlowID, executeModel.GroupID, currentTask.PrevID))
+                                        {
+                                            isPassing = false;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                case 2://一个步骤同意即可
+                                    isPassing = false;
+                                    foreach (var prevStep in prevSteps)
+                                    {
+                                        if (IsPassing(prevStep, executeModel.FlowID, executeModel.GroupID, currentTask.PrevID))
+                                        {
+                                            isPassing = true;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                case 3://依据比例
+                                    int passCount = 0;
+                                    foreach (var prevStep in prevSteps)
+                                    {
+                                        if (IsPassing(prevStep, executeModel.FlowID, executeModel.GroupID, currentTask.PrevID))
+                                        {
+                                            passCount++;
+                                        }
+                                    }
+                                    isPassing = (((decimal)passCount / (decimal)prevSteps.Count) * 100).Round() >= (nextStep.Behavior.CountersignaturePercentage <= 0 ? 100 : nextStep.Behavior.CountersignaturePercentage);
+                                    break;
+                            }
+                            if (isPassing)
+                            {
+                                var tjTasks = GetTaskList(currentTask.ID);
+                                foreach (var tjTask in tjTasks)
+                                {
+                                    if (tjTask.ID == currentTask.ID || tjTask.Status.In(2, 3, 4, 5))
+                                    {
+                                        continue;
+                                    }
+                                    Completed(tjTask.ID, "", false, 4);
+                                }
+                            }
                         }
-                        task.PrevID = currentTask.ID;
-                        task.PrevStepID = currentTask.StepID;
-                        task.ReceiveID = user.ID;
-                        task.ReceiveName = user.Name;
-                        task.ReceiveTime = Utility.DateTimeNew.Now;
-                        task.SenderID = executeModel.Sender.ID;
-                        task.SenderName = executeModel.Sender.Name;
-                        task.SenderTime = task.ReceiveTime;
-                        task.Status = status;
-                        task.StepID = step.Key;
-                        task.StepName = nextSteps.First().Name;
-                        task.Sort = currentTask.Sort + 1;
-                        task.Title = executeModel.Title.IsNullOrEmpty() ? currentTask.Title : executeModel.Title;
-                        
-                        Add(task);
-                        nextTasks.Add(task);
+                        #endregion
+
+                        if (isPassing)
+                        {
+                            Data.Model.WorkFlowTask task = new Data.Model.WorkFlowTask();
+                            if (nextStep.WorkTime > 0)
+                            {
+                                task.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)nextStep.WorkTime);
+                            }
+
+                            task.FlowID = executeModel.FlowID;
+                            task.GroupID = currentTask != null ? currentTask.GroupID : executeModel.GroupID;
+                            task.ID = Guid.NewGuid();
+                            task.Type = 0;
+                            task.InstanceID = executeModel.InstanceID;
+                            if (!executeModel.Note.IsNullOrEmpty())
+                            {
+                                task.Note = executeModel.Note;
+                            }
+                            task.PrevID = currentTask.ID;
+                            task.PrevStepID = currentTask.StepID;
+                            task.ReceiveID = user.ID;
+                            task.ReceiveName = user.Name;
+                            task.ReceiveTime = Utility.DateTimeNew.Now;
+                            task.SenderID = executeModel.Sender.ID;
+                            task.SenderName = executeModel.Sender.Name;
+                            task.SenderTime = task.ReceiveTime;
+                            task.Status = status;
+                            task.StepID = step.Key;
+                            task.StepName = nextSteps.First().Name;
+                            task.Sort = currentTask.Sort + 1;
+                            task.Title = executeModel.Title.IsNullOrEmpty() ? currentTask.Title : executeModel.Title;
+
+                            Add(task);
+                            nextTasks.Add(task);
+                        }
                     }
                 }
 
                 scope.Complete();
 
-                List<string> nextStepName = new List<string>();
-                foreach (var nstep in nextTasks)
+                if (nextTasks.Count > 0)
                 {
-                    nextStepName.Add(nstep.StepName);
+                    List<string> nextStepName = new List<string>();
+                    foreach (var nstep in nextTasks)
+                    {
+                        nextStepName.Add(nstep.StepName);
+                    }
+                    result.DebugMessages += string.Format("已发送到：{0}", nextStepName.Distinct().ToList().ToString(","));
+                    result.IsSuccess = true;
+                    result.Messages += string.Format("已发送到：{0}", nextStepName.Distinct().ToList().ToString(","));
+                    result.NextTasks = nextTasks;
                 }
-
-                result.DebugMessages += string.Format("已发送到：{0}", nextStepName.Distinct().ToList().ToString(","));
-                result.IsSuccess = true;
-                result.Messages += string.Format("已发送到：{0}", nextStepName.Distinct().ToList().ToString(","));
-                result.NextTasks = nextTasks;
+                else
+                {
+                    result.DebugMessages += string.Format("已发送,等待其它步骤处理");
+                    result.IsSuccess = true;
+                    result.Messages += string.Format("已发送,等待其它步骤处理");
+                    result.NextTasks = nextTasks;
+                }
             }
         }
 
@@ -573,7 +646,7 @@ namespace Business.Platform
                         switch (currentStep.Behavior.HanlderModel)
                         {
                             case 0://所有人必须同意,如果一人不同意则全部退回
-                                var taskList1 = GetTaskList(currentTask.ID);
+                                var taskList1 = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                                 foreach (var task in taskList1)
                                 {
                                     if (task.ID != currentTask.ID)
@@ -590,7 +663,7 @@ namespace Business.Platform
                                 }
                                 break;
                             case 1://一人同意即可
-                                var taskList = GetTaskList(currentTask.ID);
+                                var taskList = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                                 if (taskList.Count > 1)
                                 {
                                     var noCompleted = taskList.Where(p => p.Status != 3);
@@ -602,12 +675,11 @@ namespace Business.Platform
                                 Completed(currentTask.ID, executeModel.Comment, executeModel.IsSign, 3);
                                 break;
                             case 2://依据人数比例
-                                var taskList2 = GetTaskList(currentTask.ID);
+                                var taskList2 = GetTaskListByStepID(currentTask.ID, currentTask.StepID);
                                 if (taskList2.Count > 1)
                                 {
-                                    decimal percentage = currentStep.Behavior.Percentage;//比例
-                                    var noCompleted = taskList2.Where(p => p.Status != 3);
-                                    if ((((decimal)(taskList2.Count - (noCompleted.Count() - 1)) / (decimal)taskList2.Count) * 100).Round() < percentage)
+                                    decimal percentage = currentStep.Behavior.Percentage <= 0 ? 100 : currentStep.Behavior.Percentage;//比例
+                                    if ((((decimal)(taskList2.Where(p => p.Status == 3).Count() + 1) / (decimal)taskList2.Count) * 100).Round() < percentage)
                                     {
                                         status = -1;
                                     }
@@ -635,15 +707,13 @@ namespace Business.Platform
 
                 if (status == -1)
                 {
-                    result.DebugMessages += "已退回,其他人未处理";
+                    result.DebugMessages += "已退回,等待他人处理";
                     result.IsSuccess = true;
                     result.Messages += "已退回,等待他人处理!";
                     result.NextTasks = nextTasks;
                     scope.Complete();
                     return;
                 }
-
-                List<Data.Model.WorkFlowTask> tasks = new List<Data.Model.WorkFlowTask>();
 
                 foreach (var backTask in backTasks)
                 {
@@ -659,53 +729,131 @@ namespace Business.Platform
                     {
                         Completed(backTask.ID, "", false, 3, "他人已退回");
                     }
-                    tasks.AddRange(GetTaskList(executeModel.FlowID, executeModel.Steps.First().Key, executeModel.GroupID));
                 }
 
-                foreach (var task in tasks.Distinct(this))
+                List<Data.Model.WorkFlowTask> tasks = new List<Data.Model.WorkFlowTask>();
+                foreach (var step in executeModel.Steps)
                 {
-                    if (task != null)
+                    tasks.AddRange(GetTaskList(executeModel.FlowID, step.Key, executeModel.GroupID));
+                }
+
+                #region 处理会签形式的退回 
+                //当前步骤是否是会签步骤
+                var countersignatureStep = bWorkFlow.GetNextSteps(executeModel.FlowID, executeModel.StepID).Find(p => p.Behavior.Countersignature != 0);
+                bool IsCountersignature = countersignatureStep != null;
+                bool isBack = true;
+                if (IsCountersignature)
+                {
+                    var steps = bWorkFlow.GetPrevSteps(executeModel.FlowID, countersignatureStep.ID);
+                    switch (countersignatureStep.Behavior.Countersignature)
+                    { 
+                        case 1://所有步骤处理，如果一个步骤退回则退回
+                            isBack = false;
+                            foreach (var step in steps)
+                            {
+                                if (IsBack(step, executeModel.FlowID, currentTask.GroupID, currentTask.PrevID))
+                                {
+                                    isBack = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        case 2://一个步骤退回,如果有一个步骤同意，则不退回
+                            isBack = true;
+                            foreach (var step in steps)
+                            {
+                                if (!IsBack(step, executeModel.FlowID, currentTask.GroupID, currentTask.PrevID))
+                                {
+                                    isBack = false;
+                                    break;
+                                }
+                            }
+                            break;
+                        case 3://依据比例退回
+                            int backCount = 0;
+                            foreach (var step in steps)
+                            {
+                                if (IsBack(step, executeModel.FlowID, currentTask.GroupID, currentTask.PrevID))
+                                {
+                                    backCount++;
+                                }
+                            }
+                            isBack = (((decimal)backCount / (decimal)steps.Count) * 100).Round() >= (countersignatureStep.Behavior.CountersignaturePercentage <= 0 ? 100 : countersignatureStep.Behavior.CountersignaturePercentage);
+                            break;
+                    }
+
+                    if (isBack)
                     {
-                        Data.Model.WorkFlowTask newTask = task;
-                        newTask.ID = Guid.NewGuid();
-                        newTask.PrevID = currentTask.ID;
-                        newTask.Note = "退回任务";
-                        newTask.ReceiveTime = Utility.DateTimeNew.Now;
-                        newTask.SenderID = currentTask.ReceiveID;
-                        newTask.SenderName = currentTask.ReceiveName;
-                        newTask.SenderTime = Utility.DateTimeNew.Now;
-                        newTask.Sort = currentTask.Sort + 1;
-                        newTask.Status = 0;
-                        newTask.Comment = "";
-                        newTask.OpenTime = null;
-                        //newTask.PrevStepID = currentTask.StepID;
-                        if (currentStep.WorkTime > 0)
+                        var tjTasks = GetTaskList(currentTask.ID);
+                        foreach (var tjTask in tjTasks)
                         {
-                            newTask.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)currentStep.WorkTime);
+                            if (tjTask.ID == currentTask.ID || tjTask.Status.In(2,3,4,5))
+                            {
+                                continue;
+                            }
+                            Completed(tjTask.ID, "", false, 5);
                         }
-                        else
+                    }
+                }
+                #endregion
+
+                if (isBack)
+                {
+                    foreach (var task in tasks.Distinct(this))
+                    {
+                        if (task != null)
                         {
-                            newTask.CompletedTime = null;
+                            Data.Model.WorkFlowTask newTask = task;
+                            newTask.ID = Guid.NewGuid();
+                            newTask.PrevID = currentTask.ID;
+                            newTask.Note = "退回任务";
+                            newTask.ReceiveTime = Utility.DateTimeNew.Now;
+                            newTask.SenderID = currentTask.ReceiveID;
+                            newTask.SenderName = currentTask.ReceiveName;
+                            newTask.SenderTime = Utility.DateTimeNew.Now;
+                            newTask.Sort = currentTask.Sort + 1;
+                            newTask.Status = 0;
+                            newTask.Comment = "";
+                            newTask.OpenTime = null;
+                            //newTask.PrevStepID = currentTask.StepID;
+                            if (currentStep.WorkTime > 0)
+                            {
+                                newTask.CompletedTime = Utility.DateTimeNew.Now.AddHours((double)currentStep.WorkTime);
+                            }
+                            else
+                            {
+                                newTask.CompletedTime = null;
+                            }
+                            newTask.CompletedTime1 = null;
+                            Add(newTask);
+                            nextTasks.Add(newTask);
                         }
-                        newTask.CompletedTime1 = null;
-                        Add(newTask);
-                        nextTasks.Add(newTask);
                     }
                 }
 
                 scope.Complete();
             }
 
-            List<string> nextStepName = new List<string>();
-            foreach (var nstep in nextTasks)
+            if (nextTasks.Count > 0)
             {
-                nextStepName.Add(nstep.StepName);
+                List<string> nextStepName = new List<string>();
+                foreach (var nstep in nextTasks)
+                {
+                    nextStepName.Add(nstep.StepName);
+                }
+                string msg = string.Format("已退回到：{0}", nextStepName.Distinct().ToList().ToString(","));
+                result.DebugMessages += msg;
+                result.IsSuccess = true;
+                result.Messages += msg;
+                result.NextTasks = nextTasks;
             }
-            string msg = string.Format("已退回到：{0}", nextStepName.Distinct().ToList().ToString(","));
-            result.DebugMessages += msg;
-            result.IsSuccess = true;
-            result.Messages += msg;
-            result.NextTasks = nextTasks;
+            else
+            {
+                result.DebugMessages += "已退回,等待其它步骤处理";
+                result.IsSuccess = true;
+                result.Messages += "已退回,等待其它步骤处理";
+                result.NextTasks = nextTasks;
+            }
             return;
         }
 
@@ -805,6 +953,66 @@ namespace Business.Platform
             result.IsSuccess = true;
             result.Messages = string.Concat("已转交给：", currentTask.ReceiveName);
             return;
+        }
+
+        /// <summary>
+        /// 判断一个步骤是否通过
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        private bool IsPassing(Data.Model.WorkFlowInstalledSub.Step step, Guid flowID, Guid groupID, Guid taskID)
+        {
+            var tasks = GetTaskList(flowID, step.ID, groupID).FindAll(p => p.PrevID == taskID);
+            if (tasks.Count == 0)
+            {
+                return false;
+            }
+            bool isPassing = true;
+            switch (step.Behavior.HanlderModel)
+            { 
+                case 0://所有人必须处理
+                case 3://独立处理
+                    isPassing = tasks.Where(p => p.Status != 2).Count() == 0;
+                    break;
+                case 1://一人同意即可
+                    isPassing = tasks.Where(p => p.Status == 2).Count() > 0;
+                    break;
+                case 2://依据人数比例
+                    isPassing = (((decimal)(tasks.Where(p => p.Status == 2).Count() + 1) / (decimal)tasks.Count) * 100).Round() >= (step.Behavior.Percentage <= 0 ? 100 : step.Behavior.Percentage);
+                    break;
+            }
+            return isPassing;
+        }
+
+        /// <summary>
+        /// 判断一个步骤是否退回
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="groupID"></param>
+        /// <returns></returns>
+        private bool IsBack(Data.Model.WorkFlowInstalledSub.Step step, Guid flowID, Guid groupID, Guid taskID)
+        {
+            var tasks = GetTaskList(flowID, step.ID, groupID).FindAll(p => p.PrevID == taskID);
+            if (tasks.Count == 0)
+            {
+                return false;
+            }
+            bool isBack = true;
+            switch (step.Behavior.HanlderModel)
+            {
+                case 0://所有人必须处理
+                case 3://独立处理
+                    isBack = tasks.Where(p => p.Status.In(3,5)).Count() > 0;
+                    break;
+                case 1://一人同意即可
+                    isBack = tasks.Where(p => p.Status.In(2,4)).Count() == 0;
+                    break;
+                case 2://依据人数比例
+                    isBack = (((decimal)(tasks.Where(p => p.Status.In(3,5)).Count() + 1) / (decimal)tasks.Count) * 100).Round() >= (step.Behavior.Percentage <= 0 ? 100 : step.Behavior.Percentage);
+                    break;
+            }
+            return isBack;
         }
 
         /// <summary>
@@ -918,7 +1126,6 @@ namespace Business.Platform
             }
         }
         
-
         /// <summary>
         /// 删除流程实例
         /// </summary>
@@ -975,6 +1182,17 @@ namespace Business.Platform
         }
 
         /// <summary>
+        /// 得到和一个任务同级的任务(同一步骤内)
+        /// </summary>
+        /// <param name="taskID">任务ID</param>
+        /// <param name="stepID">步骤ID</param>
+        /// <returns></returns>
+        public List<Data.Model.WorkFlowTask> GetTaskListByStepID(Guid taskID, Guid stepID)
+        {
+            return dataWorkFlowTask.GetTaskList(taskID).FindAll(p => p.StepID == stepID);
+        }
+
+        /// <summary>
         /// 得到一个任务的前一任务
         /// </summary>
         /// <param name="flowID"></param>
@@ -1006,23 +1224,39 @@ namespace Business.Platform
         public Dictionary<Guid, string> GetBackSteps(Guid taskID, int backType, Guid stepID, Data.Model.WorkFlowInstalled wfInstalled)
         {
             Dictionary<Guid, string> dict = new Dictionary<Guid, string>();
+            var steps = wfInstalled.Steps.Where(p => p.ID == stepID);
+            if (steps.Count() == 0)
+            {
+                return dict;
+            }
+            var step = steps.First();
             switch (backType)
             { 
                 case 0://退回前一步
                     var task = Get(taskID);
                     if (task != null)
                     {
-                        dict.Add(task.PrevStepID, bWorkFlow.GetStepName(task.PrevStepID, wfInstalled));
+                        if (step.Behavior.Countersignature != 0)//如果是会签步骤，则要退回到前面所有步骤
+                        {
+                            var backSteps = bWorkFlow.GetPrevSteps(task.FlowID, step.ID);
+                            foreach (var backStep in backSteps)
+                            {
+                                dict.Add(backStep.ID, backStep.Name);
+                            }
+                        }
+                        else
+                        {
+                            dict.Add(task.PrevStepID, bWorkFlow.GetStepName(task.PrevStepID, wfInstalled));
+                        }
                     }
                     break;
                 case 1://退回第一步
                     dict.Add(wfInstalled.FirstStepID, bWorkFlow.GetStepName(wfInstalled.FirstStepID, wfInstalled));
                     break;
                 case 2://退回某一步
-                    var steps = wfInstalled.Steps.Where(p => p.ID == stepID);
-                    if (steps.Count() > 0 && steps.First().Behavior.BackType == 2 && steps.First().Behavior.BackStepID != Guid.Empty)
+                    if (step.Behavior.BackType == 2 && step.Behavior.BackStepID != Guid.Empty)
                     {
-                        dict.Add(steps.First().Behavior.BackStepID, bWorkFlow.GetStepName(steps.First().Behavior.BackStepID, wfInstalled));
+                        dict.Add(step.Behavior.BackStepID, bWorkFlow.GetStepName(step.Behavior.BackStepID, wfInstalled));
                     }
                     else
                     {
@@ -1083,6 +1317,7 @@ namespace Business.Platform
         {
             return dataWorkFlowTask.HasNoCompletedTasks(flowID, stepID, groupID, userID);
         }
+
         /// <summary>
         /// 得到状态显示标题
         /// </summary>
@@ -1106,7 +1341,7 @@ namespace Business.Platform
                     title = "已退回";
                     break;
                 case 4:
-                    title = "他人已完成";
+                    title = "他人已处理";
                     break;
                 case 5:
                     title = "他人已退回";
@@ -1150,6 +1385,7 @@ namespace Business.Platform
             }
             return true;
         }
+
         /// <summary>
         /// 收回任务
         /// </summary>
@@ -1208,6 +1444,7 @@ namespace Business.Platform
 
             return "指派成功";
         }
+
         /// <summary>
         /// 管理员强制退回任务
         /// </summary>

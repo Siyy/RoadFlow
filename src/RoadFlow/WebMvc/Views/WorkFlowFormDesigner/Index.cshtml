@@ -1,15 +1,90 @@
 ﻿@{
     ViewBag.Title = "Index";
+    string icoUrl = "~/Scripts/FormDesinger/ueditor/plugins/images/";
 }
-<script src="@Url.Content("~/Scripts/FlowDesinger/ueditor/ueditor.config.js")"></script>
-<script src="@Url.Content("~/Scripts/FlowDesinger/ueditor/ueditor.all.js")"></script>
-<script src="@Url.Content("~/Scripts/FlowDesinger/ueditor/lang/zh-cn/zh-cn.js")"></script>
-<div>
+<script src="@Url.Content("~/Scripts/FormDesinger/ueditor/ueditor.config.js")"></script>
+<script src="@Url.Content("~/Scripts/FormDesinger/ueditor/ueditor.all.min.js")"></script>
+<script src="@Url.Content("~/Scripts/FormDesinger/ueditor/lang/zh-cn/zh-cn.js")"></script>
+<script src="@Url.Content("~/Scripts/FormDesinger/ueditor/plugins/plugins.js")"></script>
+<style type="text/css">
+    .toolbar a span{padding:0 8px; display:inline-block; cursor:default;}
+</style>
+<div class="toolbar" style="margin-top:0; border-top:none 0;">
+    <a href="#" onclick="execCommend('formadd'); return false;" title="新建">
+        <span style="background:url(@Url.Content(icoUrl + "new.png")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formopen'); return false;" title="打开">
+        <span style="background:url(@Url.Content(icoUrl + "open.png")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formattribute'); return false;" title="属性">
+        <span style="background:url(@Url.Content(icoUrl + "setting.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <span class="toolbarsplit">&nbsp;</span>
+    <a href="#" onclick="execCommend('formtext'); return false;" title="文本框">
+        <span style="background:url(@Url.Content(icoUrl + "input.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formtextarea'); return false;" title="文本域">
+        <span style="background:url(@Url.Content(icoUrl + "textarea.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formhtml'); return false;" title="Html编辑器">
+        <span style="background:url(@Url.Content(icoUrl + "html.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formradio'); return false;" title="单选按钮组">
+        <span style="background:url(@Url.Content(icoUrl + "radio.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formcheckbox'); return false;" title="复选按钮组">
+        <span style="background:url(@Url.Content(icoUrl + "checkbox.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formhidden'); return false;" title="隐藏域">
+        <span style="background:url(@Url.Content(icoUrl + "hidden.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formselect'); return false;" title="下拉列表框">
+        <span style="background:url(@Url.Content(icoUrl + "select.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formlabel'); return false;" title="Label标签">
+        <span style="background:url(@Url.Content(icoUrl + "label.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formbutton'); return false;" title="按钮">
+        <span style="background:url(@Url.Content(icoUrl + "button.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formorg'); return false;" title="组织机构选择框">
+        <span style="background:url(@Url.Content(icoUrl + "org.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formdictionary'); return false;" title="数据字典选择框">
+        <span style="background:url(@Url.Content(icoUrl + "dictionary.png")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formdatetime'); return false;" title="日期时间选择">
+        <span style="background:url(@Url.Content(icoUrl + "datetime.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formfiles'); return false;" title="附件上传">
+        <span style="background:url(@Url.Content(icoUrl + "attachment.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formsubtable'); return false;" title="子表">
+        <span style="background:url(@Url.Content(icoUrl + "subtable.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formgrid'); return false;" title="数据表格">
+        <span style="background:url(@Url.Content(icoUrl + "database_info.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+   
+    <span class="toolbarsplit">&nbsp;</span>
+    <a href="#" onclick="execCommend('formsave'); return false;" title="保存当前表单">
+        <span style="background:url(@Url.Content(icoUrl + "save.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formsaveas'); return false;" title="表单另存为">
+        <span style="background:url(@Url.Content(icoUrl + "saveas.gif")) no-repeat center;">&nbsp;</span>
+    </a>
+    <a href="#" onclick="execCommend('formcompile'); return false;" title="发布表单">
+        <span style="background:url(@Url.Content(icoUrl + "page_code.png")) no-repeat center;">&nbsp;</span>
+    </a>
+</div>
+<div id="editordiv" style="overflow:auto;">
     <script id="editor" name="editor" type="text/plain" style="width:98%; height:300px;"></script>
 </div>
 <script type="text/javascript">
     var formattributeJSON = { hasEditor: "0" };
     var formsubtabs = [];
+    var formEvents = [];
+    var myUE = null;
     $(function ()
     {
         resize();
@@ -18,9 +93,15 @@
 
     function resize()
     {
-        $("#editor").height($(window).height() - 104);
-        $("#editor").width($(window).width() - 19);
-        UE.getEditor('editor');
+        $("#editor").height($(window).height() - 133);
+        $("#editor").width($(window).width() - 2);
+        myUE = UE.getEditor('editor', { wordCount: false, maximumWords: 1000000000, autoHeightEnabled: false });
     }
+    
+    function execCommend(method)
+    {
+        myUE.execCommand(method);
+    }
+
 </script>
 

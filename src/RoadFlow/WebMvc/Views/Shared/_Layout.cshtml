@@ -16,7 +16,7 @@
         string checkAppMsg = string.Empty;
         if ((Page.CheckApp == null || Page.CheckApp == true) && !WebMvc.Common.Tools.CheckApp(out checkAppMsg, Request.QueryString["appid"]))
         {
-            Response.Write(checkAppMsg.IsNullOrEmpty() ? "应用程序权限检查错误!" : checkAppMsg);
+            Response.Write("<label style='font-size:12px;'>" + (checkAppMsg.IsNullOrEmpty() ? "应用程序权限检查错误" : checkAppMsg) + "</label>");
             Response.End();
         }
     }

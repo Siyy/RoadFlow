@@ -56,5 +56,27 @@ namespace Utility
                 return Now.ToString("yyyy年MM月dd日 HH时mm分");
             }
         }
+
+        /// <summary>
+        /// 日期时间(yyyy年MM月dd日 HH时mm分)
+        /// </summary>
+        public static string LongTime
+        {
+            get
+            {
+                return Now.ToString("HH时mm分");
+            }
+        }
+
+        /// <summary>
+        /// 日期时间(yyyy年MM月dd日 HH时mm分)
+        /// </summary>
+        public static string ShortTime
+        {
+            get
+            {
+                return Now.ToString("HH:mm");
+            }
+        }
     }
 }

@@ -78,6 +78,26 @@ namespace WebMvc.Controllers
             }
         }
 
+        public string GetEvents()
+        {
+            string id = Request["id"];
+            Guid gid;
+            if (!id.IsGuid(out gid))
+            {
+                return "";
+            }
+
+            var wff = new Business.Platform.WorkFlowForm().Get(gid);
+            if (wff == null)
+            {
+                return "";
+            }
+            else
+            {
+                return wff.EventsJson;
+            }
+        }
+
         public string TestSql()
         {
             string sql = Request["sql"];
@@ -108,6 +128,7 @@ namespace WebMvc.Controllers
             string id = Request["id"];
             string type = Request["type"];
             string subtable = Request["subtable"];
+            string formEvents = Request["formEvents"];
             if (name.IsNullOrEmpty())
             {
                 return "表单名称不能为空!";
@@ -144,6 +165,7 @@ namespace WebMvc.Controllers
             wff.LastModifyTime = Utility.DateTimeNew.Now;
             wff.Name = name;
             wff.SubTableJson = subtable;
+            wff.EventsJson = formEvents;
 
             if (isAdd)
             {
@@ -219,10 +241,9 @@ namespace WebMvc.Controllers
 
             if (attrJSON.ContainsKey("hasEditor") && "1" == attrJSON["hasEditor"].ToString())
             {
-                serverScript.Append("<script src=\"~/Scripts/ueditor/ueditor.config.js\" type=\"text/javascript\" ></script>\r\n");
-                serverScript.Append("<script src=\"~/Scripts/ueditor/ueditor.all.min.js\" type=\"text/javascript\" ></script>\r\n");
-                serverScript.Append("<script src=\"~/Scripts/ueditor/lang/zh-cn/zh-cn.js\" type=\"text/javascript\" ></script>\r\n");
-                serverScript.Append("<script src=\"~/Scripts/ueditor/ueditor-patch-149.js\" type=\"text/javascript\" ></script>\r\n");
+                serverScript.Append("<script src=\"~/Scripts/Ueditor/ueditor.config.js\" type=\"text/javascript\" ></script>\r\n");
+                serverScript.Append("<script src=\"~/Scripts/Ueditor/ueditor.all.min.js\" type=\"text/javascript\" ></script>\r\n");
+                serverScript.Append("<script src=\"~/Scripts/Ueditor/lang/zh-cn/zh-cn.js\" type=\"text/javascript\" ></script>\r\n");
                 serverScript.Append("<input type=\"hidden\" id=\"Form_HasUEditor\" name=\"Form_HasUEditor\" value=\"1\" />\r\n");
             }
             string validatePropType = attrJSON.ContainsKey("validatealerttype") ? attrJSON["validatealerttype"].ToString() : "2";
@@ -254,9 +275,11 @@ namespace WebMvc.Controllers
             string file = Server.MapPath("~/Views/WorkFlowFormDesigner/Forms/" + fileName);
             System.IO.Stream stream = System.IO.File.Open(file, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
             stream.SetLength(0);
+           
             StreamWriter sw = new StreamWriter(stream, System.Text.Encoding.UTF8);
             sw.Write(serverScript.ToString());
             sw.Write(Server.HtmlDecode(html));
+            
             sw.Close();
             stream.Close();
 

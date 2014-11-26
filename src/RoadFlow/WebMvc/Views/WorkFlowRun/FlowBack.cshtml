@@ -45,7 +45,7 @@
     @foreach (var step in prevSteps)
     {
         string checked1 = string.Empty;
-        if (backType == 2 && step.Key == currentStep.Behavior.BackStepID)
+        if ((backType == 2 && step.Key == currentStep.Behavior.BackStepID) || currentStep.Behavior.Countersignature != 0)
         {
             checked1 = "checked=\"checked\""; i++;
         }
@@ -53,11 +53,11 @@
         {
             checked1 = !step.Key.ToString().IsNullOrEmpty() && i++ == 0 ? "checked=\"checked\"" : "";
         }
-        string disabled = step.Key.ToString().IsNullOrEmpty() ? "disabled=\"disabled\"" : "";
+        string disabled = step.Key.ToString().IsNullOrEmpty() || currentStep.Behavior.Countersignature != 0 ? "disabled=\"disabled\"" : "";
     <tr>
         <td style="padding:9px 0 2px 0;">
         <input type="hidden" name="nextstepid" value="@step" />
-        <input type="radio" value="@step.Key" @Html.Raw(checked1) @Html.Raw(disabled) name="stepid" id="step_@step.Key" style="vertical-align:middle;" />
+        <input type="checkbox" value="@step.Key" @Html.Raw(checked1) @Html.Raw(disabled) name="stepid" id="step_@step.Key" style="vertical-align:middle;" />
         <label for="step_@step.Key" style="vertical-align:middle;">@step.Value</label>
         </td>
     </tr>

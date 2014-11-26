@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Set_SubFlow";
+    Business.Platform.WorkFlow bworkFlow = new Business.Platform.WorkFlow();
+    Business.Platform.DBConnection bdbConn = new Business.Platform.DBConnection();
+    Business.Platform.WorkFlowButtons bworkFlowButtons = new Business.Platform.WorkFlowButtons();
+    Business.Platform.AppLibrary bappLibrary = new Business.Platform.AppLibrary();
+
+    string appLibraryTypes = bappLibrary.GetTypeOptions();
+    string stepID = Request.QueryString["id"];
+    string stepX = Request.QueryString["x"];
+    string stepY = Request.QueryString["y"];
+    string stepWidth = Request.QueryString["width"];
+    string stepHeight = Request.QueryString["height"];
+    string flowOptions = bworkFlow.GetOptions("");
+}
+<form method="post">
+    <br />
+    <table cellpadding="0" cellspacing="1" border="0" width="99%" class="formtable">
+        <tr>
+            <th style="width:80px;">步骤ID：</th>
+            <td><input type="text" id="Step_ID" value="@stepID" class="mytext" readonly="readonly" style="width:75%"/></td>
+        </tr>
+        <tr>
+            <th>步骤名称：</th>
+            <td><input type="text" id="Step_Name" class="mytext" style="width:75%"/></td>
+        </tr>
+        <tr>
+            <th>子流程：</th>
+            <td><select id="Step_Flow" class="myselect" style="width:312px"><option value=""></option>@Html.Raw(flowOptions)</select></td>
+        </tr>
+        <tr>
+            <th>处理者：</th>
+            <td><input type="text" class="mymember" id="Step_Handler" style="width:75%"/></td>
+        </tr>
+        <tr>
+            <th>处理策略：</th>
+            <td><select id="Step_Strategy" class="myselect" style="width:200px">
+                <option value="0">子流程完成才能提交</option>
+                <option value="1">子流程发起即可提交</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    <div style="width:100%; margin:10px auto 10px auto; text-align:center;">
+        <input type="button" class="mybutton" value=" 确 定 " onclick="confirm1();" />
+        <input type="button" class="mybutton" value=" 取 消 " onclick="new RoadUI.Window().close();" />
+    </div>
+</form>
+<script type="text/javascript">
+    var frame = null;
+    var openerid = '@Request.QueryString["openerid"]';
+    var stepid = '@stepID';
+    $(function ()
+    {
+        var iframes = top.frames;
+        for (var i = 0; i < iframes.length; i++)
+        {
+            if (iframes[i].name == openerid + "_iframe")
+            {
+                frame = iframes[i]; break;
+            }
+        }
+        if (frame == null) return;
+        var json = frame.wf_json;
+        var step = null;
+
+        if (json && json.steps && json.steps.length > 0)
+        {
+            for (var i = 0; i < json.steps.length; i++)
+            {
+                if (json.steps[i].id == stepid)
+                {
+                    step = json.steps[i];
+                }
+            }
+        }
+        if (step == null) return;
+        $("#Step_Name").val(step.name);
+        $("#Step_Flow").val(step.flowid);
+        $("#Step_Handler").val(step.handler);
+        $("#Step_Strategy").val(step.strategy || 0);
+        new RoadUI.Member().setValue($("#Step_Handler"));
+    });
+
+    function confirm1()
+    {
+        var step = {};
+        step.id = stepid;
+        step.type = "subflow";
+        step.position = {x:@stepX, y:@stepY, width:@stepWidth, height:@stepHeight};
+        step.name = $("#Step_Name").val() || "";
+        step.flowid = $("#Step_Flow").val() || "";
+        step.handler = $("#Step_Handler").val() || "";
+        step.strategy = $("#Step_Strategy").val() || 0;
+
+        frame.addStep1(step);
+        frame.setStepText(step.id, step.name);
+        new RoadUI.Window().close();
+    }
+</script>

@@ -27,15 +27,6 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
-
-*.scc
-*.psd
 src/RoadFlow/packages/*
 !src/RoadFlow/packages/*.config
-src/RoadFlow/Web/Content/Upload/*
-src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/tmp/*
-src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/upload*
-src/RoadFlow/Web/Platform/WorkFlow/Sign/*
-!src/RoadFlow/Web/Platform/WorkFlow/FormDesigner/ueditor/net/Uploader.cs
-tree副本.gif
-*.vssscc
+

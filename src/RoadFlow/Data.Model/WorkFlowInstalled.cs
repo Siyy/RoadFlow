@@ -178,6 +178,10 @@ namespace Data.Model.WorkFlowInstalledSub
         /// </summary>
         public Guid ID { get; set; }
         /// <summary>
+        /// 步骤类型 step 一般步骤 subflow 子流程步骤
+        /// </summary>
+        public string Type { get; set; }
+        /// <summary>
         /// 步骤名称
         /// </summary>
         public string Name { get; set; }
@@ -251,6 +255,21 @@ namespace Data.Model.WorkFlowInstalledSub
         /// 设计时y坐标(用于排序)
         /// </summary>
         public decimal Position_y { get; set; }
+
+        /// <summary>
+        /// 子流程ID
+        /// </summary>
+        public string SubFlow_FlowID { get; set; }
+
+        /// <summary>
+        /// 子流程处理者
+        /// </summary>
+        public string SubFlow_Handler { get; set; }
+
+        /// <summary>
+        /// 子流程处理策略 0 子流程处理完后才能提交 1 子流程发起即可提交
+        /// </summary>
+        public int SubFlow_Strategy { get; set; }
     }
 
     /// <summary>
@@ -341,7 +360,14 @@ namespace Data.Model.WorkFlowInstalledSub.StepSet
         /// 退回步骤ID 当退回类型为 2退回某一步 时
         /// </summary>
         public Guid BackStepID { get; set; }
-
+        /// <summary>
+        /// 会签策略 0 不会签 1 所有步骤同意 2 一个步骤同意即可 3 依据比例
+        /// </summary>
+        public int Countersignature { get; set; }
+        /// <summary>
+        /// 会签策略是依据比例时设置的百分比
+        /// </summary>
+        public decimal CountersignaturePercentage { get; set; }
 
     }
 
@@ -375,6 +401,10 @@ namespace Data.Model.WorkFlowInstalledSub.StepSet
         /// 按钮ID(为guid则是按钮库中的按钮，否则为其它特定功能按钮)
         /// </summary>
         public string ID { get; set; }
+        /// <summary>
+        /// 按钮说明
+        /// </summary>
+        public string Note { get; set; }
         /// <summary>
         /// 排序
         /// </summary>

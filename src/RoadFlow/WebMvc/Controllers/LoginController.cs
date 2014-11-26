@@ -24,7 +24,6 @@ namespace WebMvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Login(FormCollection collection)
         {
             string isVcodeSessionKey = Utility.Keys.SessionKeys.IsValidateCode.ToString();

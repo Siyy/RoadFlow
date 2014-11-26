@@ -12,6 +12,10 @@
     <AssemblyName>Utility</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,9 +58,16 @@
     <Compile Include="EncryptionDes.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HashEncrypt.cs" />
+    <Compile Include="HttpHelper.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LitJSON\LitJSON.csproj">
+      <Project>{28d9f7ba-2923-4364-9bea-9e1ccd70dd22}</Project>
+      <Name>LitJSON</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

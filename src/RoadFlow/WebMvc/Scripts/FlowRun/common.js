@@ -140,6 +140,11 @@ function showProcess()
     top.mainDialog.open({ id: 'showprocess', title: '查看处理过程', url:top.rootdir + '/WorkFlowTasks/Detail?' + query, width: 850, height: 450 });
 }
 
+function showFlowDesign()
+{
+    top.mainDialog.open({ id: 'showflowdesign', title: '查看流程图', url: top.rootdir + '/WorkFlowRun/ShowDesign?' + query, width: 850, height: 450 });
+}
+
 function formPrint()
 {
     RoadUI.Core.open(top.rootdir + "/WorkFlowRun/Print?" + query, 980, 600, "打印表单");

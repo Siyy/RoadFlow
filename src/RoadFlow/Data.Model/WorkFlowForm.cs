@@ -62,6 +62,12 @@ namespace Data.Model
         public string SubTableJson { get; set; }
 
         /// <summary>
+        /// 事件设置
+        /// </summary>
+        [DisplayName("事件设置")]
+        public string EventsJson { get; set; }
+
+        /// <summary>
         /// 相关属性
         /// </summary>
         [DisplayName("相关属性")]

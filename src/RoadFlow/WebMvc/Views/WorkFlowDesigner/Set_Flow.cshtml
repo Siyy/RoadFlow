@@ -224,7 +224,7 @@ function getFields(connid, table, field)
     var fields = frame.getFields(connid, table);
     for (var i = 0; i < fields.length; i++)
     {
-        options += '<option value="' + fields[i].name + '" ' + (fields[i].name == field ? 'selected="selected"' : '') + '>' + fields[i].name + '</option>';
+        options += '<option value="' + fields[i].name + '" ' + (fields[i].name == field ? 'selected="selected"' : '') + '>' + fields[i].name + (fields[i].note ? '(' + fields[i].note + ')' : '') + '</option>';
     }
     return options;
 }
