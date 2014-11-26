@@ -12,7 +12,8 @@ public class Upload : IHttpHandler, IReadOnlySessionState
         context.Response.ContentType = "text/plain";
         string str1 = context.Request["str1"];
         string str2 = context.Request["str2"];
-        if (!Check.CheckLogin(false))
+        string msg;
+        if (!WebMvc.Common.Tools.CheckLogin(out msg))
         {
             context.Response.Write("您不能上传文件");
             context.Response.End();

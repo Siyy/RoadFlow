@@ -1632,6 +1632,7 @@
     <Content Include="Views\WorkFlowFormDesigner\Forms\475bda65-9c5f-5fcc-a008-9d65d0c1a533.cshtml" />
     <Content Include="Views\Log\副本 Index.cshtml" />
     <Content Include="Views\WorkFlowFormDesigner\Forms\59137107-1594-1f6c-9d7d-ca7e912acec8.cshtml" />
+    <Content Include="Views\WorkFlowFormDesigner\Forms\37355170-bda6-8217-3a34-ffce9c8aae24.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
