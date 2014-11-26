@@ -118,7 +118,6 @@
             {
                 $control.attr("validate", validate);
             }
-            
         });
         $("[issubflowtable='1']").each(function ()
         {
@@ -235,7 +234,21 @@
                 filedcheck = parseInt(fieldstatusArray[1]);
             }
         }
-        initValue = initValue || "";
+        if (!initValue || $.trim(initValue).length == 0 || initValue.toLowerCase() == "null")
+        {
+            if (type == "flow_org" || type == "flow_dict" || type == "flow_files")//某些特定控件取值要值前一个对象的值
+            {
+                initValue = $control.prev().val();
+            }
+            else
+            {
+                initValue = $control.val();
+            }
+            if (!initValue || $.trim(initValue).length == 0 || initValue.toLowerCase() == "null")
+            {
+                initValue = "";
+            }
+        }
         switch (type)
         {
             case "flow_text":
