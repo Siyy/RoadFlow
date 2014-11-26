@@ -414,6 +414,7 @@
         var editmode = colnumJSON.editmode;
         var input = '<input type="text" class="mytext" issubflow="1" type1="subflow_text" ';
         input += 'name="' + id + '_' + i + '_' + colnumJSON.name + '" ';
+        input += 'id="' + id + '_' + i + '_' + colnumJSON.name + '" ';
         input += 'colname="' + colnumJSON.name + '" ';
         if (editmode.text_width)
         {
@@ -438,7 +439,7 @@
     getSubTableHtml_Textarea: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var textarea = '<textarea class="mytextarea" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_textarea" ';
+        var textarea = '<textarea class="mytextarea" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_textarea" ';
         var width = editmode.textarea_width;
         var height = editmode.textarea_height;
         textarea += 'colname="' + colnumJSON.name + '" ';
@@ -496,12 +497,12 @@
                     select += '<option value="' + val.toString().replaceAll('"', '') + '">' + txt + '</option>';
                     break;
                 case 1:
-                    select += '<input type="checkbox" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
-                    select += '<label style="vertical-align:middle;">' + txt + '</label>';
+                    select += '<input type="checkbox" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" id="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
+                    select += '<label style="vertical-align:middle;" for="' + name + '">' + txt + '</label>';
                     break;
                 case 2:
-                    select += '<input type="radio" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
-                    select += '<label style="vertical-align:middle;">' + txt + '</label>';
+                    select += '<input type="radio" colname="' + colname + '" issubflow="1" type1="subflow_checkbox" name="' + name + '" id="' + name + '" value="' + val.toString().replaceAll('"', '') + '" style="vertical-align:middle;"/>';
+                    select += '<label style="vertical-align:middle;" for="' + name + '">' + txt + '</label>';
                     break;
             }
         }
@@ -510,7 +511,7 @@
     getSubTableHtml_Select: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var select = '<select class="myselect" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_select" ';
+        var select = '<select class="myselect" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_select" ';
         select += 'colname="' + colnumJSON.name + '" ';
         if (editmode.select_width)
         {
@@ -566,7 +567,7 @@
     getSubTableHtml_DateTime: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var datetime = '<input type="text" class="mycalendar" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_datetime" value="' + UE.compule.getDefaultValue(editmode.datetime_defaultvalue) + '" ';
+        var datetime = '<input type="text" class="mycalendar" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_datetime" value="' + UE.compule.getDefaultValue(editmode.datetime_defaultvalue) + '" ';
         datetime += 'colname="' + colnumJSON.name + '" ';
         if (editmode.datetime_min)
         {
@@ -586,7 +587,7 @@
     getSubTableHtml_Org: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var org = '<input type="text" class="mymember" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_org" value="' + UE.compule.getDefaultValue(editmode.org_defaultvalue) + '" ';
+        var org = '<input type="text" class="mymember" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_org" value="' + UE.compule.getDefaultValue(editmode.org_defaultvalue) + '" ';
         org += 'colname="' + colnumJSON.name + '" ';
         var org_type = editmode.org_type;
         if (org_type)
@@ -625,7 +626,7 @@
     getSubTableHtml_Dict: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var dict = '<input type="text" class="mydict" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_dict" ';
+        var dict = '<input type="text" class="mydict" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_dict" ';
         dict += 'colname="' + colnumJSON.name + '" ';
         if (editmode.dict_width)
         {
@@ -642,7 +643,7 @@
     getSubTableHtml_Files: function (colnumJSON, id, i, iscount)
     {
         var editmode = colnumJSON.editmode;
-        var files = '<input type="text" class="myfile" name="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_file" ';
+        var files = '<input type="text" class="myfile" name="' + id + '_' + i + '_' + colnumJSON.name + '" id="' + id + '_' + i + '_' + colnumJSON.name + '" issubflow="1" type1="subflow_file" ';
         files += 'colname="' + colnumJSON.name + '" ';
         if (editmode.files_width)
         {

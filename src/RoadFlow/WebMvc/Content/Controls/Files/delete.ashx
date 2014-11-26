@@ -15,7 +15,8 @@ public class Delete : IHttpHandler, IReadOnlySessionState
 
         string str1 = context.Request["str1"];
         string str2 = context.Request["str2"];
-        if (!Check.CheckLogin(false))
+        string msg;
+        if (!WebMvc.Common.Tools.CheckLogin(out msg))
         {
             context.Response.Write("var json = {\"success\":0,\"message\":\"您不能删除文件\"}");
             context.Response.End();

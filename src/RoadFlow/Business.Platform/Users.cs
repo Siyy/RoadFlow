@@ -439,4 +439,16 @@ namespace Business.Platform
             return "";
         }
     }
+
+    public class UsersEqualityComparer : IEqualityComparer<Data.Model.Users>
+    {
+        public bool Equals(Data.Model.Users user1, Data.Model.Users user2)
+        {
+            return user1.ID == user2.ID;
+        }
+        public int GetHashCode(Data.Model.Users user)
+        {
+            return user.ToString().GetHashCode();
+        }
+    }
 }

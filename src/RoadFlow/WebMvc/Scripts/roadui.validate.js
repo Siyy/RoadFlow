@@ -78,22 +78,22 @@
                 flag = flag1;
             }
         });
-
-        if (flag && event && event.srcElement)
+        var e = arguments.callee.caller.arguments[0] || window.event;
+        if (flag && e && e.srcElement != null)
         {
             var $submits = $("input[type='submit']", $f);
             $submits.prop("disabled", true);
-            var eventElement = event.srcElement;
+            var eventElement = e.srcElement;
             if (eventElement)
             {
                 $submits.each(function ()
                 {
-                    if ($(this).get(0) === event.srcElement)
+                    if ($(this).get(0) === e.srcElement)
                     {
                         $f.append('<input type="hidden" name="' + $(this).attr("name") + '" value="' + $(this).val() + '" />');
                     }
                 });
-                if ("INPUT" == event.srcElement.tagName)
+                if ("INPUT" == e.srcElement.tagName)
                 {
                     $f.submit();
                 }

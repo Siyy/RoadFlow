@@ -584,33 +584,33 @@
     subtableNewRow: function (but, pkValue, isAppend, isLoad)//pkValue：主键值 isAppend 0：为在当前行后增加 1：为在最后一行增加 isLoad:是否为二次加载
     {
         var $tr = $(but).parent().parent();
-        var $newtr = $tr.clone(true);
+        var $newtr = $tr.clone();
         var guid = pkValue || RoadUI.Core.newid(false);
         var id = $("input[name='flowsubid']", $tr).val();
         $("[type1='subflow_text']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).val("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).val("");
         });
         $("[type1='subflow_textarea']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).html("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).html("");
         });
         $("[type1='subflow_select']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).val("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).val("");
         });
         $("[type1='subflow_checkbox']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).prop("checked", false);
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).prop("checked", false);
         });
         $("[type1='subflow_datetime']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).val("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).val("");
             new RoadUI.Calendar().init($(this));
         });
         $("[type1='subflow_dict']", $newtr).each(function ()
@@ -619,13 +619,13 @@
             $(this).next().remove();
             $(this).removeClass().addClass("mydict");
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).val("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).val("");
             new RoadUI.Dict().init($(this));
         });
         $("[type1='subflow_org']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).val("");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).val("");
             $(this).prev().remove();
             $(this).next().remove();
             $(this).removeClass().addClass("mymember");
@@ -635,7 +635,7 @@
         $("[type1='subflow_file']", $newtr).each(function ()
         {
             var colname = $(this).attr("colname");
-            $(this).attr("name", id + "_" + guid + "_" + colname).attr("value1","");
+            $(this).attr("name", id + "_" + guid + "_" + colname).attr("id", id + "_" + guid + "_" + colname).attr("value1", "");
             $(this).prev().remove();
             $(this).next().remove();
             $(this).removeClass().addClass("myfile");

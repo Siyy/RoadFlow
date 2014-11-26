@@ -13,6 +13,8 @@ namespace Business.Platform
         {
             this.dataOrganize = Data.Factory.Platform.GetOrganizeInstance();
         }
+
+       
         /// <summary>
         /// 新增
         /// </summary>
@@ -198,7 +200,7 @@ namespace Business.Platform
                 }
             }
             userList.RemoveAll(p => p == null);
-            return userList;
+            return userList.Distinct(new UsersEqualityComparer()).ToList();
         }
 
         private void addWorkGroupUsers(List<Data.Model.Users> userList, Data.Model.WorkGroup wg)
